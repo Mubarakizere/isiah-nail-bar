@@ -1,0 +1,202 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use App\Models\Booking;
+use App\Models\Payment;
+use App\Services\TwilioService;
+use App\Mail\BookingConfirmed;
+use App\Mail\ProviderNewBooking;
+use App\Models\WebhookLog;
+
+class PaymentWebhookController extends Controller
+{
+    public function handleWeFlexfyWebhook(Request $request)
+    {
+        Log::info('🔔 WeFlexfy Webhook Triggered', $request->all());
+
+        $token = $request->input('token');
+        $requestType = $request->input('requestType');
+
+        if (!$token || !$requestType) {
+            return response()->json(['error' => 'Invalid payload'], 400);
+        }
+
+        try {
+            $secretKey = config('services.weflexfy.secret_key');
+            $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+            $payload = (array) $decoded;
+            
+            // Save webhook data to DB
+        WebhookLog::create([
+            'type' => "weflexfy_{$requestType}",
+            'payload' => $payload,
+            'status' => $payload['status'] ?? null,
+        ]);
+        
+            Log::info("🔓 Decoded WeFlexfy JWT ({$requestType})", $payload);
+
+            if ($requestType === 'transfer' && isset($payload['payload'])) {
+                return $this->handleTransfer($payload);
+            }
+
+            if ($requestType === 'payment' && isset($payload['paymentRef'])) {
+                return $this->handlePaymentRef($payload);
+            }
+
+            return response()->json(['message' => 'Webhook received but no matching type handled'], 200);
+        } catch (\Exception $e) {
+            Log::error('❌ Webhook exception: ' . $e->getMessage());
+            return response()->json(['error' => 'Invalid token'], 401);
+        }
+    }
+
+    protected function handleTransfer(array $payload)
+    {
+        $custom = (array) $payload['payload'];
+        $reference = $custom['reference'] ?? null;
+        $type = $custom['type'] ?? 'full';
+
+        if (!$reference) {
+            Log::warning("⚠️ Missing reference in transfer payload.");
+            return response()->json(['error' => 'Missing reference'], 400);
+        }
+
+        $booking = Booking::where('reference', $reference)->first();
+        if (!$booking) {
+            Log::warning("⚠️ Booking not found for reference: $reference");
+            return response()->json(['error' => 'Booking not found'], 404);
+        }
+
+        if ($payload['status'] === 'SUCCESS') {
+            $booking->status = 'accepted';
+
+            // ✅ Mark as fully paid for both 'full' and 'remaining' payments
+            if (in_array($type, ['full', 'remaining'])) {
+                $booking->is_fully_paid = true;
+            }
+        } elseif ($payload['status'] === 'FAILED') {
+            $booking->status = 'declined';
+        }
+
+        $booking->save();
+
+        $payment = Payment::where('booking_id', $booking->id)->latest()->first();
+        if ($payment) {
+            $payment->status = $payload['status'] === 'SUCCESS' ? 'paid' : 'failed';
+            $payment->paid_at = now();
+            $payment->save();
+        }
+
+        if ($payload['status'] === 'SUCCESS') {
+            $this->sendNotifications($booking);
+        }
+
+        Log::info("✔️ Transfer webhook processed for booking #{$booking->id}");
+        return response()->json(['message' => 'Transfer processed'], 200);
+    }
+
+    protected function handlePaymentRef(array $payload)
+{
+    $paymentRef = $payload['paymentRef'];
+
+    $payment = Payment::whereNull('payment_ref')
+        ->where('status', 'pending')
+        ->latest()
+        ->first();
+
+    if (!$payment) {
+        Log::warning("⚠️ No pending payment found for paymentRef: $paymentRef");
+        return response()->json(['error' => 'No pending payment found'], 404);
+    }
+
+    // Update payment_ref anyway
+    $payment->payment_ref = $paymentRef;
+
+    // Check for status: must be 'SUCCESS'
+    $isPaid = strtolower($payload['status']) === 'success';
+
+    // Optional: check if payload contains a transfer and confirm it's not DRAFT
+    $transferStatus = strtolower($payload['transfers'][0]['status'] ?? '');
+    $isTransferConfirmed = in_array($transferStatus, ['completed', 'success']);
+
+   if ($isPaid) {
+    $payment->status = 'paid';
+    $payment->paid_at = now();
+    $payment->save();
+
+    $booking = $payment->booking;
+    if ($booking) {
+        $booking->is_fully_paid = true;
+        $booking->status = 'accepted';
+        $booking->save();
+        $this->sendNotifications($booking);
+        Log::info("✔️ Booking #{$booking->id} updated via payment webhook");
+    }
+} else {
+    $payment->status = 'failed';
+    $payment->paid_at = now();
+    $payment->save();
+
+    $booking = $payment->booking;
+    if ($booking) {
+        $booking->status = 'declined';
+        $booking->save();
+        Log::info("❌ Booking #{$booking->id} marked as declined via payment webhook");
+    }
+}
+
+
+    return response()->json(['message' => 'Payment ref processed'], 200);
+}
+
+
+    protected function sendNotifications(Booking $booking)
+    {
+        $user = $booking->customer->user ?? null;
+        $customer = $booking->customer;
+        $email = $user->email ?? $customer->email ?? null;
+        $phone = $customer->phone ?? null;
+
+        if ($phone && !str_starts_with($phone, '+')) {
+            $phone = '+250' . ltrim($phone, '0');
+        }
+
+        // ✅ Send SMS
+        try {
+            if ($phone) {
+                $msg = "Hi {$user?->name}, your payment has been received. Appointment confirmed on {$booking->date} at {$booking->time}. – Isaiah Nail Bar";
+                app(TwilioService::class)->sendSms($phone, $msg);
+                Log::info("📲 SMS sent to $phone");
+            }
+        } catch (\Exception $e) {
+            Log::error("❌ SMS failed: " . $e->getMessage());
+        }
+
+        // ✅ Send Email to Customer
+        try {
+            if ($email) {
+                Mail::to($email)->send(new BookingConfirmed($booking));
+                Log::info("📧 Email sent to customer: $email");
+            }
+        } catch (\Exception $e) {
+            Log::error("❌ Email to customer failed: " . $e->getMessage());
+        }
+
+        // ✅ Send Email to Provider
+        try {
+            $providerEmail = $booking->provider->email ?? null;
+            if ($providerEmail) {
+                Mail::to($providerEmail)->send(new ProviderNewBooking($booking));
+                Log::info("📧 Email sent to provider: $providerEmail");
+            }
+        } catch (\Exception $e) {
+            Log::error("❌ Email to provider failed: " . $e->getMessage());
+        }
+    }
+}
