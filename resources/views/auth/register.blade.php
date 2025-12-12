@@ -3,71 +3,122 @@
 @section('title', 'Register')
 
 @section('content')
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-sm p-4 border-0 rounded-4" style="width: 100%; max-width: 450px;">
-        <div class="text-center mb-4">
-            <a href="{{ url('/') }}"><img src="{{ asset('storage/logo.png') }}" alt="Isiah Logo" style="width: 80px;"></a>
-            <h4 class="fw-bold mt-3">Create Your Account</h4>
-            <p class="text-muted small">Join the Isiah experience</p>
+<div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    
+    {{-- Left: Artistic Image --}}
+    <div class="hidden lg:block relative overflow-hidden bg-gray-900">
+        <div class="absolute inset-0 opacity-60">
+            {{-- Use a different image if available, or the same brand banner --}}
+            <img src="{{ asset('storage/banner.jpg') }}" alt="Register Background" class="w-full h-full object-cover">
         </div>
-
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
-
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                    <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>
-                </div>
-                @error('name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+        
+        <div class="absolute bottom-0 left-0 right-0 p-12 text-white z-10">
+            <h2 class="text-4xl font-serif font-bold mb-4 leading-tight">"Join our community of elegance."</h2>
+             <div class="flex items-center gap-4">
+                <div class="h-px bg-rose-500 w-12"></div>
+                <p class="text-rose-200 uppercase tracking-widest text-sm font-medium">Isaiah Nail Bar</p>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                    <input type="email" name="email" value="{{ old('email') }}" class="form-control" required>
-                </div>
-                @error('email') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-            </div>
-            <!-- ✅ Add Phone Field -->
-<div class="mb-3">
-    <label class="form-label">Phone</label>
-    <div class="input-group">
-        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-        <input type="text" name="phone" value="{{ old('phone') }}" class="form-control" required>
+        </div>
     </div>
-    @error('phone') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-</div>
 
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Confirm Password</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
-                    <input type="password" name="password_confirmation" class="form-control" required>
-                </div>
-            </div>
-
-            <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-dark rounded-pill">
-                    <i class="fas fa-user-plus me-1"></i> Register
-                </button>
-            </div>
-
+    {{-- Right: Form --}}
+    <div class="flex items-center justify-center p-8 sm:p-12 lg:p-16 bg-white">
+        <div class="w-full max-w-md space-y-8">
+            
+            {{-- Header --}}
             <div class="text-center">
-                <a href="{{ route('login') }}" class="text-decoration-none small">Already have an account? Login →</a>
+                 <a href="{{ url('/') }}" class="inline-block mb-6">
+                    <img src="{{ asset('storage/logo.png') }}" alt="Logo" class="h-16 w-auto mx-auto object-contain">
+                </a>
+                <h2 class="text-3xl font-serif font-bold text-gray-900">Create Account</h2>
+                <p class="mt-2 text-gray-500">Sign up to book appointments easily</p>
             </div>
-        </form>
+
+            <form method="POST" action="{{ route('register') }}" class="space-y-5">
+                @csrf
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-user text-gray-400 text-lg"></i>
+                        </div>
+                        <input type="text" name="name" value="{{ old('name') }}" required autofocus
+                               class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors bg-gray-50 focus:bg-white placeholder-gray-400"
+                               placeholder="Jane Doe">
+                    </div>
+                    @error('name') <p class="mt-1 text-sm text-rose-500">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-envelope text-gray-400 text-lg"></i>
+                        </div>
+                        <input type="email" name="email" value="{{ old('email') }}" required
+                               class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors bg-gray-50 focus:bg-white placeholder-gray-400"
+                               placeholder="you@example.com">
+                    </div>
+                    @error('email') <p class="mt-1 text-sm text-rose-500">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                     <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-phone text-gray-400 text-lg"></i>
+                        </div>
+                        <input type="text" name="phone" value="{{ old('phone') }}" required
+                               class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors bg-gray-50 focus:bg-white placeholder-gray-400"
+                               placeholder="+250 7XX XXX XXX">
+                    </div>
+                    @error('phone') <p class="mt-1 text-sm text-rose-500">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-lock-key text-gray-400 text-lg"></i>
+                        </div>
+                        <input type="password" name="password" required
+                               class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors bg-gray-50 focus:bg-white placeholder-gray-400"
+                               placeholder="••••••••">
+                    </div>
+                    @error('password') <p class="mt-1 text-sm text-rose-500">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                    <div class="relative">
+                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-check-circle text-gray-400 text-lg"></i>
+                        </div>
+                        <input type="password" name="password_confirmation" required
+                               class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-colors bg-gray-50 focus:bg-white placeholder-gray-400"
+                               placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-gray-900 hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-300 transform hover:-translate-y-0.5">
+                        Register
+                        <i class="ph ph-user-plus"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-500">
+                    Already have an account? 
+                    <a href="{{ route('login') }}" class="font-bold text-gray-900 hover:text-rose-600 transition-colors">
+                        Sign in
+                    </a>
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

@@ -3,151 +3,79 @@
 @section('title', 'Meet Our Team')
 
 @section('content')
-<x-page-header title="Meet Our Team" subtitle="The skilled hands behind your beautiful nails" />
 
-<!-- Team Section -->
-<section class="py-5" style="background: #fafafa;">
-    <div class="container">
-        <!-- Simple intro -->
-        <div class="row justify-content-center mb-5">
-            <div class="col-lg-8 text-center">
-                <p class="lead text-muted mb-4">
-                    Our nail technicians bring years of experience and genuine care to every appointment. 
-                    Each specialist has their own style and expertise to help you achieve the perfect look.
-                </p>
-            </div>
-        </div>
-
-       
-
-        <!-- Team members -->
-        <div class="row g-4">
-            @forelse($providers as $provider)
-                <div class="col-lg-4 col-md-6">
-                    <div class="card h-100 border-0 shadow-sm team-card">
-                        <!-- Photo -->
-                        <div class="card-img-top position-relative overflow-hidden">
-                            <img src="{{ $provider->photo ? asset('storage/' . $provider->photo) : 'https://via.placeholder.com/400x300/e9ecef/6c757d?text=' . urlencode($provider->name) }}"
-                                 alt="{{ $provider->name }}"
-                                 class="w-100"
-                                 style="height: 280px; object-fit: cover;">
-                            
-                            @if($provider->status === 'active')
-                            <span class="position-absolute top-0 end-0 m-3">
-                                <span class="badge bg-success">Available</span>
-                            </span>
-                            @endif
-                        </div>
-
-                        <div class="card-body text-center">
-                            <h5 class="card-title mb-2">{{ $provider->name }}</h5>
-                            <p class="text-primary mb-3">Nail Specialist</p>
-                            
-                            @if($provider->bio)
-                            <p class="card-text text-muted small mb-3">
-                                {{ Str::limit($provider->bio, 100) }}
-                            </p>
-                            @endif
-
-                            @if($provider->phone)
-                            <div class="mb-3">
-                                <small class="text-muted">
-                                    <i class="fas fa-phone me-1"></i>{{ $provider->phone }}
-                                </small>
-                            </div>
-                            @endif
-
-                            <!-- Specialties -->
-                            <div class="mb-3">
-                                <span class="badge bg-light text-dark me-1">Manicures</span>
-                                <span class="badge bg-light text-dark me-1">Gel Polish</span>
-                                <span class="badge bg-light text-dark">Nail Art</span>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-transparent border-0 pt-0">
-                            <a href="{{ route('booking.step2') }}" class="btn btn-primary w-100">
-                                Book with {{ explode(' ', $provider->name)[0] }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            @empty
-                <div class="col-12 text-center">
-                    <div class="py-5">
-                        <i class="fas fa-users text-muted mb-3" style="font-size: 4rem; opacity: 0.3;"></i>
-                        <h4 class="text-muted">We're Building Our Team</h4>
-                        <p class="text-muted">We're currently hiring talented nail technicians. Check back soon!</p>
-                        <a href="{{ url('/contact') }}" class="btn btn-outline-primary">
-                            Contact Us
-                        </a>
-                    </div>
-                </div>
-            @endforelse
-        </div>
+{{-- Team Hero --}}
+<div class="relative bg-gray-900 py-24 overflow-hidden">
+    <div class="absolute inset-0 opacity-40">
+        <img src="{{ asset('storage/banner.jpg') }}" alt="Team Banner" class="w-full h-full object-cover">
     </div>
-</section>
-
-
-<!-- Call to action -->
-<section class="py-5" style="background: var(--primary-color);">
-    <div class="container text-center text-white">
-        <h3 class="mb-3">Ready for Your Next Appointment?</h3>
-        <p class="lead mb-4">Book online or call us directly - we're here to help you look and feel your best</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="{{ route('booking.step1') }}" class="btn btn-light btn-lg">
-                Book Online
-            </a>
-            <a href="tel:+250788421063" class="btn btn-outline-light btn-lg">
-                Call Us
-            </a>
-        </div>
-    </div>
-</section>
-
-@push('styles')
-<style>
-.team-card {
-    transition: transform 0.2s ease;
-}
-
-.team-card:hover {
-    transform: translateY(-5px);
-}
-
-.card-img-top img {
-    transition: transform 0.3s ease;
-}
-
-.team-card:hover .card-img-top img {
-    transform: scale(1.05);
-}
-
-/* Simple, clean hover effects */
-.btn {
-    transition: all 0.2s ease;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-/* Clean badge styling */
-.badge {
-    font-weight: normal;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .d-flex.gap-3 {
-        flex-direction: column;
-    }
+    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
     
-    .d-flex.gap-3 .btn {
-        margin-bottom: 0.5rem;
-    }
-}
-</style>
-@endpush
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12">
+        <span class="text-rose-400 font-medium tracking-widest text-sm uppercase mb-3 block animate-fade-in-up">The Artists</span>
+        <h1 class="text-4xl md:text-6xl font-serif text-white mb-6 animate-fade-in-up delay-100">Meet the Team</h1>
+        <p class="text-xl text-gray-300 font-light max-w-2xl mx-auto animate-fade-in-up delay-200">
+            Dedicated professionals committed to delivering perfection in every stroke.
+        </p>
+    </div>
+</div>
+
+{{-- Providers Grid --}}
+<section class="py-20 bg-white min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        @if($providers->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                @foreach($providers as $provider)
+                    <div class="group">
+                        <div class="relative aspect-[3/4] mb-6 overflow-hidden rounded-lg bg-gray-100">
+                            <img src="{{ $provider->photo ? asset('storage/' . $provider->photo) : 'https://via.placeholder.com/400x500/f3f4f6/9ca3af?text=' . urlencode($provider->name) }}"
+                                 alt="{{ $provider->name }}"
+                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                            
+                            {{-- Overlay Content --}}
+                            <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-gray-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0 transform">
+                                @if($provider->status === 'active')
+                                    <span class="inline-block px-2 py-1 bg-green-500/20 text-green-300 text-xs font-medium rounded mb-2 border border-green-500/30">Available for Booking</span>
+                                @endif
+                                <p class="text-gray-300 text-sm line-clamp-2 mb-4">{{ $provider->bio ?? 'Passionate nail artist dedicated to excellence.' }}</p>
+                                <a href="{{ route('booking.step2') }}" class="block w-full py-3 bg-white text-gray-900 text-center font-medium rounded-full hover:bg-rose-50 transition-colors">
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <h3 class="text-2xl font-serif text-gray-900 mb-1">{{ $provider->name }}</h3>
+                            <p class="text-rose-600 font-medium text-sm tracking-widest uppercase">Nail Specialist</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-24">
+                <i class="ph ph-users-three text-4xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-serif text-gray-900 mb-2">Our Team is Growing</h3>
+                <p class="text-gray-500 mb-8">Check back soon to see our talented artists.</p>
+                <a href="{{ url('/contact') }}" class="text-gray-900 underline underline-offset-4 hover:text-rose-600 transition-colors">
+                    Join our team
+                </a>
+            </div>
+        @endif
+
+    </div>
+</section>
+
+{{-- CTA --}}
+<section class="py-24 bg-gray-50 border-t border-gray-100">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-serif text-gray-900 mb-6">Experience the Difference</h2>
+        <div class="flex justify-center gap-4">
+            <a href="{{ route('booking.step1') }}" class="px-8 py-4 bg-gray-900 text-white font-medium rounded-full hover:bg-rose-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+                Book an Appointment
+            </a>
+        </div>
+    </div>
+</section>
 
 @endsection

@@ -12,52 +12,55 @@
         }
         .text-center { text-align: center; }
         .mb-2 { margin-bottom: 8px; }
-        .mb-3 { margin-bottom: 16px; }
         .mb-4 { margin-bottom: 24px; }
         .logo { height: 65px; margin-bottom: 10px; }
         .section-title {
             font-weight: bold;
             font-size: 15px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 4px;
-            margin-bottom: 10px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            margin-top: 20px;
             text-transform: uppercase;
-            color: #444;
+            color: #1e40af;
         }
         .table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #ddd;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
             vertical-align: top;
         }
         .table td.label {
             font-weight: bold;
             width: 40%;
-            background-color: #f9f9f9;
+            background-color: #f9fafb;
+            color: #374151;
         }
         .footer {
             text-align: center;
-            font-size: 12px;
-            color: #777;
+            font-size: 11px;
+            color: #6b7280;
             margin-top: 40px;
             line-height: 1.6;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
         }
         .status {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: bold;
             text-transform: uppercase;
         }
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-completed { background: #d4edda; color: #155724; }
-        .status-cancelled,
-        .status-declined { background: #f8d7da; color: #721c24; }
-        .status-accepted { background: #d1ecf1; color: #0c5460; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-cancelled, .status-declined { background: #fee2e2; color: #991b1b; }
+        .status-accepted { background: #dbeafe; color: #1e40af; }
     </style>
 </head>
 <body>
@@ -68,8 +71,8 @@
             <img src="{{ $logo }}" alt="Isaiah Nail Bar Logo" class="logo">
         @endif
         <h2 class="mb-2">Booking Receipt</h2>
-        <p class="mb-2">Isaiah Nail Bar — Kigali</p>
-        <small class="text-muted">Generated on {{ \Carbon\Carbon::now()->format('d M Y, H:i') }}</small>
+        <p class="mb-2" style="color: #6b7280;">Isaiah Nail Bar — Kigali</p>
+        <small style="color: #9ca3af;">Generated on {{ \Carbon\Carbon::now()->format('d M Y, H:i') }}</small>
     </div>
 
     {{-- Booking Details --}}
@@ -80,7 +83,7 @@
         <tr><td class="label">Email:</td><td>{{ $booking->customer->user->email ?? '-' }}</td></tr>
         <tr><td class="label">Provider:</td><td>{{ $booking->provider->name ?? '-' }}</td></tr>
         <tr><td class="label">Date:</td><td>{{ \Carbon\Carbon::parse($booking->date)->format('D, M j Y') }}</td></tr>
-        <tr><td class="label">Time:</td><td>{{ \Carbon\Carbon::parse($booking->time)->format('H:i') }}</td></tr>
+        <tr><td class="label">Time:</td><td>{{ \Carbon\Carbon::parse($booking->time)->format('h:i A') }}</td></tr>
         <tr><td class="label">Payment Option:</td><td>{{ ucfirst($booking->payment_option) }}</td></tr>
     </table>
 
@@ -92,13 +95,12 @@
             <td>
                 <ul style="margin: 0; padding-left: 16px;">
                    @foreach($booking->services as $service)
-    <li>
-        {{ $service->name }} — {{ $service->category->name ?? '—' }} —
-        {{ $service->duration_minutes }} mins —
-        RWF {{ number_format($service->price) }}
-    </li>
-@endforeach
-
+                        <li>
+                            {{ $service->name }} — {{ $service->category->name ?? '—' }} —
+                            {{ $service->duration_minutes }} mins —
+                            RWF {{ number_format($service->price) }}
+                        </li>
+                    @endforeach
                 </ul>
             </td>
         </tr>
@@ -109,7 +111,7 @@
     <table class="table">
         <tr>
             <td class="label">Total Services Price:</td>
-            <td>RWF {{ number_format($booking->services->sum('price')) }}</td>
+            <td style="font-weight: bold;">RWF {{ number_format($booking->services->sum('price')) }}</td>
         </tr>
         @if($booking->deposit_amount)
             <tr><td class="label">Deposit Paid:</td><td>RWF {{ number_format($booking->deposit_amount) }}</td></tr>

@@ -1,346 +1,249 @@
 @extends('layouts.public')
 
-@section('title', 'Our Nail Services')
+@section('title', 'Our Luxury Nail Services')
 
 @section('content')
-<x-page-header 
-    title="Our Services" 
-    subtitle="Professional nail care in Kigali" 
-/>
 
-<!-- Services Content -->
-<section class="py-5" style="background: #fefefe;">
-    <div class="container">
+{{-- Hero Section --}}
+<div class="relative bg-gray-900 py-24 overflow-hidden">
+    <div class="absolute inset-0 opacity-40">
+        <img src="{{ asset('storage/banner.jpg') }}" alt="Services Banner" class="w-full h-full object-cover">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12">
+        <span class="text-rose-400 font-medium tracking-widest text-sm uppercase mb-3 block animate-fade-in-up">Our Expertise</span>
+        <h1 class="text-4xl md:text-6xl font-serif text-white mb-6 animate-fade-in-up delay-100">Service Menu</h1>
+        <p class="text-xl text-gray-300 font-light max-w-2xl mx-auto animate-fade-in-up delay-200">
+            Discover our curated selection of nail treatments, designed to provide the ultimate in care and relaxation.
+        </p>
+    </div>
+</div>
+
+{{-- Main Content --}}
+<section class="py-16 bg-white min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Share Section -->
-        <div class="row justify-content-center mb-5">
-            <div class="col-lg-8">
-                <div class="share-section text-center p-4 rounded-3" style="background: #f8f9fa; border: 1px solid #e9ecef;">
-                    <h5 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif; color: #2c2c2c;">
-                        Share Our Services
-                    </h5>
-                    <div class="d-flex justify-content-center gap-2 flex-wrap">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
-                           target="_blank" class="btn btn-sm px-3 py-2 rounded-pill"
-                           style="background: #1877f2; color: white;">
-                            <i class="fab fa-facebook-f me-1"></i>Facebook
-                        </a>
-                        <a href="https://wa.me/?text={{ urlencode('Check out Isaiah Nail Bar services: ' . url()->current()) }}"
-                           target="_blank" class="btn btn-sm px-3 py-2 rounded-pill"
-                           style="background: #25d366; color: white;">
-                            <i class="fab fa-whatsapp me-1"></i>WhatsApp
-                        </a>
-                        <button onclick="copyLink()" class="btn btn-sm px-3 py-2 rounded-pill" style="background: #6c757d; color: white;">
-                            <i class="fas fa-link me-1"></i>Copy
+        {{-- Search & Filter Bar --}}
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 sticky top-24 z-30 bg-white/95 backdrop-blur-md py-4 transition-all duration-300 border-b border-gray-100" id="filterBar">
+            {{-- Categories --}}
+            <div class="overflow-x-auto scrollbar-hide w-full md:w-auto -mx-4 px-4 md:mx-0 md:px-0">
+                <div class="flex gap-2 min-w-max">
+                    <button onclick="filterCategory('all', this)" 
+                            class="category-tab active px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-transparent bg-gray-900 text-white">
+                        All Services
+                    </button>
+                    @foreach($categories as $category)
+                        <button onclick="filterCategory('{{ $category->id }}', this)" 
+                                class="category-tab px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 bg-white">
+                            {{ $category->name }}
                         </button>
-                    </div>
+                    @endforeach
                 </div>
+            </div>
+
+            {{-- Search --}}
+            <div class="relative w-full md:w-72">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Search treatments..." 
+                       class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all">
+                <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
         </div>
 
-        <!-- Services by Category -->
-        @forelse($categories as $category)
-            @php $services = $category->services->sortBy('price'); @endphp
-            
-            <div class="category-section mb-5">
-                <div class="category-header mb-4 p-4 rounded-3" style="background: var(--primary-gradient); color: white;">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <h3 class="fw-bold mb-1" style="font-family: 'Playfair Display', serif;">{{ $category->name }}</h3>
-                            <p class="mb-0 opacity-75">{{ $services->count() }} {{ Str::plural('service', $services->count()) }} available</p>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-spa fa-2x opacity-50"></i>
-                        </div>
-                    </div>
-                </div>
-
-                @if($services->count())
-                    <div class="services-grid">
-                        @foreach($services as $service)
-                            <div class="service-item mb-4 p-4 rounded-3 border" style="background: white; transition: all 0.2s ease;">
-                                <div class="row align-items-center">
-                                    <!-- Service Info -->
-                                    <div class="col-lg-8 col-md-7">
-                                        <div class="service-details">
-                                            <div class="d-flex align-items-start justify-content-between mb-2">
-                                                <h5 class="service-name fw-bold mb-0" style="font-family: 'Playfair Display', serif; color: #2c2c2c;">
-                                                    {{ $service->name }}
-                                                </h5>
-                                                <span class="price-tag fw-bold" style="color: var(--primary-color); font-size: 1.1rem;">
-                                                    RWF {{ number_format($service->price) }}
-                                                </span>
-                                            </div>
-                                            
-                                            @if($service->description)
-                                                <div class="service-description mb-3">
-                                                    <p class="text-muted mb-0 lh-base">{{ $service->description }}</p>
-                                                </div>
-                                            @endif
-
-                                            @if($service->duration)
-                                                <div class="service-meta mb-3">
-                                                    <span class="badge bg-light text-dark">
-                                                        <i class="fas fa-clock me-1"></i>{{ $service->duration }} min
-                                                    </span>
-                                                </div>
-                                            @endif
-                                        </div>
+        @if($categories->count() > 0)
+            <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                @foreach($categories as $category)
+                    @foreach($category->services->sortBy('price') as $service)
+                        <div class="service-card group cursor-pointer" 
+                             onclick="openServiceModal({{ json_encode([
+                                'id' => $service->id,
+                                'name' => $service->name,
+                                'price' => number_format($service->price),
+                                'duration' => $service->duration,
+                                'category' => $category->name,
+                                'description' => $service->description,
+                                'image' => $service->image ? asset('storage/' . $service->image) : null
+                            ]) }})"
+                             data-category="{{ $category->id }}"
+                             data-name="{{ strtolower($service->name) }}"
+                             data-description="{{ strtolower($service->description ?? '') }}">
+                            
+                            {{-- Image/Placement --}}
+                            <div class="relative aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
+                                @if($service->image)
+                                    <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                                        <i class="ph ph-sparkle text-3xl"></i>
                                     </div>
-                                    
-                                    <!-- Service Actions -->
-                                    <div class="col-lg-4 col-md-5">
-                                        <div class="service-actions text-end">
-                                            <div class="d-flex gap-2 justify-content-end">
-                                                <a href="{{ route('booking.step1', ['service_id' => $service->id]) }}" 
-                                                   class="btn btn-primary px-4 py-2 rounded-pill">
-                                                    Book Now
-                                                </a>
-                                                @if($service->description)
-                                                    <button class="btn btn-outline-secondary px-3 py-2 rounded-pill" 
-                                                            data-bs-toggle="modal" data-bs-target="#serviceModal{{ $service->id }}">
-                                                        <i class="fas fa-info"></i>
-                                                    </button>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endif
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                             </div>
 
-                            <!-- Service Modal -->
-                            @if($service->description)
-                                <div class="modal fade" id="serviceModal{{ $service->id }}" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content border-0 rounded-4">
-                                            <div class="modal-header border-0 pb-0" style="background: var(--primary-gradient); color: white; border-radius: 1rem 1rem 0 0;">
-                                                <h5 class="modal-title fw-bold" style="font-family: 'Playfair Display', serif;">{{ $service->name }}</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body p-4">
-                                                <div class="service-details">
-                                                    @if($service->image)
-                                                        <div class="service-image mb-3">
-                                                            <img src="{{ asset('storage/' . $service->image) }}" 
-                                                                 class="img-fluid rounded-3" alt="{{ $service->name }}">
-                                                        </div>
-                                                    @endif
-                                                    
-                                                    <div class="price-info mb-3 p-3 rounded-3" style="background: var(--glass-pink);">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <span class="fw-semibold">Price:</span>
-                                                            <span class="fw-bold" style="color: var(--primary-color);">RWF {{ number_format($service->price) }}</span>
-                                                        </div>
-                                                        @if($service->duration)
-                                                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                                                <span class="fw-semibold">Duration:</span>
-                                                                <span>{{ $service->duration }} minutes</span>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    
-                                                    <div class="description">
-                                                        <h6 class="fw-bold mb-2">Description</h6>
-                                                        <p class="text-muted lh-base">{{ $service->description }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-0 pt-0">
-                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                                                <a href="{{ route('booking.step1', ['service_id' => $service->id]) }}" 
-                                                   class="btn btn-primary">Book This Service</a>
-                                            </div>
+                            {{-- Content --}}
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <h3 class="text-lg font-serif text-gray-900 group-hover:text-rose-600 transition-colors">{{ $service->name }}</h3>
+                                    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $service->description }}</p>
+                                    @if($service->duration)
+                                        <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
+                                            <i class="ph ph-clock"></i>
+                                            <span>{{ $service->duration }} mins</span>
                                         </div>
-                                    </div>
+                                    @endif
                                 </div>
-                            @endif
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-4">
-                        <div class="text-muted">
-                            <i class="fas fa-spa fa-3x mb-3 opacity-25"></i>
-                            <p>No services available in this category yet.</p>
+                                <div class="text-right">
+                                    <span class="block text-lg font-medium text-gray-900 whitespace-nowrap">
+                                        {{ number_format($service->price) }} <span class="text-xs text-gray-500 font-normal">RWF</span>
+                                    </span>
+                                    <button class="mt-2 text-sm font-medium text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
+                                        Book <i class="ph ph-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                @endif
+                    @endforeach
+                @endforeach
             </div>
-        @empty
-            <div class="text-center py-5">
-                <div class="empty-state">
-                    <i class="fas fa-spa fa-4x text-muted mb-3 opacity-25"></i>
-                    <h4 class="text-muted mb-3">No Services Available</h4>
-                    <p class="text-muted">We're updating our services. Please check back soon!</p>
-                    <a href="{{ url('/contact') }}" class="btn btn-outline-primary">Contact Us</a>
-                </div>
-            </div>
-        @endforelse
 
-        <!-- Book Now Section -->
-        <div class="cta-section mt-5 p-5 rounded-4 text-center" style="background: var(--dark-primary); color: white;">
-            <h3 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif;">Ready to Book?</h3>
-            <p class="mb-4 opacity-75">Schedule your appointment and experience luxury nail care</p>
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                <a href="{{ route('booking.step1') }}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill">
-                    Book Appointment
-                </a>
-                <a href="{{ url('/contact') }}" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill">
-                    Contact Us
-                </a>
+            {{-- No Results --}}
+            <div id="noResults" class="hidden text-center py-24">
+                <i class="ph ph-magnifying-glass text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No services found matching your criteria.</p>
             </div>
-        </div>
+        @else
+            <div class="text-center py-24">
+                <p class="text-gray-500">Our service menu is currently being updated.</p>
+            </div>
+        @endif
     </div>
 </section>
 
-@push('styles')
-<style>
-/* Service Cards */
-.service-item {
-    transition: all 0.15s ease;
-}
+{{-- Minimalist Modal --}}
+<div id="serviceModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" onclick="closeServiceModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+        {{-- Image --}}
+        <div id="modalImageContainer" class="hidden relative h-48 sm:h-64">
+            <img id="modalImage" src="" alt="" class="w-full h-full object-cover">
+            <button onclick="closeServiceModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div id="modalNoImageHeader" class="hidden p-6 pb-0 flex justify-end">
+            <button onclick="closeServiceModal()" class="text-gray-400 hover:text-gray-600">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        </div>
 
-.service-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    border-color: var(--primary-color) !important;
-}
-
-/* Category Headers */
-.category-header {
-    transition: all 0.2s ease;
-}
-
-.category-section:hover .category-header {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px rgba(212, 113, 122, 0.2);
-}
-
-/* Buttons */
-.btn:hover {
-    transform: translateY(-1px);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 5px 15px rgba(212, 113, 122, 0.3);
-}
-
-/* Share buttons */
-.share-section .btn:hover {
-    transform: translateY(-2px) scale(1.02);
-}
-
-/* Modal styling */
-.modal-content {
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    .service-item .row {
-        text-align: center;
-    }
-    
-    .service-actions {
-        text-align: center !important;
-        margin-top: 1rem;
-    }
-    
-    .service-actions .d-flex {
-        justify-content: center !important;
-    }
-    
-    .service-details .d-flex {
-        flex-direction: column;
-        text-align: center;
-        gap: 0.5rem;
-    }
-    
-    .price-tag {
-        align-self: center;
-        margin-top: 0.5rem;
-    }
-    
-    .cta-section .d-flex {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .share-section .d-flex {
-        gap: 0.5rem;
-    }
-    
-    .category-header {
-        padding: 1.5rem !important;
-    }
-    
-    .service-item {
-        padding: 1.5rem !important;
-    }
-}
-
-@media (max-width: 576px) {
-    .btn-lg {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-    
-    .share-section .btn {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.8rem !important;
-    }
-}
-
-/* Remove excessive animations on mobile for better performance */
-@media (max-width: 768px) {
-    .service-item:hover {
-        transform: none;
-    }
-    
-    .category-section:hover .category-header {
-        transform: none;
-    }
-}
-</style>
-@endpush
+        <div class="p-8">
+            <span id="modalCategory" class="text-xs font-bold tracking-widest text-rose-600 uppercase mb-2 block"></span>
+            <div class="flex justify-between items-start gap-4 mb-6">
+                <h3 id="modalTitle" class="text-2xl font-serif text-gray-900"></h3>
+                <div class="text-right">
+                    <span id="modalPrice" class="text-xl font-medium text-gray-900 block"></span>
+                    <span id="modalDuration" class="text-sm text-gray-500 block"></span>
+                </div>
+            </div>
+            
+            <p id="modalDescription" class="text-gray-600 leading-relaxed mb-8 font-light"></p>
+            
+            <a id="modalBookBtn" href="#" class="w-full block py-4 bg-gray-900 text-white text-center font-medium rounded-full hover:bg-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                Book Appointment
+            </a>
+        </div>
+    </div>
+</div>
 
 @push('scripts')
 <script>
-// Simple copy function
-function copyLink() {
-    const url = window.location.href;
+// Filter Logic
+function filterCategory(catId, btn) {
+    // Reset buttons
+    document.querySelectorAll('.category-tab').forEach(b => {
+        b.classList.remove('bg-gray-900', 'text-white', 'border-transparent');
+        b.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+    });
     
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(() => {
-            showMessage('Link copied!');
-        });
-    } else {
-        // Fallback
-        const input = document.createElement('input');
-        input.value = url;
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand('copy');
-        document.body.removeChild(input);
-        showMessage('Link copied!');
-    }
+    // Active button style
+    btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+    btn.classList.add('bg-gray-900', 'text-white', 'border-transparent');
+    
+    // Filter
+    const cards = document.querySelectorAll('.service-card');
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    let hasVisible = false;
+
+    cards.forEach(card => {
+        const matchesCat = catId === 'all' || card.dataset.category === catId;
+        const matchesSearch = card.dataset.name.includes(searchTerm) || card.dataset.description.includes(searchTerm);
+        
+        if (matchesCat && matchesSearch) {
+            card.style.display = 'block';
+            card.classList.add('animate-fade-in');
+            hasVisible = true;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    document.getElementById('noResults').classList.toggle('hidden', hasVisible);
 }
 
-// Simple notification
-function showMessage(text) {
-    if (typeof toastr !== 'undefined') {
-        toastr.success(text);
-    } else {
-        alert(text);
-    }
-}
-
-// Initialize tooltips
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        tooltips.forEach(el => new bootstrap.Tooltip(el));
-    }
+// Search Logic
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    // Trigger current active filter re-run
+    const activeBtn = document.querySelector('.category-tab.bg-gray-900'); // roughly finds active
+    const activeCat = activeBtn ? activeBtn.getAttribute('onclick').match(/'([^']+)'/)[1] : 'all';
+    filterCategory(activeCat, activeBtn || document.querySelector('.category-tab'));
 });
+
+// Modal Logic
+function openServiceModal(service) {
+    document.getElementById('modalTitle').textContent = service.name;
+    document.getElementById('modalCategory').textContent = service.category;
+    document.getElementById('modalPrice').textContent = 'RWF ' + service.price;
+    document.getElementById('modalDescription').textContent = service.description || 'No description available.';
+    document.getElementById('modalBookBtn').href = '{{ route("booking.step1") }}?service_id=' + service.id;
+    
+    if (service.duration) {
+        document.getElementById('modalDuration').textContent = service.duration + ' mins';
+        document.getElementById('modalDuration').style.display = 'block';
+    } else {
+        document.getElementById('modalDuration').style.display = 'none';
+    }
+
+    const imgContainer = document.getElementById('modalImageContainer');
+    const noImgHeader = document.getElementById('modalNoImageHeader');
+    
+    if (service.image) {
+        document.getElementById('modalImage').src = service.image;
+        imgContainer.classList.remove('hidden');
+        noImgHeader.classList.add('hidden');
+    } else {
+        imgContainer.classList.add('hidden');
+        noImgHeader.classList.remove('hidden');
+    }
+
+    const modal = document.getElementById('serviceModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex'); // Ensure flex is on
+    document.body.style.overflow = 'hidden';
+}
+
+function closeServiceModal() {
+    document.getElementById('serviceModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Fade in animation style
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+`;
+document.head.appendChild(style);
 </script>
 @endpush
 

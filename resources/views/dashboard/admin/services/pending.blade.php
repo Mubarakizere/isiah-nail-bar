@@ -3,76 +3,84 @@
 @section('title', 'Pending Services')
 
 @section('content')
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">
-            <i class="ph ph-hourglass-simple-high me-2 text-warning"></i>
-            Pending Services for Approval
-        </h4>
+<div class="p-6">
+    {{-- Header --}}
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Pending Services</h1>
+        <p class="text-gray-600">Review and approve/reject service submissions from providers</p>
     </div>
 
     @if ($pendingServices->count())
-        <div class="row g-4">
+        {{-- Services Grid --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             @foreach ($pendingServices as $service)
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body d-flex flex-column justify-content-between">
-                            <div class="mb-3">
-                                <h5 class="fw-bold mb-1 d-flex align-items-center justify-content-between">
-                                    {{ $service->name }}
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                </h5>
+                <div class="bg-white rounded-2xl shadow-md border-2 border-yellow-200 overflow-hidden hover:shadow-xl transition">
+                    {{-- Card Header --}}
+                    <div class="p-6 pb-4">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="text-lg font-bold text-gray-900 flex-1">{{ $service->name }}</h3>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 flex-shrink-0 ml-2">
+                                <i class="ph ph-clock mr-1"></i>Pending
+                            </span>
+                        </div>
 
-                                <p class="mb-1 text-muted">
-    <i class="ph ph-scissors me-1"></i> {{ $service->category->name ?? '—' }}
-</p>
-
-
-                                <p class="mb-1 text-muted">
-                                    <i class="ph ph-clock me-1"></i> {{ $service->duration_minutes }} min
-                                </p>
-
-                                <p class="mb-1 text-muted">
-                                    <i class="ph ph-currency-circle-dollar me-1"></i>
-                                    RWF {{ number_format($service->price) }}
-                                </p>
-
-                                <p class="text-muted small mb-2">
-                                    <i class="ph ph-user me-1"></i>
-                                    Submitted by: <strong>{{ $service->provider->user->name ?? 'Unknown' }}</strong>
-                                </p>
-
-                                <p class="text-muted small">
-                                    {{ \Illuminate\Support\Str::limit($service->description, 100) }}
-                                </p>
+                        {{-- Service Details --}}
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <i class="ph ph-folder text-gray-400"></i>
+                                <span>{{ $service->category->name ?? '—' }}</span>
                             </div>
-
-                            <div class="d-flex gap-2">
-                                <form action="{{ route('admin.services.approve', $service->id) }}" method="POST">
-                                    @csrf
-                                    <button class="btn btn-sm btn-success w-100">
-                                        <i class="ph ph-check-circle me-1"></i> Approve
-                                    </button>
-                                </form>
-                                <form action="{{ route('admin.services.reject', $service->id) }}" method="POST">
-                                    @csrf
-                                    <button class="btn btn-sm btn-outline-danger w-100">
-                                        <i class="ph ph-x-circle me-1"></i> Reject
-                                    </button>
-                                </form>
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <i class="ph ph-timer text-gray-400"></i>
+                                <span>{{ $service->duration_minutes }} minutes</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm font-semibold text-green-600">
+                                <i class="ph ph-currency-circle-dollar text-green-500"></i>
+                                <span>RWF {{ number_format($service->price) }}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <i class="ph ph-user text-gray-400"></i>
+                                <span>By <strong>{{ $service->provider->user->name ?? 'Unknown' }}</strong></span>
                             </div>
                         </div>
+
+                        {{-- Description --}}
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            {{ \Illuminate\Support\Str::limit($service->description, 120) }}
+                        </p>
+                    </div>
+
+                    {{-- Action Buttons --}}
+                    <div class="p-6 pt-0 flex gap-2">
+                        <form action="{{ route('admin.services.approve', $service->id) }}" method="POST" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
+                                <i class="ph ph-check-circle mr-1"></i>Approve
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.services.reject', $service->id) }}" method="POST" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full px-4 py-2.5 bg-red-100 text-red-700 font-semibold rounded-lg hover:bg-red-200 transition">
+                                <i class="ph ph-x-circle mr-1"></i>Reject
+                            </button>
+                        </form>
                     </div>
                 </div>
             @endforeach
         </div>
 
-        <div class="mt-4 d-flex justify-content-center">
-            {{ $pendingServices->links() }}
-        </div>
+        {{-- Pagination --}}
+        @if($pendingServices->hasPages())
+            <div class="flex justify-center">
+                {{ $pendingServices->links() }}
+            </div>
+        @endif
     @else
-        <div class="alert alert-info text-center">
-            <i class="ph ph-info me-1"></i> No pending services at the moment.
+        {{-- Empty State --}}
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-12 text-center">
+            <i class="ph ph-check-circle text-6xl text-blue-300 mb-4"></i>
+            <p class="text-blue-900 font-semibold text-lg">All caught up!</p>
+            <p class="text-blue-700 text-sm mt-2">No pending services to review at the moment</p>
         </div>
     @endif
 </div>

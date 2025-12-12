@@ -1,187 +1,67 @@
-{{-- Optimized Hero Section --}}
-<section class="hero-section text-white position-relative"
-         style="background: url('{{ asset('storage/banner.jpg') }}') no-repeat center center / cover; 
-                height: 100vh; display: flex; align-items: center;">
+{{-- Modern Luxury Hero Section --}}
+<section class="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden bg-gray-900">
     
-    <!-- Simplified overlay using layout variables -->
-    <div class="overlay position-absolute w-100 h-100"
-         style="background: linear-gradient(135deg, rgba(212, 113, 122, 0.6) 0%, rgba(45, 55, 72, 0.8) 100%);
-                top: 0; left: 0; z-index: 0;"></div>
-    
-    <div class="container text-center position-relative" style="z-index: 1;">
-        <div data-aos="fade-up" data-aos-duration="800">
-            <h1 class="display-2 fw-bold mb-3"
-                style="font-family: 'Playfair Display', serif; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">
-                Luxury Nails. Effortlessly.
+    {{-- Background Image --}}
+    <div class="absolute inset-0 z-0">
+        <img src="{{ asset('storage/banner.jpg') }}" alt="Hero Background" class="w-full h-full object-cover">
+        
+        {{-- Luxury Gradient Overlay --}}
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-black/30"></div>
+        <div class="absolute inset-0 bg-gray-900/20 backdrop-brightness-75"></div>
+    </div>
+
+    {{-- Content --}}
+    <div class="container mx-auto px-4 relative z-10 text-center">
+        <div class="max-w-5xl mx-auto space-y-8 animate-fade-in-up">
+            
+            {{-- Decorative Element --}}
+            <div class="inline-block mb-4">
+                <span class="px-4 py-1.5 rounded-full border border-white/30 text-white/90 text-sm font-medium tracking-widest uppercase backdrop-blur-sm">
+                    Kigali's Premier Nail Salon
+                </span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-tight tracking-tight drop-shadow-lg">
+                Artistry at Your <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-200 to-white">Fingertips</span>
             </h1>
             
-            <div class="hero-subtitle lead fs-4 mt-2 mb-4">
-                <span id="typed-text" class="fw-light"></span><span class="cursor">|</span>
-            </div>
+            <p class="text-xl md:text-2xl text-gray-200 font-light max-w-2xl mx-auto leading-relaxed opacity-90">
+                Experience the perfect blend of luxury, hygiene, and style.
+            </p>
             
-            <a href="{{ route('booking.step1') }}" class="btn btn-lg px-5 py-3 hero-cta-btn">
-                <i class="fas fa-calendar-check me-2"></i>Book Now
-            </a>
+            <div class="pt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="{{ route('booking.step1') }}" 
+                   class="min-w-[200px] px-8 py-4 bg-white text-gray-900 font-medium rounded-full hover:bg-rose-50 transition-all duration-300 transform hover:-translate-y-1 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                    Book Appointment
+                </a>
+                <a href="{{ url('/services') }}" 
+                   class="min-w-[200px] px-8 py-4 bg-transparent border border-white/30 text-white font-medium rounded-full hover:bg-white/10 hover:border-white transition-all duration-300 backdrop-blur-sm">
+                    View Services
+                </a>
+            </div>
         </div>
     </div>
-    
-    <!-- Simplified scroll indicator -->
-    <div class="scroll-indicator position-absolute bottom-0 start-50 translate-middle-x mb-4" 
-         style="z-index: 1;" data-aos="bounce" data-aos-delay="1200">
-        <i class="fas fa-chevron-down fa-lg text-white opacity-75 scroll-bounce"></i>
+
+    {{-- Scroll Indicator --}}
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+        <span class="text-white/50 text-sm uppercase tracking-widest mb-2 block text-center text-[10px]">Scroll</span>
+        <i class="ph ph-caret-down text-2xl text-white/70"></i>
     </div>
 </section>
 
-@push('styles')
 <style>
-/* Hero Button using layout variables */
-.hero-cta-btn {
-    background: var(--glass-white) !important;
-    color: var(--primary-color) !important;
-    border: 2px solid rgba(255, 255, 255, 0.3) !important;
-    backdrop-filter: blur(15px);
-    border-radius: 50px;
-    font-weight: 600;
-    transition: var(--transition-smooth);
-    box-shadow: var(--shadow-soft);
-}
-
-.hero-cta-btn:hover {
-    background: rgba(255, 255, 255, 0.95) !important;
-    color: var(--accent-color) !important;
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: var(--shadow-glow);
-}
-
-/* Optimized typing cursor */
-.cursor {
-    display: inline-block;
-    animation: cursor-blink 1s infinite;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 300;
-}
-
-@keyframes cursor-blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-}
-
-/* Simplified bounce animation */
-.scroll-bounce {
-    animation: scroll-bounce 2s ease-in-out infinite;
-    transition: var(--transition-fast);
-}
-
-@keyframes scroll-bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-
-.scroll-indicator:hover .scroll-bounce {
-    animation-duration: 0.8s;
-    opacity: 1 !important;
-}
-
-/* Performance optimizations */
-.hero-section {
-    will-change: transform;
-}
-
-.hero-cta-btn,
-.scroll-indicator {
-    will-change: transform;
-}
-
-/* Mobile optimizations */
-@media (max-width: 768px) {
-    .hero-section {
-        height: 80vh;
-        min-height: 600px;
-    }
-    
-    .display-2 {
-        font-size: 2.5rem !important;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem !important;
-    }
-    
-    .hero-cta-btn {
-        width: 100%;
-        max-width: 280px;
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .display-2 {
-        font-size: 2rem !important;
-        line-height: 1.2;
-    }
-    
-    .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-}
-
-/* Reduce motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-    .cursor {
-        animation: none;
-        opacity: 1;
-    }
-    
-    .scroll-bounce {
-        animation: none;
-    }
-}
-</style>
-@endpush
-
-@push('scripts')
-<script>
-// Optimized typing effect
-document.addEventListener('DOMContentLoaded', function() {
-    const text = "Book your glow-up in Kigali — fast & easy.";
-    const target = document.getElementById("typed-text");
-    
-    if (!target) return; // Safety check
-    
-    let i = 0;
-    const typeSpeed = 50; // Slightly slower for better readability
-    
-    function typeWriter() {
-        if (i < text.length) {
-            target.textContent += text.charAt(i);
-            i++;
-            setTimeout(typeWriter, typeSpeed);
-        } else {
-            // Optional: Hide cursor after typing is complete
-            setTimeout(() => {
-                const cursor = document.querySelector('.cursor');
-                if (cursor) cursor.style.opacity = '0';
-            }, 3000);
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translate3d(0, 40px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
         }
     }
-    
-    // Start typing after a short delay
-    setTimeout(typeWriter, 1000);
-});
-
-// Smooth scroll for scroll indicator
-document.addEventListener('DOMContentLoaded', function() {
-    const scrollIndicator = document.querySelector('.scroll-indicator');
-    if (scrollIndicator) {
-        scrollIndicator.addEventListener('click', function(e) {
-            e.preventDefault();
-            const nextSection = document.querySelector('.hero-section').nextElementSibling;
-            if (nextSection) {
-                nextSection.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+    .animate-fade-in-up {
+        animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-});
-</script>
-@endpush
+</style>

@@ -24,20 +24,38 @@ class PaymentWebhookController extends Controller
         $requestType = $request->input('requestType');
 
         if (!$token || !$requestType) {
+            Log::warning('⚠️ Webhook missing required fields');
             return response()->json(['error' => 'Invalid payload'], 400);
         }
 
         try {
             $secretKey = config('services.weflexfy.secret_key');
+            
+            // ✅ SECURITY: Decode JWT with proper validation
             $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
             $payload = (array) $decoded;
             
-            // Save webhook data to DB
-        WebhookLog::create([
-            'type' => "weflexfy_{$requestType}",
-            'payload' => $payload,
-            'status' => $payload['status'] ?? null,
-        ]);
+            // ✅ SECURITY: Check JWT expiration if present
+            if (isset($payload['exp']) && $payload['exp'] < time()) {
+                Log::warning('⚠️ Webhook JWT expired', ['exp' => $payload['exp']]);
+                return response()->json(['error' => 'Token expired'], 401);
+            }
+            
+            // ✅ SECURITY: Replay attack prevention (check if webhook is recent)
+            if (isset($payload['iat'])) {
+                $age = time() - $payload['iat'];
+                if ($age > 300) { // 5 minutes tolerance
+                    Log::warning('⚠️ Webhook too old', ['age_seconds' => $age]);
+                    return response()->json(['error' => 'Token too old'], 401);
+                }
+            }
+            
+            // Save webhook data to DB for audit trail
+            WebhookLog::create([
+                'type' => "weflexfy_{$requestType}",
+                'payload' => $payload,
+                'status' => $payload['status'] ?? null,
+            ]);
         
             Log::info("🔓 Decoded WeFlexfy JWT ({$requestType})", $payload);
 
@@ -49,10 +67,21 @@ class PaymentWebhookController extends Controller
                 return $this->handlePaymentRef($payload);
             }
 
-            return response()->json(['message' => 'Webhook received but no matching type handled'], 200);
+            Log::info('⚠️ Webhook type not handled', ['type' => $requestType]);
+            return response()->json(['message' => 'Webhook received'], 200);
+            
+        } catch (\Firebase\JWT\ExpiredException $e) {
+            Log::error('❌ JWT expired: ' . $e->getMessage());
+            return response()->json(['error' => 'Token expired'], 401);
+        } catch (\Firebase\JWT\SignatureInvalidException $e) {
+            Log::error('❌ JWT signature invalid: ' . $e->getMessage());
+            return response()->json(['error' => 'Invalid signature'], 401);
         } catch (\Exception $e) {
-            Log::error('❌ Webhook exception: ' . $e->getMessage());
-            return response()->json(['error' => 'Invalid token'], 401);
+            Log::error('❌ Webhook exception: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            // ✅ SECURITY: Don't leak internal error details
+            return response()->json(['error' => 'Processing failed'], 500);
         }
     }
 
@@ -88,9 +117,22 @@ class PaymentWebhookController extends Controller
 
         $payment = Payment::where('booking_id', $booking->id)->latest()->first();
         if ($payment) {
+            // ✅ FIX: Capture actual payment method from webhook
+            $actualMethod = $this->extractPaymentMethod($payload);
+            
             $payment->status = $payload['status'] === 'SUCCESS' ? 'paid' : 'failed';
             $payment->paid_at = now();
+            $payment->actual_method_used = $actualMethod;
+            $payment->provider_transaction_id = $payload['id'] ?? $payload['transactionId'] ?? null;
+            $payment->webhook_payload = $payload; // Store full payload for audit
             $payment->save();
+            
+            Log::info("💳 Payment method captured", [
+                'payment_id' => $payment->id,
+                'user_selected' => $payment->method,
+                'actually_used' => $actualMethod,
+                'transaction_id' => $payment->provider_transaction_id
+            ]);
         }
 
         if ($payload['status'] === 'SUCCESS') {
@@ -115,6 +157,9 @@ class PaymentWebhookController extends Controller
         return response()->json(['error' => 'No pending payment found'], 404);
     }
 
+    // ✅ FIX: Extract actual payment method from webhook
+    $actualMethod = $this->extractPaymentMethod($payload);
+
     // Update payment_ref anyway
     $payment->payment_ref = $paymentRef;
 
@@ -128,7 +173,17 @@ class PaymentWebhookController extends Controller
    if ($isPaid) {
     $payment->status = 'paid';
     $payment->paid_at = now();
+    $payment->actual_method_used = $actualMethod;
+    $payment->provider_transaction_id = $payload['id'] ?? $payload['transactionId'] ?? null;
+    $payment->webhook_payload = $payload;
     $payment->save();
+    
+    Log::info("💳 Payment method captured via paymentRef", [
+        'payment_id' => $payment->id,
+        'user_selected' => $payment->method,
+        'actually_used' => $actualMethod,
+        'transaction_id' => $payment->provider_transaction_id
+    ]);
 
     $booking = $payment->booking;
     if ($booking) {
@@ -141,6 +196,7 @@ class PaymentWebhookController extends Controller
 } else {
     $payment->status = 'failed';
     $payment->paid_at = now();
+    $payment->webhook_payload = $payload;
     $payment->save();
 
     $booking = $payment->booking;
@@ -198,5 +254,50 @@ class PaymentWebhookController extends Controller
         } catch (\Exception $e) {
             Log::error("❌ Email to provider failed: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Extract the actual payment method used from webhook payload
+     * WeFlexfy sends payment method in different fields depending on the webhook type
+     */
+    protected function extractPaymentMethod(array $payload): ?string
+    {
+        // Try to get method from various possible fields in the webhook
+        $methodMapping = [
+            'MTN' => 'momo',
+            'MOMO' => 'momo',
+            'AIRTEL' => 'airtel',
+            'CARD' => 'card',
+            'VISA' => 'card',
+            'MASTERCARD' => 'card',
+            'CASH' => 'cash',
+        ];
+
+        // Check payment channel
+        $channel = strtoupper($payload['paymentChannel'] ?? $payload['channel'] ?? '');
+        if (isset($methodMapping[$channel])) {
+            return $methodMapping[$channel];
+        }
+
+        // Check payment method field
+        $method = strtoupper($payload['paymentMethod'] ?? $payload['method'] ?? '');
+        if (isset($methodMapping[$method])) {
+            return $methodMapping[$method];
+        }
+
+        // Check transfer details if available
+        if (isset($payload['transfers'][0])) {
+            $transfer = $payload['transfers'][0];
+            $transferMethod = strtoupper($transfer['method'] ?? $transfer['channel'] ?? '');
+            if (isset($methodMapping[$transferMethod])) {
+                return $methodMapping[$transferMethod];
+            }
+        }
+
+        Log::warning('⚠️ Could not determine payment method from webhook', [
+            'payload_keys' => array_keys($payload)
+        ]);
+
+        return null; // Return null if we can't determine the method
     }
 }

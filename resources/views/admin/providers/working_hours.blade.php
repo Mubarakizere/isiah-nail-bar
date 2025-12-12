@@ -3,85 +3,107 @@
 @section('title', 'Edit Working Hours for ' . $provider->name)
 
 @section('content')
-<div class="container my-5">
-    <h2 class="fw-bold text-center mb-4">Edit Working Hours — {{ $provider->name }}</h2>
+<div class="p-6">
+    {{-- Header --}}
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Working Hours</h1>
+        <p class="text-gray-600">Manage schedule for <strong>{{ $provider->name }}</strong></p>
+    </div>
 
     <form method="POST" action="{{ route('admin.providers.hours.update', $provider->id) }}">
         @csrf
 
-        <div class="accordion" id="workingHoursAccordion">
+        {{-- Days Accordion --}}
+        <div class="space-y-3 mb-6">
             @foreach($days as $dayIndex => $dayName)
                 @php $hour = $workingHours[$dayIndex] ?? null; @endphp
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading-{{ $dayIndex }}">
-                        <button class="accordion-button {{ $dayIndex !== 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $dayIndex }}" aria-expanded="{{ $dayIndex === 0 ? 'true' : 'false' }}" aria-controls="collapse-{{ $dayIndex }}">
-                            {{ ucfirst($dayName) }}
+                <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                    {{-- Day Header --}}
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <h3 class="font-bold text-gray-900">{{ ucfirst($dayName) }}</h3>
                             @if($hour && $hour->is_day_off)
-                                <span class="badge bg-secondary ms-2">Day Off</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-bold rounded-full">Day Off</span>
                             @endif
                             @if($hour && $hour->is_holiday)
-                                <span class="badge bg-warning text-dark ms-2">Holiday</span>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">Holiday</span>
                             @endif
-                        </button>
-                    </h2>
-                    <div id="collapse-{{ $dayIndex }}" class="accordion-collapse collapse {{ $dayIndex === 0 ? 'show' : '' }}" aria-labelledby="heading-{{ $dayIndex }}" data-bs-parent="#workingHoursAccordion">
-                        <div class="accordion-body">
-                            <div class="row g-3 align-items-center working-day-row" data-day="{{ $dayIndex }}">
-                                <div class="col-md-3">
-                                    <label class="form-label">Start Time</label>
-                                    <input type="time"
-                                           name="working_hours[{{ $dayIndex }}][start_time]"
-                                           class="form-control start-time"
-                                           value="{{ $hour->start_time ?? '' }}"
-                                           {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
-                                </div>
+                        </div>
+                    </div>
 
-                                <div class="col-md-3">
-                                    <label class="form-label">End Time</label>
-                                    <input type="time"
-                                           name="working_hours[{{ $dayIndex }}][end_time]"
-                                           class="form-control end-time"
-                                           value="{{ $hour->end_time ?? '' }}"
-                                           {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
-                                </div>
+                    {{-- Day Content --}}
+                    <div class="p-6 working-day-row" data-day="{{ $dayIndex }}">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Start Time</label>
+                                <input type="time"
+                                       name="working_hours[{{ $dayIndex }}][start_time]"
+                                       class="start-time w-full px-4 py-2.5 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none"
+                                       value="{{ $hour->start_time ?? '' }}"
+                                       {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
+                            </div>
 
-                                <div class="col-md-3">
-                                    <label class="form-label">Break Start</label>
-                                    <input type="time"
-                                           name="working_hours[{{ $dayIndex }}][break_start]"
-                                           class="form-control break-start"
-                                           value="{{ $hour->break_start ?? '' }}"
-                                           {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
-                                </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">End Time</label>
+                                <input type="time"
+                                       name="working_hours[{{ $dayIndex }}][end_time]"
+                                       class="end-time w-full px-4 py-2.5 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none"
+                                       value="{{ $hour->end_time ?? '' }}"
+                                       {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
+                            </div>
 
-                                <div class="col-md-3">
-                                    <label class="form-label">Break End</label>
-                                    <input type="time"
-                                           name="working_hours[{{ $dayIndex }}][break_end]"
-                                           class="form-control break-end"
-                                           value="{{ $hour->break_end ?? '' }}"
-                                           {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
-                                </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Break Start</label>
+                                <input type="time"
+                                       name="working_hours[{{ $dayIndex }}][break_start]"
+                                       class="break-start w-full px-4 py-2.5 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none"
+                                       value="{{ $hour->break_start ?? '' }}"
+                                       {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
+                            </div>
 
-                                <div class="col-12 d-flex flex-wrap gap-2 mt-3">
-                                    <button type="button" class="btn btn-outline-primary btn-sm copy-btn">Copy Times</button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm paste-btn">Paste Times</button>
-                                    <button type="button" class="btn btn-outline-warning btn-sm toggle-holiday-btn">Mark as Holiday</button>
-                                    <button type="button" class="btn btn-outline-danger btn-sm toggle-disable-btn">Mark as Day Off</button>
-                                </div>
-
-                                <input type="hidden" name="working_hours[{{ $dayIndex }}][is_day_off]" class="is-day-off" value="{{ $hour->is_day_off ?? 0 }}">
-                                <input type="hidden" name="working_hours[{{ $dayIndex }}][is_holiday]" class="is-holiday" value="{{ $hour->is_holiday ?? 0 }}">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Break End</label>
+                                <input type="time"
+                                       name="working_hours[{{ $dayIndex }}][break_end]"
+                                       class="break-end w-full px-4 py-2.5 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none"
+                                       value="{{ $hour->break_end ?? '' }}"
+                                       {{ $hour && $hour->is_day_off ? 'disabled' : '' }}>
                             </div>
                         </div>
+
+                        {{-- Action Buttons --}}
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" class="copy-btn px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-semibold rounded-lg hover:bg-blue-200 transition">
+                                <i class="ph ph-copy mr-1"></i>Copy
+                            </button>
+                            <button type="button" class="paste-btn px-3 py-1.5 bg-green-100 text-green-700 text-sm font-semibold rounded-lg hover:bg-green-200 transition">
+                                <i class="ph ph-clipboard mr-1"></i>Paste
+                            </button>
+                            <button type="button" class="toggle-holiday-btn px-3 py-1.5 {{ $hour && $hour->is_holiday ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-700' }} text-sm font-semibold rounded-lg hover:bg-yellow-200 transition">
+                                <i class="ph ph-sun mr-1"></i>Holiday
+                            </button>
+                            <button type="button" class="toggle-disable-btn px-3 py-1.5 {{ $hour && $hour->is_day_off ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-700' }} text-sm font-semibold rounded-lg hover:bg-gray-200 transition">
+                                <i class="ph ph-prohibit mr-1"></i>Day Off
+                            </button>
+                        </div>
+
+                        <input type="hidden" name="working_hours[{{ $dayIndex }}][is_day_off]" class="is-day-off" value="{{ $hour->is_day_off ?? 0 }}">
+                        <input type="hidden" name="working_hours[{{ $dayIndex }}][is_holiday]" class="is-holiday" value="{{ $hour->is_holiday ?? 0 }}">
                     </div>
                 </div>
             @endforeach
         </div>
 
-        <div class="mt-4 text-end">
-            <a href="{{ route('admin.providers.index') }}" class="btn btn-outline-secondary">Back</a>
-            <button type="submit" class="btn btn-success px-4">Save Working Hours</button>
+        {{-- Submit Buttons --}}
+        <div class="flex gap-3">
+            <a href="{{ route('admin.providers.index') }}" 
+               class="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition">
+                Back
+            </a>
+            <button type="submit" 
+                    class="px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition">
+                <i class="ph ph-check-circle mr-2"></i>Save Working Hours
+            </button>
         </div>
     </form>
 </div>
@@ -100,18 +122,32 @@
                 breakStart: row.querySelector('.break-start').value,
                 breakEnd: row.querySelector('.break-end').value
             };
-            alert("Times copied.");
+            
+            // Visual feedback
+            this.innerHTML = '<i class="ph ph-check mr-1"></i>Copied!';
+            setTimeout(() => {
+                this.innerHTML = '<i class="ph ph-copy mr-1"></i>Copy';
+            }, 2000);
         });
     });
 
     document.querySelectorAll('.paste-btn').forEach(btn => {
         btn.addEventListener('click', function () {
-            if (!clipboard.start || !clipboard.end) return alert("No copied time found.");
+            if (!clipboard.start || !clipboard.end) {
+                alert("No copied time found. Please copy times first.");
+                return;
+            }
             const row = this.closest('.working-day-row');
             row.querySelector('.start-time').value = clipboard.start;
             row.querySelector('.end-time').value = clipboard.end;
             row.querySelector('.break-start').value = clipboard.breakStart;
             row.querySelector('.break-end').value = clipboard.breakEnd;
+            
+            // Visual feedback
+            this.innerHTML = '<i class="ph ph-check mr-1"></i>Pasted!';
+            setTimeout(() => {
+                this.innerHTML = '<i class="ph ph-clipboard mr-1"></i>Paste';
+            }, 2000);
         });
     });
 
@@ -125,8 +161,13 @@
             inputs.forEach(input => input.disabled = isDisabled);
             hidden.value = isDisabled ? 1 : 0;
 
-            this.classList.toggle('btn-outline-danger');
-            this.classList.toggle('btn-danger');
+            if (isDisabled) {
+                this.classList.remove('bg-gray-100', 'text-gray-700');
+                this.classList.add('bg-gray-600', 'text-white');
+            } else {
+                this.classList.remove('bg-gray-600', 'text-white');
+                this.classList.add('bg-gray-100', 'text-gray-700');
+            }
         });
     });
 
@@ -137,8 +178,14 @@
             const isHoliday = hidden.value == 0;
 
             hidden.value = isHoliday ? 1 : 0;
-            this.classList.toggle('btn-outline-warning');
-            this.classList.toggle('btn-warning');
+
+            if (isHoliday) {
+                this.classList.remove('bg-yellow-100', 'text-yellow-700');
+                this.classList.add('bg-yellow-500', 'text-white');
+            } else {
+                this.classList.remove('bg-yellow-500', 'text-white');
+                this.classList.add('bg-yellow-100', 'text-yellow-700');
+            }
         });
     });
 </script>

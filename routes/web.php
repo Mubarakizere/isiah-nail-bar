@@ -62,6 +62,7 @@ Route::view('/faq', 'faq')->name('faq');
 Route::view('/about', 'about')->name('about');
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 Route::post('/webhook/weflexfy', [\App\Http\Controllers\PaymentWebhookController::class, 'handleWeFlexfyWebhook'])
+    ->middleware('throttle:60,1') // ✅ SECURITY: Rate limit webhooks to 60 per minute
     ->withoutMiddleware([
         \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         HandlePrecognitiveRequests::class
@@ -120,7 +121,9 @@ Route::controller(BookingController::class)->group(function () {
       });
     Route::view('/booking/success', 'booking.success')->name('booking.success');
     Route::get('/booking/{id}/receipt', 'receipt')->name('booking.receipt');
-    Route::post('/booking/pay', [PaymentController::class, 'initiate'])->name('booking.pay');
+    Route::post('/booking/pay', [PaymentController::class, 'initiate'])
+        ->middleware('throttle:10,1') // ✅ SECURITY: Limit payment initiations to 10 per minute
+        ->name('booking.pay');
     Route::get('/booking/payment-iframe', [BookingController::class, 'showPaymentIframe'])->name('booking.paymentIframe');
 
 });
@@ -354,6 +357,14 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
             Route::post('/providers/{provider}/working-hours', [ProviderWorkingHourController::class, 'update'])->name('admin.providers.hours.update');
         });
         Route::get('/admin/webhooks', [\App\Http\Controllers\Admin\WebhookLogController::class, 'index'])->name('admin.webhooks.index');
+        
+        // Manual Booking
+        Route::get('/bookings/manual/create', [\App\Http\Controllers\Admin\ManualBookingController::class, 'create'])->name('admin.bookings.manual.create');
+        Route::post('/bookings/manual', [\App\Http\Controllers\Admin\ManualBookingController::class, 'store'])->name('admin.bookings.manual.store');
+        
+        // Email Logs
+        Route::get('/emails', [\App\Http\Controllers\Admin\EmailLogController::class, 'index'])->name('admin.emails.index');
+        Route::get('/emails/{emailLog}', [\App\Http\Controllers\Admin\EmailLogController::class, 'show'])->name('admin.emails.show');
         
         Route::get('/pending-services', [\App\Http\Controllers\Admin\PendingServiceController::class, 'index'])->name('admin.services.pending');
         Route::post('/pending-services/{service}/approve', [\App\Http\Controllers\Admin\PendingServiceController::class, 'approve'])->name('admin.services.approve');

@@ -3,26 +3,42 @@
 @section('title', 'Add New Tag')
 
 @section('content')
-<div class="container my-5">
-    <h2 class="fw-bold text-center mb-4">
-        <i class="ph ph-tag-simple me-1 text-primary"></i> Add New Tag
-    </h2>
+<div class="p-6">
+    {{-- Header --}}
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Add New Tag</h1>
+        <p class="text-gray-600">Create a new service tag</p>
+    </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    {{-- Form Card --}}
+    <div class="max-w-2xl">
+        <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
             <form action="{{ route('admin.tags.store') }}" method="POST">
                 @csrf
 
-                <div class="mb-3">
-                    <label for="name" class="form-label">Tag Name</label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter tag name" required>
-                    @error('name') <small class="text-danger">{{ $message }}</small> @enderror
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Tag Name
+                    </label>
+                    <input type="text" 
+                           name="name" 
+                           value="{{ old('name') }}" 
+                           required
+                           placeholder="Enter tag name"
+                           class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none @error('name') border-red-500 @enderror">
+                    @error('name') 
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.tags.index') }}" class="btn btn-outline-secondary">← Cancel</a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="ph ph-floppy-disk me-1"></i> Save Tag
+                <div class="flex gap-3">
+                    <a href="{{ route('admin.tags.index') }}" 
+                       class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition text-center">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="flex-1 px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition">
+                        <i class="ph ph-check-circle mr-2"></i>Save Tag
                     </button>
                 </div>
             </form>

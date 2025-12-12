@@ -3,72 +3,78 @@
 @section('title', 'Pay Remaining Balance')
 
 @section('content')
-<div class="container my-5" style="max-width: 650px;">
-    <div class="card shadow-sm p-4 border-0 rounded-4">
-        <h4 class="fw-bold mb-3">
-            <i class="ph ph-wallet me-1 text-primary"></i> Pay Remaining Balance
-        </h4>
+<div class="bg-gray-50 py-8 min-h-screen">
+    <div class="max-w-2xl mx-auto px-4">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <h4 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <i class="ph ph-wallet text-blue-600"></i>
+                Pay Remaining Balance
+            </h4>
+            <p class="text-gray-600 mb-6">
+                Please review your booking details and complete your remaining payment.
+            </p>
 
-        <p class="mb-4 text-muted">
-            Please review your booking details and complete your remaining payment.
-        </p>
+            {{-- Summary --}}
+            <div class="mb-6">
+                <div class="space-y-3">
+                    @foreach ($booking->services as $service)
+                        <div class="flex justify-between py-2 border-b">
+                            <span class="text-gray-700">{{ $service->name }}</span>
+                            <span class="font-semibold">RWF {{ number_format($service->price) }}</span>
+                        </div>
+                    @endforeach
 
-        {{-- Booking Summary --}}
-        <div class="mb-4">
-            <ul class="list-group list-group-flush">
-                {{-- Services List --}}
-                @foreach ($booking->services as $service)
-                    <li class="list-group-item d-flex justify-content-between">
-                        <span>{{ $service->name }}</span>
-                        <span>RWF {{ number_format($service->price) }}</span>
-                    </li>
-                @endforeach
+                    <div class="flex justify-between py-2 border-b font-semibold">
+                        <span>Total</span>
+                        <span>RWF {{ number_format($booking->services->sum('price')) }}</span>
+                    </div>
 
-                {{-- Totals --}}
-                <li class="list-group-item d-flex justify-content-between">
-                    <span class="fw-semibold">Total</span>
-                    <span class="fw-semibold">RWF {{ number_format($booking->services->sum('price')) }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                    <span>Deposit Paid</span>
-                    <span>RWF {{ number_format($booking->deposit_amount) }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between text-danger fw-bold">
-                    <span>Remaining Balance</span>
-                    <span>RWF {{ number_format($remainingAmount) }}</span>
-                </li>
-            </ul>
-        </div>
+                    <div class="flex justify-between py-2 border-b text-green-600">
+                        <span>Deposit Paid</span>
+                        <span>RWF {{ number_format($booking->deposit_amount) }}</span>
+                    </div>
 
-        {{-- Payment Form --}}
-        <form method="POST" action="{{ route('customer.booking.payRemainingPost', $booking->id) }}">
-            @csrf
-
-            {{-- Phone --}}
-            <div class="mb-3">
-                <label for="phone" class="form-label fw-semibold">Payment Phone Number</label>
-                <input type="text" name="phone" id="phone" value="{{ $phone }}" required class="form-control" placeholder="e.g. 0788xxxxxx">
-            </div>
-
-            {{-- Payment Method --}}
-            <div class="mb-4">
-                <label class="form-label fw-semibold">Payment Method</label>
-                <div class="vstack gap-2">
-                    <label class="form-check border p-3 rounded">
-                        <input class="form-check-input me-2" type="radio" name="payment_method" value="momo" required>
-                        <span>Mobile Money (MoMo)</span>
-                    </label>
-                    <label class="form-check border p-3 rounded">
-                        <input class="form-check-input me-2" type="radio" name="payment_method" value="card">
-                        <span>Debit/Credit Card</span>
-                    </label>
+                    <div class="flex justify-between py-3 text-red-600 font-bold text-lg">
+                        <span>Remaining Balance</span>
+                        <span>RWF {{ number_format($remainingAmount) }}</span>
+                    </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="ph ph-arrow-circle-right me-1"></i> Pay Now
-            </button>
-        </form>
+            {{-- Payment Form --}}
+            <form method="POST" action="{{ route('customer.booking.payRemainingPost', $booking->id) }}">
+                @csrf
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Phone Number</label>
+                    <input type="tel" 
+                           name="phone" 
+                           value="{{ $phone }}" 
+                           required
+                           placeholder="e.g. 0788xxxxxx"
+                           class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Payment Method</label>
+                    <div class="space-y-2">
+                        <label class="block p-4 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition">
+                            <input type="radio" name="payment_method" value="momo" required class="mr-3">
+                            <span class="font-semibold">Mobile Money (MoMo)</span>
+                        </label>
+                        <label class="block p-4 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition">
+                            <input type="radio" name="payment_method" value="card" class="mr-3">
+                            <span class="font-semibold">Debit/Credit Card</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full px-6 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition">
+                    <i class="ph ph-arrow-circle-right mr-2"></i>Pay Now
+                </button>
+            </form>
+        </div>
     </div>
 </div>
+
 @endsection

@@ -28,24 +28,73 @@ class ProviderController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email',
+            'email' => 'required|email|unique:providers,email|unique:users,email',
             'phone' => 'nullable|string',
             'bio' => 'nullable|string',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|max:30720',
             'services' => 'nullable|array',
             'services.*' => 'exists:services,id',
         ]);
 
-        $data = $request->only('name', 'email', 'phone', 'bio');
+        try {
+            DB::beginTransaction();
 
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('providers', 'public');
+            // Generate a secure random password
+            $generatedPassword = $this->generateSecurePassword();
+
+            // Create user account for the provider
+            $user = \App\Models\User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($generatedPassword),
+            ]);
+
+            // Assign provider role if it exists
+            if (\Spatie\Permission\Models\Role::where('name', 'provider')->exists()) {
+                $user->assignRole('provider');
+            }
+
+            // Prepare provider data
+            $data = $request->only('name', 'email', 'phone', 'bio');
+            $data['user_id'] = $user->id;
+
+            // Handle photo upload
+            if ($request->hasFile('photo')) {
+                $data['photo'] = $request->file('photo')->store('providers', 'public');
+            }
+
+            // Create provider
+            $provider = Provider::create($data);
+            $provider->services()->sync($request->input('services', []));
+
+            // Send credentials email
+            \Mail::to($provider->email)->send(new \App\Mail\ProviderCredentialsMail($provider, $generatedPassword));
+
+            DB::commit();
+
+            return redirect()->route('admin.providers.index')
+                ->with('success', 'Provider added successfully! Login credentials have been sent to ' . $provider->email);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to create provider: ' . $e->getMessage());
         }
+    }
 
-        $provider = Provider::create($data);
-        $provider->services()->sync($request->input('services', []));
-
-        return redirect()->route('admin.providers.index')->with('success', 'Provider added successfully.');
+    /**
+     * Generate a secure random password
+     */
+    private function generateSecurePassword($length = 12)
+    {
+        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+        $password = '';
+        
+        for ($i = 0; $i < $length; $i++) {
+            $password .= $characters[random_int(0, strlen($characters) - 1)];
+        }
+        
+        return $password;
     }
 
     public function edit(Provider $provider)
@@ -61,7 +110,7 @@ class ProviderController extends Controller
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
             'bio' => 'nullable|string',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|max:30720',
             'services' => 'nullable|array',
             'services.*' => 'exists:services,id',
         ]);

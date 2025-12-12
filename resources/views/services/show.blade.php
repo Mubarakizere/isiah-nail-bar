@@ -3,121 +3,130 @@
 @section('title', $service->name)
 
 @section('content')
-<div class="container my-5">
-    <div class="row g-5 align-items-start">
-        {{-- 🖼️ Image Section --}}
-        <div class="col-12 col-md-6" data-aos="fade-right">
-            @if($service->image)
-                <img src="{{ asset('storage/' . $service->image) }}" 
-                     class="img-fluid rounded shadow-sm w-100 service-image" 
-                     alt="{{ $service->name }}">
-            @else
-                <img src="https://via.placeholder.com/600x400?text=No+Image" 
-                     class="img-fluid rounded shadow-sm" 
-                     alt="No Image">
-            @endif
-        </div>
-
-        {{-- 📝 Details Section --}}
-        <div class="col-12 col-md-6" data-aos="fade-left">
-            <h2 class="fw-bold mb-3 text-dark">{{ $service->name }}</h2>
-
-            <p class="text-muted mb-4">{{ $service->description }}</p>
-
-            @if($service->category)
-                <span class="badge bg-white border text-muted mb-3"><i class="ph ph-tag me-1"></i>{{ $service->category->name }}</span>
-            @endif
-
-            <ul class="list-unstyled text-muted fs-6 mb-4">
-                <li class="mb-2"><i class="ph ph-clock me-2 text-primary"></i> <strong>Duration:</strong> {{ $service->duration_minutes }} minutes</li>
-                <li class="mb-2"><i class="ph ph-currency-circle-dollar me-2 text-primary"></i> <strong>Price:</strong> RWF {{ number_format($service->price) }}</li>
-                @if($service->provider)
-                    <li><i class="ph ph-user me-2 text-primary"></i> <strong>Provider:</strong> {{ $service->provider->name }}</li>
+<div class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            
+            {{-- Image --}}
+            <div>
+                @if($service->image)
+                    <img src="{{ asset('storage/' . $service->image) }}" 
+                         alt="{{ $service->name }}"
+                         class="w-full rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300">
+                @else
+                    <div class="w-full h-96 bg-gray-200 rounded-2xl flex items-center justify-center">
+                        <i class="ph ph-image text-6xl text-gray-400"></i>
+                    </div>
                 @endif
-            </ul>
-
-            <a href="{{ route('booking.step1', ['service_id' => $service->id]) }}" 
-               class="btn btn-success btn-lg w-100 animate__animated animate__pulse animate__infinite">
-                <i class="ph ph-calendar-check me-1"></i> Book This Service
-            </a>
-        </div>
-    </div>
-
-    {{-- 💬 Reviews --}}
-    @if($service->reviews->count())
-    <div class="mt-5" data-aos="fade-up">
-        <h4 class="fw-bold mb-4">
-            <i class="ph ph-chat-circle-text me-2 text-secondary"></i> Customer Reviews
-        </h4>
-
-        @foreach($service->reviews as $review)
-            <div class="border rounded p-3 mb-3 shadow-sm review-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <strong>{{ $review->user->name ?? 'Anonymous' }}</strong>
-                    <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
-                </div>
-                <p class="mb-1">{{ $review->comment }}</p>
             </div>
-        @endforeach
-    </div>
-    @endif
 
-    {{-- ✍️ Leave Review --}}
-    @auth
-        @if(auth()->user()->hasBookedService($service->id))
-        <div class="mt-5" data-aos="fade-up">
-            <h5 class="fw-bold mb-3">Leave a Review</h5>
+            {{-- Details --}}
+            <div>
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">{{ $service->name }}</h2>
+                
+                <p class="text-lg text-gray-600 mb-6">{{ $service->description }}</p>
 
-            <form method="POST" action="{{ route('reviews.store') }}" class="p-4 bg-light rounded-3 shadow-sm">
-                @csrf
-                <input type="hidden" name="service_id" value="{{ $service->id }}">
+                @if($service->category)
+                    <span class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-semibold mb-6">
+                        <i class="ph ph-tag"></i>
+                        {{ $service->category->name }}
+                    </span>
+                @endif
 
-                <div class="mb-3">
-                    <label class="form-label">Rating (1 to 5)</label>
-                    <select name="rating" class="form-select shadow-sm" required>
-                        <option value="">Select rating</option>
-                        @for($i = 1; $i <= 5; $i++)
-                            <option value="{{ $i }}">{{ $i }} ★</option>
-                        @endfor
-                    </select>
-                    @error('rating') <small class="text-danger">{{ $message }}</small> @enderror
+                <div class="bg-white rounded-xl p-6 shadow-md border border-gray-200 mb-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <i class="ph ph-clock text-2xl text-blue-600"></i>
+                            <div>
+                                <p class="text-sm text-gray-600">Duration</p>
+                                <p class="font-bold text-gray-900">{{ $service->duration_minutes }} minutes</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <i class="ph ph-currency-circle-dollar text-2xl text-blue-600"></i>
+                            <div>
+                                <p class="text-sm text-gray-600">Price</p>
+                                <p class="text-2xl font-bold text-blue-600">RWF {{ number_format($service->price) }}</p>
+                            </div>
+                        </div>
+
+                        @if($service->provider)
+                            <div class="flex items-center gap-3">
+                                <i class="ph ph-user text-2xl text-blue-600"></i>
+                                <div>
+                                    <p class="text-sm text-gray-600">Provider</p>
+                                    <p class="font-bold text-gray-900">{{ $service->provider->name }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Comment</label>
-                    <textarea name="comment" rows="3" class="form-control shadow-sm" required></textarea>
-                    @error('comment') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    <i class="ph ph-paper-plane-tilt me-1"></i> Submit Review
-                </button>
-            </form>
+                <a href="{{ route('booking.step1', ['service_id' => $service->id]) }}" 
+                   class="block w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all">
+                    <i class="ph ph-calendar-check mr-2"></i>Book This Service
+                </a>
+            </div>
         </div>
+
+        {{-- Reviews --}}
+        @if($service->reviews->count())
+            <div class="mt-16">
+                <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="ph ph-chat-circle-text text-blue-600"></i>
+                    Customer Reviews
+                </h4>
+
+                <div class="space-y-4">
+                    @foreach($service->reviews as $review)
+                        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                            <div class="flex justify-between items-center mb-3">
+                                <strong class="text-gray-900">{{ $review->user->name ?? 'Anonymous' }}</strong>
+                                <small class="text-gray-500">{{ $review->created_at->diffForHumans() }}</small>
+                            </div>
+                            <p class="text-gray-700">{{ $review->comment }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
         @endif
-    @endauth
+
+        {{-- Leave Review --}}
+        @auth
+            @if(auth()->user()->hasBookedService($service->id))
+                <div class="mt-12 bg-white rounded-xl p-8 shadow-md border border-gray-200">
+                    <h5 class="text-xl font-bold text-gray-900 mb-6">Leave a Review</h5>
+
+                    <form method="POST" action="{{ route('reviews.store') }}">
+                        @csrf
+                        <input type="hidden" name="service_id" value="{{ $service->id }}">
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Rating (1 to 5)</label>
+                            <select name="rating" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none">
+                                <option value="">Select rating</option>
+                                @for($i = 1; $i <= 5; $i++)
+                                    <option value="{{ $i }}">{{ $i }} ★</option>
+                                @endfor
+                            </select>
+                            @error('rating') <small class="text-red-600">{{ $message }}</small> @enderror
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Comment</label>
+                            <textarea name="comment" required rows="4" class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none resize-vertical"></textarea>
+                            @error('comment') <small class="text-red-600">{{ $message }}</small> @enderror
+                        </div>
+
+                        <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+                            <i class="ph ph-paper-plane-tilt mr-2"></i>Submit Review
+                        </button>
+                    </form>
+                </div>
+            @endif
+        @endauth
+    </div>
 </div>
 
-{{-- ✨ Optional CSS --}}
-<style>
-    .service-image {
-        transition: transform 0.3s ease;
-    }
-
-    .service-image:hover {
-        transform: scale(1.03);
-    }
-
-    .review-card {
-        transition: box-shadow 0.3s ease;
-    }
-
-    .review-card:hover {
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
-
-    select.form-select:focus, textarea:focus, input:focus {
-        box-shadow: 0 0 0 0.2rem rgba(25,135,84,0.25);
-    }
-</style>
 @endsection

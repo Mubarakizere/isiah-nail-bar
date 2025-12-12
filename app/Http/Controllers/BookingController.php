@@ -451,8 +451,34 @@ class BookingController extends Controller
         $phone = $this->normalizePhoneNumber(session('booking.payment_phone'));
         $paymentMethod = session('booking.payment_method');
 
-        if (!in_array($paymentMethod, ['momo', 'card'])) {
+        // ✅ SECURITY: Validate payment method
+        if (!in_array($paymentMethod, ['momo', 'card', 'airtel'])) {
             $paymentMethod = 'momo';
+        }
+
+        // ✅ SECURITY: Validate amount against expected total
+        if ($paymentOption === 'full' && abs($amount - $totalPrice) > 0.01) {
+            Log::warning('⚠️ Payment amount mismatch detected', [
+                'expected' => $totalPrice,
+                'received' => $amount,
+                'user_id' => $user->id
+            ]);
+            throw new \Exception('Payment amount does not match booking total');
+        }
+
+        // ✅ SECURITY: Validate deposit amount is reasonable
+        if ($paymentOption === 'deposit') {
+            $minDeposit = $totalPrice * 0.2; // 20% minimum
+            $maxDeposit = $totalPrice * 0.8; // 80% maximum
+            
+            if ($amount < $minDeposit || $amount > $maxDeposit) {
+                Log::warning('⚠️ Invalid deposit amount', [
+                    'amount' => $amount,
+                    'total' => $totalPrice,
+                    'user_id' => $user->id
+                ]);
+                throw new \Exception('Deposit amount must be between 20% and 80% of total');
+            }
         }
 
         return [
@@ -552,7 +578,7 @@ class BookingController extends Controller
             'webhook_url' => route('weflexfy.webhook'),
             'transfers' => [[
                 'percentage' => 100,
-                'recipientNumber' => '+250788421063',
+                'recipientNumber' => '+250783460925',
                 'payload' => [
                     'booking_id' => $booking->id,
                     'reference' => $data['reference'],
