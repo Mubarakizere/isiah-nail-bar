@@ -28,9 +28,11 @@ return new class extends Migration
         });
         
         // Separate alteration for service_id to avoid issues if previous block partially ran
-        Schema::table('bookings', function (Blueprint $table) {
-             $table->foreignId('service_id')->nullable()->change();
-        });
+        if (Schema::hasColumn('bookings', 'service_id')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                 $table->foreignId('service_id')->nullable()->change();
+            });
+        }
     }
 
     /**
