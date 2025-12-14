@@ -34,9 +34,7 @@ class TeamMemberController extends Controller
         $data = $request->except('photo');
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('public/team_members');
-            // Remove 'public/' from the path to store in database relative to storage/app/public
-            $data['photo'] = str_replace('public/', '', $data['photo']);
+            $data['photo'] = $request->file('photo')->store('team_members', 'public');
         }
 
         TeamMember::create($data);
@@ -66,11 +64,10 @@ class TeamMemberController extends Controller
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
             if ($teamMember->photo) {
-                Storage::delete('public/' . $teamMember->photo);
+                Storage::disk('public')->delete($teamMember->photo);
             }
             
-            $data['photo'] = $request->file('photo')->store('public/team_members');
-            $data['photo'] = str_replace('public/', '', $data['photo']);
+            $data['photo'] = $request->file('photo')->store('team_members', 'public');
         }
 
         $teamMember->update($data);
@@ -82,7 +79,7 @@ class TeamMemberController extends Controller
     public function destroy(TeamMember $teamMember)
     {
         if ($teamMember->photo) {
-            Storage::delete('public/' . $teamMember->photo);
+            Storage::disk('public')->delete($teamMember->photo);
         }
         
         $teamMember->delete();
