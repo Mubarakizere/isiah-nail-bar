@@ -186,7 +186,7 @@
                 allowfullscreen="" 
                 loading="lazy" 
                 referrerpolicy="no-referrer-when-downgrade"
-                class="absolute inset-0 grayscale hover:grayscale-0 transition-all duration-700">
+                class="absolute inset-0 transition-all duration-700">
             </iframe>
         </div>
     </div>

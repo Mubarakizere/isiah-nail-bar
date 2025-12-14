@@ -103,7 +103,7 @@
                 </div>
 
                 {{-- Map --}}
-                <div class="h-80 w-full bg-gray-100 rounded-2xl overflow-hidden relative grayscale hover:grayscale-0 transition-all duration-700">
+                <div class="h-80 w-full bg-gray-100 rounded-2xl overflow-hidden relative transition-all duration-700">
                      <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15950.019185121285!2d30.108678!3d-1.954736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca6ee46244f67%3A0x6291244078657662!2sKisimenti!5e0!3m2!1sen!2srw!4v1683838383838!5m2!1sen!2srw" 
                         width="100%" 

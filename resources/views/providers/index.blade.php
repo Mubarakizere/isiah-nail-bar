@@ -31,7 +31,7 @@
                         <div class="relative aspect-[3/4] mb-6 overflow-hidden rounded-lg bg-gray-100">
                             <img src="{{ $provider->photo ? asset('storage/' . $provider->photo) : 'https://via.placeholder.com/400x500/f3f4f6/9ca3af?text=' . urlencode($provider->name) }}"
                                  alt="{{ $provider->name }}"
-                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700">
+                                 class="w-full h-full object-cover transition-all duration-700">
                             
                             {{-- Overlay Content --}}
                             <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-gray-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0 transform">

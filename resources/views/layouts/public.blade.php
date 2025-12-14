@@ -281,7 +281,7 @@
                 {{-- About --}}
                 <div class="col-span-1 lg:col-span-2">
                     <div class="flex items-center gap-3 mb-6">
-                        <img src="{{ asset('storage/logo.png') }}" alt="Logo" class="h-10 w-auto opacity-90 grayscale hover:grayscale-0 transition-all duration-300">
+                        <img src="{{ asset('storage/logo.png') }}" alt="Logo" class="h-10 w-auto opacity-90 transition-all duration-300">
                         <span class="text-2xl font-bold text-white font-serif tracking-tight">Isaiah Nail Bar</span>
                     </div>
                     <p class="text-base leading-relaxed text-gray-400 mb-6 max-w-md">
