@@ -99,7 +99,10 @@ Route::get('/services', function (Request $request) {
 Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-Route::get('/providers', fn() => view('providers.index', ['providers' => Provider::where('active', true)->get()]));
+Route::get('/providers', fn() => view('providers.index', [
+    'providers' => Provider::where('active', true)->get(),
+    'teamMembers' => \App\Models\TeamMember::where('active', true)->orderBy('display_order')->get()
+]));
 
 
 Route::view('/contact', 'contact.index');
@@ -371,6 +374,7 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
         Route::post('/pending-services/{service}/reject', [\App\Http\Controllers\Admin\PendingServiceController::class, 'reject'])->name('admin.services.reject');
         Route::get('/bookings/{id}/receipt', [\App\Http\Controllers\Admin\BookingController::class, 'receipt'])->name('admin.booking.receipt');
         Route::resource('/categories', \App\Http\Controllers\Admin\CategoryController::class)->names('admin.categories');
+        Route::resource('team-members', \App\Http\Controllers\Admin\TeamMemberController::class)->names('admin.team_members');
         Route::resource('/tags', \App\Http\Controllers\TagController::class)->except(['show'])->names('admin.tags');
 
         Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');

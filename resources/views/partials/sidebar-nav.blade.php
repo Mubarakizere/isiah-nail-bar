@@ -75,6 +75,14 @@
                     <span>Providers</span>
                 </a>
 
+                <a href="{{ route('admin.team_members.index') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.team_members.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.team_members.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-users text-lg"></i>
+                    </div>
+                    <span>Team Members</span>
+                </a>
+
                 <a href="{{ route('admin.slots.index') }}" 
                    class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.slots.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.slots.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">

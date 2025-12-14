@@ -63,6 +63,37 @@
             </div>
         @endif
 
+        {{-- Team Members Support Staff --}}
+        @if(isset($teamMembers) && $teamMembers->count() > 0)
+            <div class="mt-24 mb-12 text-center">
+                <span class="text-rose-400 font-medium tracking-widest text-sm uppercase mb-3 block">Support Staff</span>
+                <h2 class="text-3xl font-serif text-gray-900">The Faces Behind the Service</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+                @foreach($teamMembers as $member)
+                    <div class="group">
+                        <div class="relative aspect-[3/4] mb-6 overflow-hidden rounded-lg bg-gray-100">
+                            <img src="{{ $member->photo ? asset('storage/' . $member->photo) : 'https://via.placeholder.com/400x500/f3f4f6/9ca3af?text=' . urlencode($member->name) }}"
+                                width="400" height="500" loading="lazy"
+                                alt="{{ $member->name }}"
+                                class="w-full h-full object-cover transition-all duration-700">
+                            
+                            {{-- Overlay Content --}}
+                            <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-gray-900/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0 transform">
+                                <p class="text-gray-300 text-sm line-clamp-3">{{ $member->bio }}</p>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <h3 class="text-xl font-serif text-gray-900 mb-1">{{ $member->name }}</h3>
+                            <p class="text-rose-600 font-medium text-sm tracking-widest uppercase">{{ $member->role }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
     </div>
 </section>
 

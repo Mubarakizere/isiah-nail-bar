@@ -578,7 +578,7 @@ class BookingController extends Controller
             'webhook_url' => route('weflexfy.webhook'),
             'transfers' => [[
                 'percentage' => 100,
-                'recipientNumber' => '+250783460925',
+                'recipientNumber' => '+250788421063',
                 'payload' => [
                     'booking_id' => $booking->id,
                     'reference' => $data['reference'],
