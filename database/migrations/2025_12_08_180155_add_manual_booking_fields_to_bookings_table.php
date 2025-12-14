@@ -13,12 +13,23 @@ return new class extends Migration
     {
         Schema::table('bookings', function (Blueprint $table) {
             // Add missing fields for manual booking
-            $table->string('payment_option')->default('full')->after('time');
-            $table->decimal('deposit_amount', 10, 2)->default(0)->after('payment_option');
-            $table->string('reference')->nullable()->after('deposit_amount');
+            if (!Schema::hasColumn('bookings', 'payment_option')) {
+                $table->string('payment_option')->default('full')->after('time');
+            }
+            if (!Schema::hasColumn('bookings', 'deposit_amount')) {
+                $table->decimal('deposit_amount', 10, 2)->default(0)->after('status');
+            }
+            if (!Schema::hasColumn('bookings', 'reference')) {
+                $table->string('reference')->nullable()->after('status');
+            }
             
             // Make service_id nullable since we use many-to-many relationship
-            $table->foreignId('service_id')->nullable()->change();
+            // $table->foreignId('service_id')->nullable()->change(); // This might fail if constraint exists, keeping it safe
+        });
+        
+        // Separate alteration for service_id to avoid issues if previous block partially ran
+        Schema::table('bookings', function (Blueprint $table) {
+             $table->foreignId('service_id')->nullable()->change();
         });
     }
 
