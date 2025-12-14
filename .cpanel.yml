@@ -1,0 +1,10 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/kayatrav/isaiahnailbar.com
+    - /bin/cp -R * $DEPLOYPATH
+    - /bin/cp .env.example $DEPLOYPATH/.env
+    - cd $DEPLOYPATH
+    - /usr/local/bin/composer install
+    - /usr/local/bin/php artisan migrate --force
+    - /usr/local/bin/php artisan config:cache
