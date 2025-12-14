@@ -50,7 +50,7 @@ class LogSentEmail
                 'status' => 'sent',
                 'sent_at' => now(),
                 'metadata' => [
-                    'message_id' => $message->getId(),
+                    'message_id' => $message->generateMessageId(),
                 ],
             ]);
         } catch (\Throwable $e) {
