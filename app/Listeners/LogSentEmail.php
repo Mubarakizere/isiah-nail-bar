@@ -18,8 +18,19 @@ class LogSentEmail
             
             // Extract recipient info
             $to = $message->getTo();
-            $recipient_email = array_key_first($to ?? []);
-            $recipient_name = $to[$recipient_email] ?? null;
+            $recipient_email = null;
+            $recipient_name = null;
+
+            if (is_array($to) && count($to) > 0) {
+                foreach ($to as $address) {
+                    // Symfony Mailer Address object
+                    if ($address instanceof \Symfony\Component\Mime\Address) {
+                        $recipient_email = $address->getAddress();
+                        $recipient_name = $address->getName();
+                        break; // Just take the first one
+                    }
+                }
+            }
 
             // Extract email type from subject or headers
             $subject = $message->getSubject();
@@ -42,7 +53,7 @@ class LogSentEmail
                     'message_id' => $message->getId(),
                 ],
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Log error but don't fail email sending
             Log::error('Failed to log email: ' . $e->getMessage());
         }
