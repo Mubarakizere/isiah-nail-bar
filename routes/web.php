@@ -379,6 +379,12 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
 
         Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');
         Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+        // Webmail
+        Route::get('/webmail', [\App\Http\Controllers\Admin\WebmailController::class, 'index'])->name('admin.webmail.index');
+        Route::get('/webmail/{uid}', [\App\Http\Controllers\Admin\WebmailController::class, 'show'])->name('admin.webmail.show');
+        Route::post('/webmail/{uid}/reply', [\App\Http\Controllers\Admin\WebmailController::class, 'reply'])->name('admin.webmail.reply');
+        Route::delete('/webmail/{uid}', [\App\Http\Controllers\Admin\WebmailController::class, 'destroy'])->name('admin.webmail.delete');
     });
         Route::get('/dashboard/admin/notifications', function () {
     $notifications = Auth::user()->notifications()->latest()->paginate(10);

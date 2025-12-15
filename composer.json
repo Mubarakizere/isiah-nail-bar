@@ -14,7 +14,8 @@
         "laravel/tinker": "^2.10.1",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^6.19",
-        "twilio/sdk": "^8.6"
+        "twilio/sdk": "^8.6",
+        "webklex/laravel-imap": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

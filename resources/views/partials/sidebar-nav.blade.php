@@ -99,6 +99,14 @@
                     <span>Messages</span>
                 </a>
 
+                <a href="{{ route('admin.webmail.index') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.webmail.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.webmail.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-envelope-open text-lg"></i>
+                    </div>
+                    <span>Webmail</span>
+                </a>
+
                  <a href="{{ route('admin.gallery-instagram.index') }}" 
                    class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.gallery-instagram.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.gallery-instagram.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
