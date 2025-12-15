@@ -105,6 +105,7 @@
 
                 <div class="flex items-center gap-3 lg:gap-6">
                     {{-- Quick Actions --}}
+                    <div class="flex items-center gap-2">
                         <div x-data="{ 
                             notifications: [],
                             unreadCount: 0,
