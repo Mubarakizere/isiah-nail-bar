@@ -149,25 +149,30 @@
             </button>
 
             {{-- Reviews Grid --}}
-            <div class="overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory flex gap-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:overflow-visible">
+            <style>
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .hide-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            </style>
+            <div class="overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory flex gap-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:overflow-visible" x-ref="carousel">
                 @foreach($reviews as $review)
                     <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-2xl p-8 hover:-translate-y-1 transition-transform duration-300 relative group">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center gap-3">
-                                @if($review->avatar_url)
-                                    <img src="{{ $review->avatar_url }}" class="w-12 h-12 rounded-full object-cover border border-gray-100">
-                                @else
-                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
-                                        {{ strtoupper(substr($review->reviewer_name ?? $review->booking->customer->user->name ?? 'A', 0, 1)) }}
-                                    </div>
-                                @endif
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                    {{ strtoupper(substr($review->reviewer_name ?? $review->booking->customer->user->name ?? 'A', 0, 1)) }}
+                                </div>
                                 <div>
                                     <h4 class="font-bold text-gray-900 text-sm">{{ $review->reviewer_name ?? $review->booking->customer->user->name ?? 'Anonymous' }}</h4>
                                     <p class="text-xs text-gray-500">{{ $review->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
                             @if($review->source === 'google')
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" class="w-6 h-6" alt="Google">
+                                <i class="ph-fill ph-google-logo text-gray-400 text-xl"></i>
                             @endif
                         </div>
 
