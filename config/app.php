@@ -156,6 +156,7 @@ return [
             /*
              * Package Service Providers...
              */
+            Webklex\IMAP\Providers\LaravelServiceProvider::class,
 
             /*
              * Application Service Providers...
