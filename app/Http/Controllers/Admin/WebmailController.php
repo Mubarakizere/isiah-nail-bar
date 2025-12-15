@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Webklex\IMAP\Facades\Client;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -13,7 +12,8 @@ class WebmailController extends Controller
     public function index()
     {
         try {
-            $client = Client::account('default');
+            /** @var \Webklex\PHPIMAP\Client $client */
+            $client = app('imap')->account('default');
             $client->connect();
 
             $folder = $client->getFolder('INBOX');
@@ -31,7 +31,7 @@ class WebmailController extends Controller
     public function show($uid)
     {
         try {
-            $client = Client::account('default');
+            $client = app('imap')->account('default');
             $client->connect();
 
             $folder = $client->getFolder('INBOX');
@@ -57,7 +57,7 @@ class WebmailController extends Controller
         ]);
 
         try {
-            $client = Client::account('default');
+            $client = app('imap')->account('default');
             $client->connect();
             $folder = $client->getFolder('INBOX');
             $message = $folder->query()->getMessageByUid($uid);
@@ -92,7 +92,7 @@ class WebmailController extends Controller
     public function destroy($uid)
     {
         try {
-            $client = Client::account('default');
+            $client = app('imap')->account('default');
             $client->connect();
             $folder = $client->getFolder('INBOX');
             $message = $folder->query()->getMessageByUid($uid);
