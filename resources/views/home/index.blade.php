@@ -128,9 +128,74 @@
             <p class="text-gray-400 font-light">Join our community of satisfied clients</p>
         </div>
         
-        <div class="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-white/5">
-            <script src="https://static.elfsight.com/platform/platform.js" async></script>
-            <div class="elfsight-app-9ff69c4b-c01b-4803-9a0b-9fb0d89e41eb" data-elfsight-app-lazy></div>
+        <div x-data="{
+                activeSlide: 0,
+                slides: {{ $reviews->count() }},
+                next() {
+                    this.activeSlide = (this.activeSlide === this.slides - 1) ? 0 : this.activeSlide + 1;
+                },
+                prev() {
+                    this.activeSlide = (this.activeSlide === 0) ? this.slides - 1 : this.activeSlide - 1;
+                }
+             }" 
+             class="relative">
+            
+            {{-- Carousel Nav --}}
+            <button @click="prev()" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-12 h-12 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-lg hidden md:flex">
+                <i class="ph ph-caret-left text-xl"></i>
+            </button>
+            <button @click="next()" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 w-12 h-12 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-lg hidden md:flex">
+                <i class="ph ph-caret-right text-xl"></i>
+            </button>
+
+            {{-- Reviews Grid --}}
+            <div class="overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory flex gap-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:overflow-visible">
+                @foreach($reviews as $review)
+                    <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-2xl p-8 hover:-translate-y-1 transition-transform duration-300 relative group">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                @if($review->avatar_url)
+                                    <img src="{{ $review->avatar_url }}" class="w-12 h-12 rounded-full object-cover border border-gray-100">
+                                @else
+                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                        {{ strtoupper(substr($review->reviewer_name ?? $review->booking->customer->user->name ?? 'A', 0, 1)) }}
+                                    </div>
+                                @endif
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm">{{ $review->reviewer_name ?? $review->booking->customer->user->name ?? 'Anonymous' }}</h4>
+                                    <p class="text-xs text-gray-500">{{ $review->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                            @if($review->source === 'google')
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" class="w-6 h-6" alt="Google">
+                            @endif
+                        </div>
+
+                        <div class="flex text-yellow-400 mb-4 text-sm">
+                            @for($i = 0; $i < 5; $i++)
+                                <i class="ph-fill ph-star{{ $i < $review->rating ? '' : '-half' }}"></i>
+                            @endfor
+                        </div>
+
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-4">
+                            {{ $review->comment }}
+                        </p>
+                        
+                        <a href="https://share.google/OtbpRmUNfC1eA9kmZ" target="_blank" class="text-rose-600 text-sm font-medium hover:underline inline-flex items-center gap-1">
+                            Read more
+                            <i class="ph ph-arrow-right"></i>
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+            
+            {{-- Mobile Dots --}}
+            <div class="flex justify-center gap-2 mt-4 md:hidden">
+                @foreach($reviews as $key => $review)
+                    <div class="w-2 h-2 rounded-full transition-colors duration-300" 
+                         :class="{ 'bg-rose-500': activeSlide === {{ $key }}, 'bg-gray-600': activeSlide !== {{ $key }} }"></div>
+                @endforeach
+            </div>
         </div>
     </div>
 </section>

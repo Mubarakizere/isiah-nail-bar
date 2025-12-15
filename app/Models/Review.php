@@ -10,8 +10,12 @@ class Review extends Model
     protected $fillable = [
         'service_id',
         'customer_id',
+        'booking_id',
         'rating',
         'comment',
+        'reviewer_name',
+        'source',
+        'avatar_url',
     ];
 
     public function service()
