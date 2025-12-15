@@ -385,6 +385,11 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
         Route::get('/webmail/{uid}', [\App\Http\Controllers\Admin\WebmailController::class, 'show'])->name('admin.webmail.show');
         Route::post('/webmail/{uid}/reply', [\App\Http\Controllers\Admin\WebmailController::class, 'reply'])->name('admin.webmail.reply');
         Route::delete('/webmail/{uid}', [\App\Http\Controllers\Admin\WebmailController::class, 'destroy'])->name('admin.webmail.delete');
+        
+        // Notification API (Polling)
+        Route::get('/api/notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'unread'])->name('admin.notifications.unread');
+        Route::post('/api/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('admin.notifications.read');
+        Route::get('/notifications/mark-all', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllRead'])->name('admin.notifications.markAllRead');
     });
         Route::get('/dashboard/admin/notifications', function () {
     $notifications = Auth::user()->notifications()->latest()->paginate(10);

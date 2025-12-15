@@ -417,6 +417,11 @@ class BookingController extends Controller
             
             // Send notification emails
             $this->sendBookingEmails($booking);
+
+            // Notify Admins
+            $admins = \App\Models\User::role('admin')->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewBookingNotification($booking));
+            
             
             // Store booking summary in session
             $this->storeBookingSummary($booking, $bookingData['services']);
@@ -538,8 +543,30 @@ class BookingController extends Controller
     private function sendBookingEmails(Booking $booking): void
     {
         try {
-            Mail::to($booking->customer->user->email)->send(new BookingCreated($booking));
-            Mail::to(config('mail.admin'))->send(new AdminBookingAlert($booking));
+            // Send to Customer
+            if ($booking->customer && $booking->customer->user) {
+                Mail::to($booking->customer->user->email)->send(new BookingCreated($booking));
+            }
+
+            // Send to Provider
+            if ($booking->provider && $booking->provider->email) {
+                Mail::to($booking->provider->email)->send(new \App\Mail\ProviderNewBooking($booking));
+            }
+
+            // Send to Admin (Original + New Recipients)
+            $adminEmails = [
+                config('mail.admin'),
+                'info@isaiahnailbar.com',
+                'isaiebm4@gmail.com'
+            ];
+            
+            // Filter out empty or duplicate emails
+            $adminEmails = array_unique(array_filter($adminEmails));
+
+            foreach ($adminEmails as $email) {
+                Mail::to($email)->send(new AdminBookingAlert($booking));
+            }
+
         } catch (\Exception $e) {
             Log::warning('Booking emails failed to send: ' . $e->getMessage());
         }

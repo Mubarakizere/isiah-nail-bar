@@ -105,11 +105,66 @@
 
                 <div class="flex items-center gap-3 lg:gap-6">
                     {{-- Quick Actions --}}
-                    <div class="flex items-center gap-2">
-                        <button class="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all relative group">
-                            <i class="ph ph-bell text-xl"></i>
-                            <span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-                        </button>
+                        <div x-data="{ 
+                            notifications: [],
+                            unreadCount: 0,
+                            open: false,
+                            async fetchNotifications() {
+                                try {
+                                    const res = await fetch('{{ route('admin.notifications.unread') }}');
+                                    const data = await res.json();
+                                    this.unreadCount = data.unread_count;
+                                    this.notifications = data.notifications;
+                                    
+                                    if(data.unread_count > 0 && data.unread_count > (localStorage.getItem('last_unread_count') || 0)) {
+                                          // Play sound or show toast if count increased
+                                    }
+                                    localStorage.setItem('last_unread_count', data.unread_count);
+                                } catch (e) {
+                                    console.error('Failed to fetch notifications');
+                                }
+                            },
+                            async markAsRead(id) {
+                                await fetch(`/api/notifications/${id}/read`, {
+                                    method: 'POST',
+                                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content }
+                                });
+                                this.fetchNotifications();
+                            }
+                        }" 
+                        x-init="fetchNotifications(); setInterval(() => fetchNotifications(), 30000)"
+                        class="relative">
+                            
+                            <button @click="open = !open" @click.away="open = false" class="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all relative group">
+                                <i class="ph ph-bell text-xl"></i>
+                                <div x-show="unreadCount > 0" x-cloak class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></div>
+                            </button>
+
+                            <!-- Dropdown -->
+                            <div x-show="open" x-cloak 
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                                
+                                <div class="px-4 py-2 border-b border-gray-100 flex justify-between items-center">
+                                    <span class="font-medium text-gray-700">Notifications</span>
+                                    <a href="{{ route('admin.notifications.markAllRead') }}" class="text-xs text-rose-500 hover:text-rose-600">Mark all read</a>
+                                </div>
+
+                                <div class="max_h-64 overflow-y-auto">
+                                    <template x-for="notification in notifications" :key="notification.id">
+                                        <div @click="markAsRead(notification.id); window.location.href='/dashboard/admin/bookings'" class="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0">
+                                            <p class="text-sm text-gray-800" x-text="notification.data.message"></p>
+                                            <p class="text-xs text-gray-400 mt-1" x-text="notification.created_at"></p>
+                                        </div>
+                                    </template>
+                                    <div x-show="notifications.length === 0" class="px-4 py-4 text-center text-gray-500 text-sm">
+                                        No new notifications
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         {{-- Contextual Help --}}
                          <button class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
