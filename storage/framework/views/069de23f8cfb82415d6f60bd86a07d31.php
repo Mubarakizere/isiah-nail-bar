@@ -1,13 +1,13 @@
-@extends('layouts.public')
 
-@section('title', 'Our Luxury Nail Services')
 
-@section('content')
+<?php $__env->startSection('title', 'Our Luxury Nail Services'); ?>
 
-{{-- Hero Section --}}
+<?php $__env->startSection('content'); ?>
+
+
 <div class="relative bg-gray-900 py-24 overflow-hidden">
     <div class="absolute inset-0 opacity-40">
-        <img src="{{ asset('storage/banner.jpg') }}" alt="Services Banner" class="w-full h-full object-cover">
+        <img src="<?php echo e(asset('storage/banner.jpg')); ?>" alt="Services Banner" class="w-full h-full object-cover">
     </div>
     <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
     
@@ -20,29 +20,30 @@
     </div>
 </div>
 
-{{-- Main Content --}}
+
 <section class="py-16 bg-white min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {{-- Search & Filter Bar --}}
+        
         <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 sticky top-24 z-30 bg-white/95 backdrop-blur-md py-4 transition-all duration-300 border-b border-gray-100" id="filterBar">
-            {{-- Categories --}}
+            
             <div class="overflow-x-auto scrollbar-hide w-full md:w-auto -mx-4 px-4 md:mx-0 md:px-0">
                 <div class="flex gap-2 min-w-max">
                     <button onclick="filterCategory('all', this)" 
                             class="category-tab active px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-transparent bg-gray-900 text-white">
                         All Services
                     </button>
-                    @foreach($categories as $category)
-                        <button onclick="filterCategory('{{ $category->id }}', this)" 
+                    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <button onclick="filterCategory('<?php echo e($category->id); ?>', this)" 
                                 class="category-tab px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 bg-white">
-                            {{ $category->name }}
+                            <?php echo e($category->name); ?>
+
                         </button>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </div>
 
-            {{-- Search --}}
+            
             <div class="relative w-full md:w-72">
                 <input type="text" 
                        id="searchInput" 
@@ -52,12 +53,12 @@
             </div>
         </div>
 
-        @if($categories->count() > 0)
+        <?php if($categories->count() > 0): ?>
             <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-                @foreach($categories as $category)
-                    @foreach($category->services->sortBy('price') as $service)
+                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $__currentLoopData = $category->services->sortBy('price'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="service-card group cursor-pointer" 
-                             onclick="openServiceModal({{ json_encode([
+                             onclick="openServiceModal(<?php echo e(json_encode([
                                 'id' => $service->id,
                                 'name' => $service->name,
                                 'price' => number_format($service->price),
@@ -65,38 +66,38 @@
                                 'category' => $category->name,
                                 'description' => $service->description,
                                 'image' => $service->image ? asset('storage/' . $service->image) : null
-                            ]) }})"
-                             data-category="{{ $category->id }}"
-                             data-name="{{ strtolower($service->name) }}"
-                             data-description="{{ strtolower($service->description ?? '') }}">
+                            ])); ?>)"
+                             data-category="<?php echo e($category->id); ?>"
+                             data-name="<?php echo e(strtolower($service->name)); ?>"
+                             data-description="<?php echo e(strtolower($service->description ?? '')); ?>">
                             
-                            {{-- Image/Placement --}}
+                            
                             <div class="relative aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
-                                @if($service->image)
-                                    <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                                @else
+                                <?php if($service->image): ?>
+                                    <img src="<?php echo e(asset('storage/' . $service->image)); ?>" alt="<?php echo e($service->name); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                <?php else: ?>
                                     <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
                                         <i class="ph ph-sparkle text-3xl"></i>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                             </div>
 
-                            {{-- Content --}}
+                            
                             <div class="flex justify-between items-start gap-4">
                                 <div>
-                                    <h3 class="text-lg font-serif text-gray-900 group-hover:text-rose-600 transition-colors">{{ $service->name }}</h3>
-                                    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $service->description }}</p>
-                                    @if($service->duration)
+                                    <h3 class="text-lg font-serif text-gray-900 group-hover:text-rose-600 transition-colors"><?php echo e($service->name); ?></h3>
+                                    <p class="text-sm text-gray-500 mt-1 line-clamp-2"><?php echo e($service->description); ?></p>
+                                    <?php if($service->duration): ?>
                                         <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
                                             <i class="ph ph-clock"></i>
-                                            <span>{{ $service->duration }} mins</span>
+                                            <span><?php echo e($service->duration); ?> mins</span>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                                 <div class="text-right">
                                     <span class="block text-lg font-medium text-gray-900 whitespace-nowrap">
-                                        {{ number_format($service->price) }} <span class="text-xs text-gray-500 font-normal">RWF</span>
+                                        <?php echo e(number_format($service->price)); ?> <span class="text-xs text-gray-500 font-normal">RWF</span>
                                     </span>
                                     <button class="mt-2 text-sm font-medium text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
                                         Book <i class="ph ph-arrow-right text-xs"></i>
@@ -104,27 +105,27 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
 
-            {{-- No Results --}}
+            
             <div id="noResults" class="hidden text-center py-24">
                 <i class="ph ph-magnifying-glass text-4xl text-gray-300 mb-4"></i>
                 <p class="text-gray-500">No services found matching your criteria.</p>
             </div>
-        @else
+        <?php else: ?>
             <div class="text-center py-24">
                 <p class="text-gray-500">Our service menu is currently being updated.</p>
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </section>
 
-{{-- Minimalist Modal --}}
+
 <div id="serviceModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" onclick="closeServiceModal()">
     <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl transform transition-all" onclick="event.stopPropagation()">
-        {{-- Image --}}
+        
         <div id="modalImageContainer" class="hidden relative h-48 sm:h-64">
             <img id="modalImage" src="" alt="" class="w-full h-full object-cover">
             <button onclick="closeServiceModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors">
@@ -156,7 +157,7 @@
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 // Filter Logic
 function filterCategory(catId, btn) {
@@ -205,7 +206,7 @@ function openServiceModal(service) {
     document.getElementById('modalCategory').textContent = service.category;
     document.getElementById('modalPrice').textContent = 'RWF ' + service.price;
     document.getElementById('modalDescription').textContent = service.description || 'No description available.';
-    document.getElementById('modalBookBtn').href = '{{ route("booking.step1") }}?service_id=' + service.id;
+    document.getElementById('modalBookBtn').href = '<?php echo e(route("booking.step1")); ?>?service_id=' + service.id;
     
     if (service.duration) {
         document.getElementById('modalDuration').textContent = service.duration + ' mins';
@@ -240,11 +241,12 @@ function closeServiceModal() {
 // Fade in animation style
 const style = document.createElement('style');
 style.textContent = `
-    @@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
 `;
 document.head.appendChild(style);
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.public', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\mouba\isaiahnailbar\resources\views/services/index.blade.php ENDPATH**/ ?>

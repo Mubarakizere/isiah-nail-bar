@@ -256,7 +256,7 @@
 
 /* === ANIMATIONS === */
 
-@keyframes pulseStep {
+@@keyframes pulseStep {
     0%, 100% {
         transform: scale(1);
         box-shadow: var(--shadow-primary);
@@ -267,18 +267,18 @@
     }
 }
 
-@keyframes rotateRing {
+@@keyframes rotateRing {
     from { transform: translate(-50%, -50%) rotate(0deg); }
     to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-@keyframes checkmarkPop {
+@@keyframes checkmarkPop {
     0% { transform: scale(0); opacity: 0; }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes fillLine {
+@@keyframes fillLine {
     from { width: 0; }
     to { width: 100%; }
 }

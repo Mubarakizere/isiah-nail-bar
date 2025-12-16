@@ -59,7 +59,7 @@
 @push('styles')
 <style>
 /* Performance-optimized animations */
-@keyframes float-gentle {
+@@keyframes float-gentle {
     0%, 100% { 
         transform: translateY(0px) scale(1); 
         opacity: 0.6;
