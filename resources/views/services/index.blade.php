@@ -14,9 +14,15 @@
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12">
         <span class="text-rose-400 font-medium tracking-widest text-sm uppercase mb-3 block animate-fade-in-up">Our Expertise</span>
         <h1 class="text-4xl md:text-6xl font-serif text-white mb-6 animate-fade-in-up delay-100">Service Menu</h1>
-        <p class="text-xl text-gray-300 font-light max-w-2xl mx-auto animate-fade-in-up delay-200">
+        <p class="text-xl text-gray-300 font-light max-w-2xl mx-auto animate-fade-in-up delay-200 mb-8">
             Discover our curated selection of nail treatments, designed to provide the ultimate in care and relaxation.
         </p>
+        
+        {{-- Share Page Button --}}
+        <button onclick="sharePage()" class="inline-flex items-center gap-2 px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all animate-fade-in-up delay-300">
+            <i class="ph ph-share-network text-lg"></i>
+            <span>Share Menu</span>
+        </button>
     </div>
 </div>
 
@@ -56,7 +62,7 @@
             <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
                 @foreach($categories as $category)
                     @foreach($category->services->sortBy('price') as $service)
-                        <div class="service-card group cursor-pointer" 
+                        <div id="service-{{ $service->id }}" class="service-card group cursor-pointer" 
                              onclick="openServiceModal({{ json_encode([
                                 'id' => $service->id,
                                 'name' => $service->name,
@@ -80,6 +86,13 @@
                                     </div>
                                 @endif
                                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+
+                                {{-- Share Button (Card) --}}
+                                <button onclick="shareService(event, {{ $service->id }}, {{ json_encode($service->name) }}, {{ json_encode($service->description ?? '') }})" 
+                                        class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white text-gray-900 rounded-full shadow-sm backdrop-blur-sm transition-all z-10 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300 delay-75"
+                                        title="Share Service">
+                                    <i class="ph ph-share-network"></i>
+                                </button>
                             </div>
 
                             {{-- Content --}}
@@ -149,9 +162,14 @@
             
             <p id="modalDescription" class="text-gray-600 leading-relaxed mb-8 font-light"></p>
             
-            <a id="modalBookBtn" href="#" class="w-full block py-4 bg-gray-900 text-white text-center font-medium rounded-full hover:bg-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                Book Appointment
-            </a>
+            <div class="flex gap-3">
+                <a id="modalBookBtn" href="#" class="flex-1 block py-4 bg-gray-900 text-white text-center font-medium rounded-full hover:bg-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                    Book Appointment
+                </a>
+                <button id="modalShareBtn" onclick="shareCurrentModalService()" class="px-4 py-4 border border-gray-200 text-gray-900 rounded-full hover:bg-gray-50 transition-all flex items-center justify-center">
+                    <i class="ph ph-share-network text-xl"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -213,6 +231,16 @@ function openServiceModal(service) {
     } else {
         document.getElementById('modalDuration').style.display = 'none';
     }
+    
+    // Set share data for modal button
+    const url = new URL(window.location.href.split('?')[0]);
+    url.searchParams.set('service', service.id);
+    
+    currentServiceShareData = {
+        title: service.name + ' - {{ config("app.name") }}',
+        text: 'Check out this service: ' + service.name,
+        url: url.toString()
+    };
 
     const imgContainer = document.getElementById('modalImageContainer');
     const noImgHeader = document.getElementById('modalNoImageHeader');
@@ -235,7 +263,98 @@ function openServiceModal(service) {
 function closeServiceModal() {
     document.getElementById('serviceModal').classList.add('hidden');
     document.body.style.overflow = 'auto';
+    
+    // Clear URL param without refreshing if it exists
+    const url = new URL(window.location);
+    if (url.searchParams.has('service')) {
+        url.searchParams.delete('service');
+        window.history.replaceState({}, '', url);
+    }
 }
+
+// Sharing Logic
+async function sharePage() {
+    const shareData = {
+        title: '{{ config("app.name") }} - Service Menu',
+        text: 'Check out the luxury nail services at {{ config("app.name") }}!',
+        url: window.location.href.split('?')[0]
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copied to clipboard!');
+        }
+    } catch (err) {
+        console.error('Error sharing:', err);
+    }
+}
+
+let currentServiceShareData = null;
+
+async function shareService(event, id, name, description) {
+    if(event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
+    const url = new URL(window.location.href.split('?')[0]);
+    url.searchParams.set('service', id);
+    
+    const shareData = {
+        title: name + ' - {{ config("app.name") }}',
+        text: 'Check out this service: ' + name,
+        url: url.toString()
+    };
+    
+    // Store for modal
+    currentServiceShareData = shareData;
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Service link copied to clipboard!');
+        }
+    } catch (err) {
+        console.error('Error sharing:', err);
+    }
+}
+
+function shareCurrentModalService() {
+    if (currentServiceShareData) {
+        shareService(null, null, currentServiceShareData.title, ''); // Reuse stored data logic manually or refactor
+        // Actually simpler to just call navigator logic directly since we have data
+        try {
+            if (navigator.share) {
+                navigator.share(currentServiceShareData);
+            } else {
+                navigator.clipboard.writeText(currentServiceShareData.url);
+                alert('Service link copied to clipboard!');
+            }
+        } catch (err) {}
+    }
+}
+
+// Auto-open from URL
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceId = urlParams.get('service');
+    
+    if (serviceId) {
+        const card = document.getElementById('service-' + serviceId);
+        if (card) {
+            // Wait slightly for any animations/loading
+            setTimeout(() => {
+                card.click();
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    }
+});
 
 // Fade in animation style
 const style = document.createElement('style');
