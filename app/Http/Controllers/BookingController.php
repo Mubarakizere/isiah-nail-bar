@@ -42,13 +42,27 @@ class BookingController extends Controller
 
     /**
      * Normalize phone number to international format
+     * Accepts: 0788123456, 788123456, +250788123456
      */
     private function normalizePhoneNumber(string $phone): string
     {
-        if (!str_starts_with($phone, '+')) {
-            return '+250' . ltrim($phone, '0');
+        // Remove all spaces, dashes, and formatting characters
+        $phone = preg_replace('/[\s\-\(\)\.]+/', '', $phone);
+        
+        // If already has country code, return as is
+        if (str_starts_with($phone, '+250')) {
+            return $phone;
         }
-        return $phone;
+        
+        // If starts with 250 (without +), add the +
+        if (str_starts_with($phone, '250')) {
+            return '+' . $phone;
+        }
+        
+        // Remove leading 0 if present and add country code
+        $phone = ltrim($phone, '0');
+        
+        return '+250' . $phone;
     }
 
     /**
@@ -344,7 +358,7 @@ class BookingController extends Controller
     {
         $request->validate([
             'payment_option' => 'required|in:full,deposit',
-            'payment_phone' => 'required|string|min:10|max:15',
+            'payment_phone' => ['required', 'string', 'regex:/^(\+?250|0)?[7][0-9]{8}$/'],
             'payment_method' => 'required|in:momo,card',
         ]);
 
@@ -672,7 +686,7 @@ class BookingController extends Controller
     public function payRemainingPost(Request $request, $id)
     {
         $request->validate([
-            'phone' => 'required|string|min:10',
+            'phone' => ['required', 'string', 'regex:/^(\+?250|0)?[7][0-9]{8}$/'],
             'payment_method' => 'required|in:momo,card',
         ]);
 
@@ -783,7 +797,7 @@ class BookingController extends Controller
     public function retryPaymentPost(Request $request, $id)
     {
         $request->validate([
-            'phone' => 'required|string|min:10',
+            'phone' => ['required', 'string', 'regex:/^(\+?250|0)?[7][0-9]{8}$/'],
             'payment_method' => 'required|in:momo,card',
         ]);
 

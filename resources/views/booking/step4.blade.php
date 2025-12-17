@@ -89,21 +89,36 @@
                              Confirm Contact
                         </h3>
                         <div class="bg-white rounded-2xl p-6 border border-gray-200">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">MoMo Payment / Contact Number</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                MoMo Payment / Contact Number
+                                <span class="text-rose-500">*</span>
+                            </label>
                             <div class="relative">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 gap-2 flex items-center border-r border-gray-200 pr-3">
                                     <i class="ph ph-phone"></i> +250
                                 </span>
                                 <input type="tel" 
+                                       id="payment_phone"
                                        name="payment_phone" 
                                        value="{{ auth()->user()->phone ?? '' }}"
                                        required
-                                       class="w-full pl-24 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-all font-medium text-gray-900"
-                                       placeholder="7XX XXX XXX">
+                                       maxlength="12"
+                                       class="w-full pl-24 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-all font-medium text-gray-900"
+                                       placeholder="788 123 456">
+                                <div id="phone-status" class="absolute right-4 top-1/2 -translate-y-1/2 hidden">
+                                    <i class="ph ph-check-circle text-green-500 text-xl"></i>
+                                </div>
+                                <div id="phone-error-icon" class="absolute right-4 top-1/2 -translate-y-1/2 hidden">
+                                    <i class="ph ph-x-circle text-red-500 text-xl"></i>
+                                </div>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                                <i class="ph ph-info"></i> This number will be used for payment processing and booking updates.
-                            </p>
+                            <div class="flex items-center justify-between mt-2">
+                                <p id="phone-helper" class="text-xs text-gray-500 flex items-center gap-1">
+                                    <i class="ph ph-info"></i> Enter 9 digits (e.g., 788123456)
+                                </p>
+                                <span id="phone-counter" class="text-xs text-gray-400">0/9</span>
+                            </div>
+                            <p id="phone-error" class="text-xs text-red-500 mt-1 hidden"></p>
                         </div>
                     </div>
 
@@ -222,6 +237,7 @@
 
 @push('scripts')
 <script>
+// Payment option toggle
 document.querySelectorAll('input[name="payment_option"]').forEach(radio => {
     radio.addEventListener('change', function() {
         const val = this.value;
@@ -235,6 +251,161 @@ document.querySelectorAll('input[name="payment_option"]').forEach(radio => {
             display.textContent = 'RWF ' + total.toLocaleString();
         }
     });
+});
+
+// Phone number validation and formatting
+const phoneInput = document.getElementById('payment_phone');
+const phoneStatus = document.getElementById('phone-status');
+const phoneErrorIcon = document.getElementById('phone-error-icon');
+const phoneError = document.getElementById('phone-error');
+const phoneHelper = document.getElementById('phone-helper');
+const phoneCounter = document.getElementById('phone-counter');
+const submitBtn = document.getElementById('payNowBtn');
+const form = phoneInput.closest('form');
+
+// Rwandan phone number regex (accepts 0788..., 788..., +250788...)
+const rwandaPhoneRegex = /^(\+?250|0)?[7][0-9]{8}$/;
+
+function cleanPhoneNumber(value) {
+    // Remove all non-digit characters except +
+    return value.replace(/[^\d+]/g, '');
+}
+
+function formatPhoneNumber(value) {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '');
+    
+    // Remove leading 0 if present
+    const cleaned = digits.replace(/^0/, '');
+    
+    // Format with spaces: 788 123 456
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return cleaned.slice(0, 3) + ' ' + cleaned.slice(3);
+    return cleaned.slice(0, 3) + ' ' + cleaned.slice(3, 6) + ' ' + cleaned.slice(6, 9);
+}
+
+function validatePhone(value) {
+    const cleaned = cleanPhoneNumber(value);
+    
+    // Check if it matches Rwandan format
+    if (rwandaPhoneRegex.test(cleaned)) {
+        return { valid: true, message: '' };
+    }
+    
+    // Provide specific error messages
+    const digitsOnly = cleaned.replace(/\D/g, '').replace(/^0/, '');
+    
+    if (digitsOnly.length === 0) {
+        return { valid: false, message: 'Phone number is required' };
+    }
+    
+    if (!digitsOnly.startsWith('7')) {
+        return { valid: false, message: 'Rwandan numbers must start with 7' };
+    }
+    
+    if (digitsOnly.length < 9) {
+        return { valid: false, message: `Enter ${9 - digitsOnly.length} more digit${9 - digitsOnly.length > 1 ? 's' : ''}` };
+    }
+    
+    if (digitsOnly.length > 9) {
+        return { valid: false, message: 'Phone number is too long' };
+    }
+    
+    return { valid: false, message: 'Invalid phone number format' };
+}
+
+function updatePhoneUI(validation, digitCount) {
+    const inputElement = phoneInput;
+    
+    // Update counter
+    phoneCounter.textContent = `${digitCount}/9`;
+    
+    if (validation.valid) {
+        // Valid state
+        phoneStatus.classList.remove('hidden');
+        phoneErrorIcon.classList.add('hidden');
+        phoneError.classList.add('hidden');
+        phoneHelper.classList.remove('hidden');
+        inputElement.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+        inputElement.classList.add('border-green-300', 'focus:border-green-500', 'focus:ring-green-500');
+        phoneCounter.classList.remove('text-red-400');
+        phoneCounter.classList.add('text-green-500');
+    } else if (digitCount > 0) {
+        // Invalid state (only show if user has typed something)
+        phoneStatus.classList.add('hidden');
+        phoneErrorIcon.classList.remove('hidden');
+        phoneError.textContent = validation.message;
+        phoneError.classList.remove('hidden');
+        phoneHelper.classList.add('hidden');
+        inputElement.classList.remove('border-green-300', 'focus:border-green-500', 'focus:ring-green-500');
+        inputElement.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+        phoneCounter.classList.remove('text-green-500');
+        phoneCounter.classList.add('text-red-400');
+    } else {
+        // Empty state
+        phoneStatus.classList.add('hidden');
+        phoneErrorIcon.classList.add('hidden');
+        phoneError.classList.add('hidden');
+        phoneHelper.classList.remove('hidden');
+        inputElement.classList.remove('border-red-300', 'border-green-300', 'focus:border-red-500', 'focus:border-green-500', 'focus:ring-red-500', 'focus:ring-green-500');
+        phoneCounter.classList.remove('text-red-400', 'text-green-500');
+        phoneCounter.classList.add('text-gray-400');
+    }
+}
+
+// Real-time validation on input
+phoneInput.addEventListener('input', function(e) {
+    const cursorPosition = e.target.selectionStart;
+    const oldValue = e.target.value;
+    const oldLength = oldValue.length;
+    
+    // Format the number
+    const formatted = formatPhoneNumber(e.target.value);
+    e.target.value = formatted;
+    
+    // Restore cursor position (accounting for added spaces)
+    const newLength = formatted.length;
+    const diff = newLength - oldLength;
+    e.target.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
+    
+    // Validate
+    const cleaned = cleanPhoneNumber(formatted).replace(/^0/, '');
+    const digitCount = cleaned.replace(/\D/g, '').length;
+    const validation = validatePhone(formatted);
+    
+    updatePhoneUI(validation, digitCount);
+});
+
+// Validate on blur
+phoneInput.addEventListener('blur', function() {
+    const validation = validatePhone(this.value);
+    const digitCount = cleanPhoneNumber(this.value).replace(/\D/g, '').replace(/^0/, '').length;
+    updatePhoneUI(validation, digitCount);
+});
+
+// Prevent form submission if phone is invalid
+form.addEventListener('submit', function(e) {
+    const validation = validatePhone(phoneInput.value);
+    if (!validation.valid) {
+        e.preventDefault();
+        phoneInput.focus();
+        const digitCount = cleanPhoneNumber(phoneInput.value).replace(/\D/g, '').replace(/^0/, '').length;
+        updatePhoneUI(validation, digitCount);
+        
+        // Scroll to phone input
+        phoneInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', function() {
+    if (phoneInput.value) {
+        const formatted = formatPhoneNumber(phoneInput.value);
+        phoneInput.value = formatted;
+        const validation = validatePhone(formatted);
+        const digitCount = cleanPhoneNumber(formatted).replace(/\D/g, '').replace(/^0/, '').length;
+        updatePhoneUI(validation, digitCount);
+    }
 });
 </script>
 <style>

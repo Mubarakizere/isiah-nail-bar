@@ -1,27 +1,36 @@
 @component('mail::message')
 # Hello {{ $booking->customer->user->name ?? 'Valued Customer' }},
 
-📥 We’ve received your booking request for the following services:
+## 🎉 Almost There! Your Appointment is Reserved
 
+We've reserved your time slot, but **payment is required** to confirm your booking.
+
+### Selected Services:
 @foreach($booking->services as $service)
 - **{{ $service->name }}** ({{ $service->duration_minutes }} mins) — RWF {{ number_format($service->price) }}
 @endforeach
 
 ---
 
-### 🗓 Booking Details:
-- **Date:** {{ \Carbon\Carbon::parse($booking->date)->format('D, M j, Y') }}  
-- **Time:** {{ \Carbon\Carbon::parse($booking->time)->format('H:i') }}  
+### 📋 Booking Details:
+- **Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
+- **Time:** {{ \Carbon\Carbon::parse($booking->time)->format('h:i A') }}  
 - **Provider:** {{ $booking->provider->name ?? '-' }}  
-- **Status:** Pending Confirmation
+- **Amount Due:** RWF {{ number_format($booking->services->sum('price')) }}
+- **Status:** ⏳ Awaiting Payment
 
-You’ll receive another email once the provider confirms your appointment.
+---
+
+### ⚠️ Important Notice
+Your booking will be **confirmed once payment is received**. Please complete your payment to secure your appointment slot.
 
 @component('mail::button', ['url' => url('/')])
-Visit Website
+Complete Payment Now
 @endcomponent
 
-Thanks for booking with us!  
+Need help? Feel free to contact us!
+
+Thanks for choosing us,  
 **Isaiah Nail Bar**
 
 _📍 KG 4 Roundabout, Kigali • 📱 IG: @isaiahnailbar_
