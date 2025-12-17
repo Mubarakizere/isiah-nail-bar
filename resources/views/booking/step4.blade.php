@@ -97,14 +97,18 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 gap-2 flex items-center border-r border-gray-200 pr-3">
                                     <i class="ph ph-phone"></i> +250
                                 </span>
+                                {{-- Display input (formatted with spaces for UX) --}}
                                 <input type="tel" 
-                                       id="payment_phone"
-                                       name="payment_phone" 
+                                       id="payment_phone_display"
                                        value="{{ auth()->user()->phone ?? '' }}"
                                        required
                                        maxlength="12"
                                        class="w-full pl-24 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-all font-medium text-gray-900"
                                        placeholder="788 123 456">
+                                {{-- Hidden input (clean number for backend submission) --}}
+                                <input type="hidden" 
+                                       id="payment_phone"
+                                       name="payment_phone">
                                 <div id="phone-status" class="absolute right-4 top-1/2 -translate-y-1/2 hidden">
                                     <i class="ph ph-check-circle text-green-500 text-xl"></i>
                                 </div>
@@ -254,14 +258,15 @@ document.querySelectorAll('input[name="payment_option"]').forEach(radio => {
 });
 
 // Phone number validation and formatting
-const phoneInput = document.getElementById('payment_phone');
+const phoneInputDisplay = document.getElementById('payment_phone_display');
+const phoneInputHidden = document.getElementById('payment_phone');
 const phoneStatus = document.getElementById('phone-status');
 const phoneErrorIcon = document.getElementById('phone-error-icon');
 const phoneError = document.getElementById('phone-error');
 const phoneHelper = document.getElementById('phone-helper');
 const phoneCounter = document.getElementById('phone-counter');
 const submitBtn = document.getElementById('payNowBtn');
-const form = phoneInput.closest('form');
+const form = phoneInputDisplay.closest('form');
 
 // Rwandan phone number regex (accepts 0788..., 788..., +250788...)
 const rwandaPhoneRegex = /^(\+?250|0)?[7][0-9]{8}$/;
@@ -315,7 +320,7 @@ function validatePhone(value) {
 }
 
 function updatePhoneUI(validation, digitCount) {
-    const inputElement = phoneInput;
+    const inputElement = phoneInputDisplay;
     
     // Update counter
     phoneCounter.textContent = `${digitCount}/9`;
@@ -354,7 +359,7 @@ function updatePhoneUI(validation, digitCount) {
 }
 
 // Real-time validation on input
-phoneInput.addEventListener('input', function(e) {
+phoneInputDisplay.addEventListener('input', function(e) {
     const cursorPosition = e.target.selectionStart;
     const oldValue = e.target.value;
     const oldLength = oldValue.length;
@@ -374,10 +379,13 @@ phoneInput.addEventListener('input', function(e) {
     const validation = validatePhone(formatted);
     
     updatePhoneUI(validation, digitCount);
+    
+    // Update hidden input with clean number (no spaces)
+    phoneInputHidden.value = cleanPhoneNumber(formatted).replace(/^0/, '');
 });
 
 // Validate on blur
-phoneInput.addEventListener('blur', function() {
+phoneInputDisplay.addEventListener('blur', function() {
     const validation = validatePhone(this.value);
     const digitCount = cleanPhoneNumber(this.value).replace(/\D/g, '').replace(/^0/, '').length;
     updatePhoneUI(validation, digitCount);
@@ -385,26 +393,34 @@ phoneInput.addEventListener('blur', function() {
 
 // Prevent form submission if phone is invalid
 form.addEventListener('submit', function(e) {
-    const validation = validatePhone(phoneInput.value);
+    // Clean the phone number and update hidden input
+    const cleanNumber = cleanPhoneNumber(phoneInputDisplay.value).replace(/^0/, '');
+    phoneInputHidden.value = cleanNumber;
+    
+    // Validate the clean number
+    const validation = validatePhone(cleanNumber);
     if (!validation.valid) {
         e.preventDefault();
-        phoneInput.focus();
-        const digitCount = cleanPhoneNumber(phoneInput.value).replace(/\D/g, '').replace(/^0/, '').length;
+        phoneInputDisplay.focus();
+        const digitCount = cleanNumber.replace(/\D/g, '').length;
         updatePhoneUI(validation, digitCount);
         
         // Scroll to phone input
-        phoneInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        phoneInputDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 });
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', function() {
-    if (phoneInput.value) {
-        const formatted = formatPhoneNumber(phoneInput.value);
-        phoneInput.value = formatted;
+    if (phoneInputDisplay.value) {
+        const formatted = formatPhoneNumber(phoneInputDisplay.value);
+        phoneInputDisplay.value = formatted;
         const validation = validatePhone(formatted);
         const digitCount = cleanPhoneNumber(formatted).replace(/\D/g, '').replace(/^0/, '').length;
         updatePhoneUI(validation, digitCount);
+        
+        // Initialize hidden input
+        phoneInputHidden.value = cleanPhoneNumber(formatted).replace(/^0/, '');
     }
 });
 </script>
