@@ -114,6 +114,62 @@
                     </div>
                     <span>Gallery</span>
                 </a>
+
+                <a href="{{ route('admin.tags.index') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.tags.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.tags.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-tag text-lg"></i>
+                    </div>
+                    <span>Tags</span>
+                </a>
+
+                <a href="{{ route('admin.reviews.index') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.reviews.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.reviews.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-star text-lg"></i>
+                    </div>
+                    <span>Reviews</span>
+                </a>
+            </div>
+        </div>
+
+        {{-- Tools & Utilities Section --}}
+        <div>
+            <div class="px-2 mb-2">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Tools</h3>
+            </div>
+            <div class="space-y-1">
+                <a href="{{ route('admin.bookings.manual.create') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.bookings.manual.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.bookings.manual.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-calendar-plus text-lg"></i>
+                    </div>
+                    <span>Manual Booking</span>
+                </a>
+
+                <a href="{{ route('admin.services.pending') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.services.pending') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.services.pending') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-hourglass text-lg"></i>
+                    </div>
+                    <span>Pending Services</span>
+                </a>
+
+                <a href="{{ route('admin.emails.index') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.emails.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.emails.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-paper-plane-tilt text-lg"></i>
+                    </div>
+                    <span>Email Logs</span>
+                </a>
+
+                <a href="{{ route('admin.webhooks.index') }}" 
+                   class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all {{ request()->routeIs('admin.webhooks.*') ? 'bg-gray-800 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.webhooks.*') ? 'bg-rose-500/20 text-rose-400' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-white' }}">
+                        <i class="ph ph-webhook text-lg"></i>
+                    </div>
+                    <span>Webhooks</span>
+                </a>
             </div>
         </div>
     </div>
