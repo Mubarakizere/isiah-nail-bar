@@ -198,12 +198,29 @@ class BookingController extends Controller
     {
         $slotsWithStatus = [];
 
+        // Check if working hour exists and is not a day off/holiday
         if (!$workingHour || $workingHour->is_day_off || $workingHour->is_holiday) {
             return $slotsWithStatus;
         }
 
-        $start = Carbon::createFromFormat('H:i:s', $workingHour->start_time);
-        $end = Carbon::createFromFormat('H:i:s', $workingHour->end_time);
+        // Validate that start_time and end_time are not null or empty
+        if (empty($workingHour->start_time) || empty($workingHour->end_time)) {
+            return $slotsWithStatus;
+        }
+
+        try {
+            $start = Carbon::createFromFormat('H:i:s', $workingHour->start_time);
+            $end = Carbon::createFromFormat('H:i:s', $workingHour->end_time);
+        } catch (\Exception $e) {
+            Log::warning('Invalid time format in working hours', [
+                'provider_id' => $providerId,
+                'date' => $selectedDate,
+                'start_time' => $workingHour->start_time,
+                'end_time' => $workingHour->end_time,
+                'error' => $e->getMessage()
+            ]);
+            return $slotsWithStatus;
+        }
 
         // Generate time slots
         $slots = [];
