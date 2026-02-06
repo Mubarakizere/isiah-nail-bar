@@ -52,7 +52,7 @@
                 </div>
 
                 {{-- Navigation --}}
-                <nav class="flex-1 px-4 py-8 space-y-1 overflow-y-auto custom-scrollbar">
+                <nav class="flex-1 px-4 py-8 space-y-1">
                     @include('partials.sidebar-nav')
                 </nav>
 

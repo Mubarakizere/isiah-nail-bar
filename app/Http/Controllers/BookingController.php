@@ -617,6 +617,7 @@ class BookingController extends Controller
         ]);
         
         session()->put('last_booking_id', $booking->id);
+        session()->put('last_booking_reference', $booking->reference); // ✅ Store reference for polling
     }
 
     /**
@@ -930,5 +931,53 @@ class BookingController extends Controller
         ])->setPaper('a4');
 
         return $pdf->download("receipt_booking_{$booking->id}.pdf");
+    }
+
+    /**
+     * API endpoint to check payment status (for polling)
+     * Used by payment iframe to wait for webhook confirmation
+     */
+    public function checkPaymentStatus($reference)
+    {
+        $booking = Booking::where('reference', $reference)
+            ->with('payments')
+            ->first();
+
+        if (!$booking) {
+            return response()->json([
+                'status' => 'not_found',
+                'message' => 'Booking not found'
+            ], 404);
+        }
+
+        // Check latest payment status
+        $latestPayment = $booking->payments()->latest()->first();
+
+        // Determine overall status
+        if ($latestPayment && $latestPayment->status === 'paid') {
+            return response()->json([
+                'status' => 'success',
+                'booking_status' => $booking->status,
+                'payment_status' => 'paid',
+                'message' => 'Payment confirmed'
+            ]);
+        }
+
+        if ($latestPayment && $latestPayment->status === 'failed') {
+            return response()->json([
+                'status' => 'failed',
+                'booking_status' => $booking->status,
+                'payment_status' => 'failed',
+                'message' => 'Payment failed'
+            ]);
+        }
+
+        // Still pending - webhook hasn't updated yet
+        return response()->json([
+            'status' => 'pending',
+            'booking_status' => $booking->status,
+            'payment_status' => $latestPayment ? $latestPayment->status : 'unknown',
+            'message' => 'Payment processing'
+        ]);
     }
 }

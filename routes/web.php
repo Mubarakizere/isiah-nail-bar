@@ -128,6 +128,7 @@ Route::controller(BookingController::class)->group(function () {
         ->middleware('throttle:10,1') // ✅ SECURITY: Limit payment initiations to 10 per minute
         ->name('booking.pay');
     Route::get('/booking/payment-iframe', [BookingController::class, 'showPaymentIframe'])->name('booking.paymentIframe');
+    Route::get('/booking/payment-status/{reference}', [BookingController::class, 'checkPaymentStatus'])->name('booking.checkPaymentStatus');
 
 });
 
