@@ -87,7 +87,7 @@ function handlePaymentEvent(data) {
             
             // Redirect after short delay
             setTimeout(() => {
-                window.location.href = "{{ route('booking.create') }}?error=payment_failed";
+                window.location.href = "/booking?error=payment_failed";
             }, 1500); // 1.5 second delay
             break;
             
@@ -96,7 +96,7 @@ function handlePaymentEvent(data) {
             // User cancelled/closed payment
             console.log('Payment cancelled by user - redirecting...');
             setTimeout(() => {
-                window.location.href = "{{ route('booking.create') }}?info=payment_cancelled";
+                window.location.href = "/booking?info=payment_cancelled";
             }, 500);
             break;
     }
