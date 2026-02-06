@@ -333,8 +333,10 @@
             </div>
 
             <div class="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-gray-500 text-center md:text-left">
                     &copy; {{ date('Y') }} Isaiah Nail Bar. All rights reserved.
+                    <span class="mx-2">|</span>
+                    Made by <a href="https://stockcenterapp.com/" target="_blank" class="hover:text-white transition-colors">Izere Moubarak</a>
                 </p>
                 <div class="flex gap-6 text-sm text-gray-500">
                     <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
