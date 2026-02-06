@@ -70,18 +70,20 @@ function handlePaymentEvent(data) {
             
         case 'failed':
             // Client-side failure (validation error, network issue, etc.)
-            console.log('Payment form submission failed');
-            alert('Payment failed. Please try again.');
-            window.location.href = "{{ route('booking.step1') }}?error=payment_failed";
+            console.log('Payment form submission failed - redirecting...');
+            // Redirect immediately without alert (iframe already shows error)
+            setTimeout(() => {
+                window.location.href = "{{ route('booking.step1') }}?error=payment_failed";
+            }, 1000); // 1 second delay to let user see the error
             break;
             
         case 'close':
         case 'cancelled':
             // User cancelled/closed payment
-            console.log('Payment cancelled by user');
-            if (confirm('Are you sure you want to cancel this payment?')) {
+            console.log('Payment cancelled by user - redirecting...');
+            setTimeout(() => {
                 window.location.href = "{{ route('booking.step1') }}?info=payment_cancelled";
-            }
+            }, 500);
             break;
     }
 }
