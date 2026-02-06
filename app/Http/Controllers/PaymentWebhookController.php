@@ -146,29 +146,57 @@ class PaymentWebhookController extends Controller
     protected function handlePaymentRef(array $payload)
 {
     $paymentRef = $payload['paymentRef'];
+    $requestToken = $payload['requestToken'] ?? null;
 
-    $payment = Payment::whereNull('payment_ref')
-        ->where('status', 'pending')
-        ->latest()
-        ->first();
+    Log::info("🔍 Looking for payment", [
+        'paymentRef' => $paymentRef,
+        'requestToken' => $requestToken
+    ]);
+
+    // Try to find payment by request_token first (most reliable)
+    $payment = null;
+    if ($requestToken) {
+        $payment = Payment::where('request_token', $requestToken)->first();
+        if ($payment) {
+            Log::info("✅ Found payment by request_token", ['payment_id' => $payment->id]);
+        }
+    }
+
+    // Fallback: find by payment_ref if already set
+    if (!$payment && $paymentRef) {
+        $payment = Payment::where('payment_ref', $paymentRef)->first();
+        if ($payment) {
+            Log::info("✅ Found payment by payment_ref", ['payment_id' => $payment->id]);
+        }
+    }
+
+    // Last resort: find most recent pending payment (risky, but better than nothing)
+    if (!$payment) {
+        $payment = Payment::whereNull('payment_ref')
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+        if ($payment) {
+            Log::warning("⚠️ Found payment by fallback method (pending + null ref)", ['payment_id' => $payment->id]);
+        }
+    }
 
     if (!$payment) {
-        Log::warning("⚠️ No pending payment found for paymentRef: $paymentRef");
-        return response()->json(['error' => 'No pending payment found'], 404);
+        Log::warning("⚠️ No payment found for paymentRef: $paymentRef, requestToken: $requestToken");
+        return response()->json(['error' => 'No payment found'], 404);
     }
 
     // ✅ FIX: Extract actual payment method from webhook
     $actualMethod = $this->extractPaymentMethod($payload);
 
-    // Update payment_ref anyway
+    // Update payment_ref and request_token
     $payment->payment_ref = $paymentRef;
+    if ($requestToken) {
+        $payment->request_token = $requestToken;
+    }
 
     // Check for status: must be 'SUCCESS'
     $isPaid = strtolower($payload['status']) === 'success';
-
-    // Optional: check if payload contains a transfer and confirm it's not DRAFT
-    $transferStatus = strtolower($payload['transfers'][0]['status'] ?? '');
-    $isTransferConfirmed = in_array($transferStatus, ['completed', 'success']);
 
    if ($isPaid) {
     $payment->status = 'paid';
@@ -178,11 +206,12 @@ class PaymentWebhookController extends Controller
     $payment->webhook_payload = $payload;
     $payment->save();
     
-    Log::info("💳 Payment method captured via paymentRef", [
+    Log::info("💳 Payment updated to PAID", [
         'payment_id' => $payment->id,
-        'user_selected' => $payment->method,
-        'actually_used' => $actualMethod,
-        'transaction_id' => $payment->provider_transaction_id
+        'booking_id' => $payment->booking_id,
+        'paymentRef' => $paymentRef,
+        'requestToken' => $requestToken,
+        'actually_used' => $actualMethod
     ]);
 
     $booking = $payment->booking;
@@ -191,13 +220,18 @@ class PaymentWebhookController extends Controller
         $booking->status = 'accepted';
         $booking->save();
         $this->sendNotifications($booking);
-        Log::info("✔️ Booking #{$booking->id} updated via payment webhook");
+        Log::info("✅ Booking #{$booking->id} (ref: {$booking->reference}) updated via payment webhook");
     }
 } else {
     $payment->status = 'failed';
     $payment->paid_at = now();
     $payment->webhook_payload = $payload;
     $payment->save();
+
+    Log::info("❌ Payment marked as FAILED", [
+        'payment_id' => $payment->id,
+        'paymentRef' => $paymentRef
+    ]);
 
     $booking = $payment->booking;
     if ($booking) {
