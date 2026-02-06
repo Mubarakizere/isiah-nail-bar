@@ -999,4 +999,42 @@ class BookingController extends Controller
             'message' => 'Payment processing'
         ]);
     }
+
+    /**
+     * Mark booking as declined when client-side payment fails
+     * Called from payment iframe when WeFlexfy shows a failure
+     */
+    public function markPaymentFailed($reference)
+    {
+        $booking = Booking::where('reference', $reference)->first();
+
+        if (!$booking) {
+            Log::warning("❌ Cannot mark payment failed: Booking not found", ['reference' => $reference]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Booking not found'
+            ], 404);
+        }
+
+        // Update booking status to declined
+        $booking->status = 'declined';
+        $booking->save();
+
+        // Update payment status to failed
+        $payment = Payment::where('booking_id', $booking->id)->latest()->first();
+        if ($payment) {
+            $payment->status = 'failed';
+            $payment->save();
+        }
+
+        Log::info("❌ Booking marked as declined (client-side failure)", [
+            'booking_id' => $booking->id,
+            'reference' => $reference
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Booking marked as declined'
+        ]);
+    }
 }

@@ -129,6 +129,7 @@ Route::controller(BookingController::class)->group(function () {
         ->name('booking.pay');
     Route::get('/booking/payment-iframe', [BookingController::class, 'showPaymentIframe'])->name('booking.paymentIframe');
     Route::get('/booking/payment-status/{reference}', [BookingController::class, 'checkPaymentStatus'])->name('booking.checkPaymentStatus');
+    Route::post('/booking/mark-failed/{reference}', [BookingController::class, 'markPaymentFailed'])->name('booking.markFailed');
 
 });
 

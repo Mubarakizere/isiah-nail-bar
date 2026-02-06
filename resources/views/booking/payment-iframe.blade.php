@@ -70,11 +70,25 @@ function handlePaymentEvent(data) {
             
         case 'failed':
             // Client-side failure (validation error, network issue, etc.)
-            console.log('Payment form submission failed - redirecting...');
-            // Redirect immediately without alert (iframe already shows error)
+            console.log('Payment form submission failed - marking booking as declined...');
+            
+            // Mark booking as declined in database
+            if (bookingReference) {
+                fetch(`{{ url('/booking/mark-failed') }}/${bookingReference}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }).then(response => response.json())
+                  .then(data => console.log('Booking marked as declined:', data))
+                  .catch(error => console.error('Error marking booking as declined:', error));
+            }
+            
+            // Redirect after short delay
             setTimeout(() => {
-                window.location.href = "{{ route('booking.step1') }}?error=payment_failed";
-            }, 1000); // 1 second delay to let user see the error
+                window.location.href = "{{ route('booking.create') }}?error=payment_failed";
+            }, 1500); // 1.5 second delay
             break;
             
         case 'close':
@@ -82,7 +96,7 @@ function handlePaymentEvent(data) {
             // User cancelled/closed payment
             console.log('Payment cancelled by user - redirecting...');
             setTimeout(() => {
-                window.location.href = "{{ route('booking.step1') }}?info=payment_cancelled";
+                window.location.href = "{{ route('booking.create') }}?info=payment_cancelled";
             }, 500);
             break;
     }
