@@ -9,8 +9,8 @@
             id="weflexIframe"></iframe>
 </div>
 
-{{-- Processing overlay (shown after user submits payment) --}}
-<div id="processingOverlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+{{-- Processing overlay (shown ONLY after user submits payment) --}}
+<div id="processingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; align-items:center; justify-content:center; flex-direction:column;">
     <div style="text-align: center; color: white;">
         <div style="width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
         <h2 style="font-size: 24px; margin-bottom: 10px;">Processing Payment...</h2>
@@ -31,52 +31,82 @@
 <script>
 let pollingInterval = null;
 let pollCount = 0;
+let paymentSubmitted = false; // Track if payment form was submitted
 const MAX_POLLS = 60; // 60 polls * 2 seconds = 2 minutes max
 const bookingReference = '{{ session("last_booking_reference") ?? "" }}';
 
-// Listen for payment form submission from iframe
+console.log('Payment page loaded. Booking reference:', bookingReference);
+
+// Listen for payment events from WeFlexfy iframe
 window.addEventListener("message", function (event) {
+    console.log('Received message from iframe:', event.data);
+    
+    // Only process messages from WeFlexfy
     if (event.data?.type === 'PAYMENT_STATUS') {
-        switch (event.data.status) {
-            case 'init':
-                console.log('Payment iframe loaded');
-                break;
-                
-            case 'success':
-                // ⚠️ DO NOT redirect immediately!
-                // The 'success' event means form submitted, NOT payment confirmed
-                console.log('Payment form submitted, waiting for webhook confirmation...');
-                showProcessingOverlay();
-                startPolling();
-                break;
-                
-            case 'failed':
-                // Client-side failure (form validation, etc.)
-                console.log('Payment form failed');
-                window.location.href = "{{ route('booking.step1') }}?error=payment_failed";
-                break;
-                
-            case 'close':
-                // User closed the payment window
-                console.log('Payment cancelled by user');
-                window.location.href = "{{ route('booking.step1') }}?info=payment_cancelled";
-                break;
-        }
+        handlePaymentEvent(event.data);
     }
 });
 
+function handlePaymentEvent(data) {
+    console.log('Payment status:', data.status);
+    
+    switch (data.status) {
+        case 'init':
+            // Iframe loaded - do nothing, let user interact
+            console.log('Payment iframe initialized and ready');
+            break;
+            
+        case 'success':
+            // ⚠️ CRITICAL: This means payment FORM was submitted
+            // NOT that payment was successful!
+            // Show overlay and start polling for webhook confirmation
+            if (!paymentSubmitted) {
+                paymentSubmitted = true;
+                console.log('Payment form submitted. Starting verification...');
+                showProcessingOverlay();
+                startPolling();
+            }
+            break;
+            
+        case 'failed':
+            // Client-side failure (validation error, network issue, etc.)
+            console.log('Payment form submission failed');
+            alert('Payment failed. Please try again.');
+            window.location.href = "{{ route('booking.step1') }}?error=payment_failed";
+            break;
+            
+        case 'close':
+        case 'cancelled':
+            // User cancelled/closed payment
+            console.log('Payment cancelled by user');
+            if (confirm('Are you sure you want to cancel this payment?')) {
+                window.location.href = "{{ route('booking.step1') }}?info=payment_cancelled";
+            }
+            break;
+    }
+}
+
 function showProcessingOverlay() {
-    document.getElementById('processingOverlay').style.display = 'flex';
-    document.getElementById('iframeContainer').style.display = 'none';
+    const overlay = document.getElementById('processingOverlay');
+    const container = document.getElementById('iframeContainer');
+    
+    if (overlay && container) {
+        overlay.style.display = 'flex';
+        container.style.display = 'none';
+        console.log('Processing overlay shown');
+    }
 }
 
 function updateStatus(message) {
-    document.getElementById('statusMessage').textContent = message;
+    const statusEl = document.getElementById('statusMessage');
+    if (statusEl) {
+        statusEl.textContent = message;
+    }
 }
 
 function startPolling() {
     if (!bookingReference) {
-        console.error('No booking reference found');
+        console.error('No booking reference found for polling');
         updateStatus('Error: Missing booking reference');
         setTimeout(() => {
             window.location.href = "{{ route('booking.step1') }}?error=missing_reference";
@@ -84,6 +114,7 @@ function startPolling() {
         return;
     }
 
+    console.log('Starting polling for booking:', bookingReference);
     updateStatus('Checking payment status...');
     
     pollingInterval = setInterval(() => {
@@ -139,5 +170,14 @@ function startPolling() {
             
     }, 2000); // Poll every 2 seconds
 }
+
+// Safety check: If overlay is visible on page load, hide it
+window.addEventListener('load', function() {
+    const overlay = document.getElementById('processingOverlay');
+    if (overlay && overlay.style.display !== 'none') {
+        console.warn('Overlay was visible on load - hiding it');
+        overlay.style.display = 'none';
+    }
+});
 </script>
 @endpush
