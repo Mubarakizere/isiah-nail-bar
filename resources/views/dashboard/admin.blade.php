@@ -1,133 +1,164 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Executive Overview')
-@section('page-subtitle', 'Real-time insight into your salon\'s performance.')
+@section('title', 'Dashboard Overview')
+@section('page-subtitle', 'Real-time insight into your salon\'s performance')
 
 @section('content')
-<div class="space-y-8">
+<div class="space-y-6">
     
     {{-- High-Level Metrics --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {{-- Total Revenue --}}
-        <div class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-gray-100 group hover:border-gray-200 transition-colors">
-            <div class="flex items-start justify-between mb-4">
-                <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
-                    <i class="ph ph-currency-circle-dollar text-2xl"></i>
+        <div class="bg-white border-2 border-gray-300 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 bg-rose-100 flex items-center justify-center text-rose-600">
+                    <i class="ph ph-currency-circle-dollar text-xl"></i>
                 </div>
-                <div class="flex flex-col items-end">
-                     <span class="inline-flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                        <i class="ph ph-trend-up"></i>
-                        +12%
-                    </span>
-                    <span class="text-xs text-gray-400 mt-1">vs last month</span>
-                </div>
+                <span class="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1">
+                    +12%
+                </span>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500 font-serif">Total Revenue</p>
-                <h3 class="text-3xl font-bold text-gray-900 mt-1">RWF {{ number_format($totalRevenue) }}</h3>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Revenue</p>
+                <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totalRevenue) }} RWF</h3>
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center text-xs">
-                 <span class="text-gray-500">MOMO: <span class="font-semibold text-gray-900">{{ number_format($momoRevenue) }}</span></span>
-                 <span class="text-gray-500">Card: <span class="font-semibold text-gray-900">{{ number_format($cardRevenue) }}</span></span>
+            <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between text-xs">
+                <span class="text-gray-600">MOMO: <span class="font-semibold text-gray-900">{{ number_format($momoRevenue) }}</span></span>
+                <span class="text-gray-600">Card: <span class="font-semibold text-gray-900">{{ number_format($cardRevenue) }}</span></span>
             </div>
         </div>
 
         {{-- Bookings --}}
-        <div class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-gray-100 group hover:border-gray-200 transition-colors">
-            <div class="flex items-start justify-between mb-4">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
-                    <i class="ph ph-calendar-check text-2xl"></i>
+        <div class="bg-white border-2 border-gray-300 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 bg-blue-100 flex items-center justify-center text-blue-600">
+                    <i class="ph ph-calendar-check text-xl"></i>
                 </div>
-                <span class="text-xs font-semibold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
+                <span class="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-1">
                    All Time
                 </span>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500 font-serif">Total Bookings</p>
-                <h3 class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($totalBookings) }}</h3>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Bookings</p>
+                <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totalBookings) }}</h3>
             </div>
-             <div class="mt-4 pt-4 border-t border-gray-50 flex items-center gap-2">
-                <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-blue-500 h-1.5 rounded-full" style="width: 75%"></div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="flex items-center gap-2">
+                    <div class="flex-1 bg-gray-200 h-2">
+                        <div class="bg-blue-600 h-2" style="width: 75%"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 font-medium">75%</span>
                 </div>
-                <span class="text-xs text-gray-500">75% capacity</span>
             </div>
         </div>
 
         {{-- Active Customers --}}
-        <div class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-gray-100 group hover:border-gray-200 transition-colors">
-            <div class="flex items-start justify-between mb-4">
-                <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
-                    <i class="ph ph-users-three text-2xl"></i>
+        <div class="bg-white border-2 border-gray-300 p-5">
+            <div class="mb-4">
+                <div class="w-10 h-10 bg-purple-100 flex items-center justify-center text-purple-600">
+                    <i class="ph ph-users-three text-xl"></i>
                 </div>
             </div>
             <div>
-                <p class="text-sm font-medium text-gray-500 font-serif">Active Clients</p>
-                <h3 class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($totalCustomers) }}</h3>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Active Clients</p>
+                <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totalCustomers) }}</h3>
             </div>
-            <p class="text-xs text-gray-400 mt-4">
-                <i class="ph ph-heart-straight text-rose-400 mr-1"></i>
+            <p class="text-xs text-gray-500 mt-4 pt-4 border-t border-gray-200">
+                <i class="ph ph-heart-straight text-rose-500 mr-1"></i>
                 Most loyal: Sarah K.
             </p>
         </div>
 
-        {{-- Net Income (Tax Calculated) --}}
-        <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 shadow-xl text-white relative overflow-hidden group">
-            <div class="absolute top-0 right-0 p-4 opacity-5">
-                <i class="ph ph-crown text-9xl"></i>
+        {{-- Net Income --}}
+        <div class="bg-gray-900 border-2 border-gray-900 p-5 text-white">
+            <div class="mb-4">
+                <div class="w-10 h-10 bg-white bg-opacity-20 flex items-center justify-center">
+                    <i class="ph ph-wallet text-xl text-white"></i>
+                </div>
             </div>
-            
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
-                        <i class="ph ph-wallet text-2xl text-white"></i>
-                    </div>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-400 font-serif">Net Income (After Tax)</p>
-                    <h3 class="text-3xl font-bold text-white mt-1">RWF {{ number_format($revenueAfterTax) }}</h3>
-                </div>
-                <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between items-center text-xs text-gray-400">
-                    <span>Tax (5%): {{ number_format($taxAmount) }}</span>
-                    <a href="{{ route('dashboard.admin.reports') }}" class="hover:text-white transition-colors">View Report &rarr;</a>
-                </div>
+            <div>
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Net Income (After Tax)</p>
+                <h3 class="text-2xl font-bold text-white mt-1">{{ number_format($revenueAfterTax) }} RWF</h3>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between text-xs">
+                <span class="text-gray-400">Tax (5%): {{ number_format($taxAmount) }}</span>
+                <a href="{{ route('dashboard.admin.reports') }}" class="text-white hover:underline">Report →</a>
             </div>
         </div>
     </div>
 
     {{-- Chart Section --}}
-    <div class="bg-white rounded-3xl p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+    <div class="bg-white border-2 border-gray-300 p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 pb-4 border-b-2 border-gray-200">
             <div>
-                <h2 class="text-xl font-bold text-gray-900 font-serif">Revenue Performance</h2>
-                <p class="text-sm text-gray-500 mt-1">Daily revenue breakdown for the past 7 days</p>
+                <h2 class="text-lg font-bold text-gray-900">Revenue Performance</h2>
+                <p class="text-sm text-gray-600 mt-0.5">Daily revenue breakdown for the past 7 days</p>
             </div>
             <div class="flex items-center gap-2">
-                <select class="bg-gray-50 border-0 text-gray-600 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block p-2.5">
+                <select class="bg-gray-100 border border-gray-300 text-gray-700 text-sm px-3 py-2 focus:outline-none focus:border-rose-500">
                     <option>Last 7 Days</option>
                     <option>This Month</option>
                     <option>Last Month</option>
                 </select>
-                <button class="p-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+                <button class="px-3 py-2 bg-gray-900 text-white hover:bg-gray-800 transition-colors">
                     <i class="ph ph-download-simple"></i>
                 </button>
             </div>
         </div>
 
         @if(collect($last7DaysRevenue)->pluck('total')->sum() == 0)
-            <div class="h-64 flex flex-col items-center justify-center bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <i class="ph ph-chart-line text-3xl text-gray-400"></i>
+            <div class="h-64 flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300">
+                <div class="w-16 h-16 bg-gray-200 flex items-center justify-center mb-4">
+                    <i class="ph ph-chart-line text-3xl text-gray-500"></i>
                 </div>
                 <p class="text-gray-900 font-medium">No revenue data available</p>
-                <p class="text-gray-500 text-sm">Processing bookings will populate this chart</p>
+                <p class="text-gray-600 text-sm">Processing bookings will populate this chart</p>
             </div>
         @else
             <div class="h-[400px]">
                 <canvas id="revenueChart"></canvas>
             </div>
         @endif
+    </div>
+
+    {{-- Quick Actions --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="{{ route('dashboard.admin.bookings') }}" class="bg-white border-2 border-gray-300 p-5 hover:border-gray-400 transition-colors">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-100 flex items-center justify-center text-blue-600">
+                    <i class="ph ph-calendar text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">Manage Bookings</p>
+                    <p class="text-xs text-gray-600">View and manage all bookings</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('dashboard.admin.reports') }}" class="bg-white border-2 border-gray-300 p-5 hover:border-gray-400 transition-colors">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-green-100 flex items-center justify-center text-green-600">
+                    <i class="ph ph-chart-line-up text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">View Reports</p>
+                    <p class="text-xs text-gray-600">Detailed analytics and insights</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('admin.services.index') }}" class="bg-white border-2 border-gray-300 p-5 hover:border-gray-400 transition-colors">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-purple-100 flex items-center justify-center text-purple-600">
+                    <i class="ph ph-scissors text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900">Manage Services</p>
+                    <p class="text-xs text-gray-600">Add or edit salon services</p>
+                </div>
+            </div>
+        </a>
     </div>
 
 </div>
@@ -145,11 +176,6 @@ window.addEventListener('load', function () {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    
-    // Gradient styling
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(225, 29, 72, 0.15)'); // Rose-600
-    gradient.addColorStop(1, 'rgba(225, 29, 72, 0)');
 
     new Chart(ctx, {
         type: 'line',
@@ -158,18 +184,18 @@ window.addEventListener('load', function () {
             datasets: [{
                 label: 'Revenue',
                 data: data,
-                borderColor: '#e11d48', // Rose-600
-                backgroundColor: gradient,
-                borderWidth: 3,
-                tension: 0.4,
+                borderColor: '#e11d48',
+                backgroundColor: 'rgba(225, 29, 72, 0.1)',
+                borderWidth: 2,
+                tension: 0,
                 pointBackgroundColor: '#ffffff',
                 pointBorderColor: '#e11d48',
                 pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8,
+                pointRadius: 4,
+                pointHoverRadius: 6,
                 pointHoverBackgroundColor: '#e11d48',
                 pointHoverBorderColor: '#ffffff',
-                pointHoverBorderWidth: 3,
+                pointHoverBorderWidth: 2,
                 fill: true
             }]
         },
@@ -201,8 +227,8 @@ window.addEventListener('load', function () {
                 y: {
                     beginAtZero: true,
                     grid: {
-                        color: 'rgba(243, 244, 246, 0.6)',
-                        borderDash: [5, 5]
+                        color: '#e5e7eb',
+                        borderDash: [3, 3]
                     },
                     ticks: {
                         callback: value => 'RWF ' + value.toLocaleString(),
