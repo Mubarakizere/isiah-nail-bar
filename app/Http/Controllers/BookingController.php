@@ -939,22 +939,37 @@ class BookingController extends Controller
      */
     public function checkPaymentStatus($reference)
     {
+        // Force fresh query from database (no caching)
         $booking = Booking::where('reference', $reference)
-            ->with('payments')
             ->first();
 
         if (!$booking) {
+            Log::warning("❌ Polling: Booking not found", ['reference' => $reference]);
             return response()->json([
                 'status' => 'not_found',
                 'message' => 'Booking not found'
             ], 404);
         }
 
-        // Check latest payment status
-        $latestPayment = $booking->payments()->latest()->first();
+        // Get fresh payment data from database
+        $latestPayment = Payment::where('booking_id', $booking->id)
+            ->latest()
+            ->first();
+
+        Log::info("🔄 Polling payment status", [
+            'reference' => $reference,
+            'booking_id' => $booking->id,
+            'booking_status' => $booking->status,
+            'payment_status' => $latestPayment ? $latestPayment->status : 'no payment',
+            'payment_id' => $latestPayment ? $latestPayment->id : null
+        ]);
 
         // Determine overall status
         if ($latestPayment && $latestPayment->status === 'paid') {
+            Log::info("✅ Polling: Payment confirmed!", [
+                'booking_id' => $booking->id,
+                'payment_id' => $latestPayment->id
+            ]);
             return response()->json([
                 'status' => 'success',
                 'booking_status' => $booking->status,
@@ -964,6 +979,10 @@ class BookingController extends Controller
         }
 
         if ($latestPayment && $latestPayment->status === 'failed') {
+            Log::warning("❌ Polling: Payment failed", [
+                'booking_id' => $booking->id,
+                'payment_id' => $latestPayment->id
+            ]);
             return response()->json([
                 'status' => 'failed',
                 'booking_status' => $booking->status,
