@@ -166,7 +166,7 @@
                         <td class="px-4 py-3">
                             @php
                                 $paidPayment = $booking->payments->where('status', 'paid')->first();
-                                $paymentMethod = $paidPayment->actual_method_used ?? null;
+                                $paymentMethod = $paidPayment->method ?? null;
                             @endphp
                             @if($paymentMethod)
                                 @if(strtolower($paymentMethod) === 'card')
