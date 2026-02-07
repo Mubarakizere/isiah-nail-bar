@@ -3,18 +3,37 @@
 <head>
     <title>Leave a Review</title>
 </head>
-<body style="font-family: sans-serif; color: #333;">
-    <h2>Hello {{ $booking->customer->user->name ?? 'Valued Customer' }},</h2>
-    <p>Thank you for trusting us with your recent appointment on {{ \Carbon\Carbon::parse($booking->date)->format('F j, Y') }}.</p>
-    <p>We’d love to hear your thoughts! Your feedback helps us improve and serve you better.</p>
+<body>
+    @component('mail::message')
+    # Thank You for Visiting Us
 
-    <p>
-        <a href="{{ url('/dashboard/reviews/create?booking_id=' . $booking->id) }}"
-           style="padding: 10px 20px; background-color: #111; color: white; text-decoration: none; border-radius: 4px;">
-           Leave a Review
-        </a>
-    </p>
+    Dear {{ $booking->customer->user->name ?? 'Valued Customer' }},
 
-    <p style="margin-top: 30px;">Thank you,<br>Isaiah Nail Bar Team</p>
+    Thank You for choosing Isaiah Nail Bar. We hope you enjoyed your experience with us.
+
+    ---
+
+    ## Your Recent Visit
+
+    **Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}
+    **Services:** {{ $booking->services->pluck('name')->implode(', ') }}
+
+    ---
+
+    ## Share Your Feedback
+
+    Your opinion matters to us. We would greatly appreciate it if you could take a moment to share your experience.
+
+    @component('mail::button', ['url' => $reviewUrl ?? url('/')])
+    Leave a Review
+    @endcomponent
+
+    ---
+
+    Thank you for your continued support.
+
+    Best regards,
+    Isaiah Nail Bar Team
+    @endcomponent
 </body>
 </html>
