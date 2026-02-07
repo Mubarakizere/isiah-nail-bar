@@ -19,7 +19,7 @@ A new booking has been made by **{{ $booking->customer->user->name ?? '-' }}**.
 - **Reference:** {{ $booking->reference }}
 - **Status:** {{ ucfirst($booking->status) }}
 
-@component('mail::button', ['url' => route('admin.bookings.index')])
+@component('mail::button', ['url' => url('/dashboard')])
 📂 View Booking in Admin
 @endcomponent
 
