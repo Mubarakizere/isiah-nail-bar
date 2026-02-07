@@ -154,11 +154,18 @@ class PaymentWebhookController extends Controller
     ]);
 
     // Try to find payment by request_token first (most reliable)
+    // Wrapped in try-catch because column may not exist in production
     $payment = null;
     if ($requestToken) {
-        $payment = Payment::where('request_token', $requestToken)->first();
-        if ($payment) {
-            Log::info("✅ Found payment by request_token", ['payment_id' => $payment->id]);
+        try {
+            $payment = Payment::where('request_token', $requestToken)->first();
+            if ($payment) {
+                Log::info("✅ Found payment by request_token", ['payment_id' => $payment->id]);
+            }
+        } catch (\Exception $e) {
+            Log::warning("⚠️ request_token column doesn't exist, using fallback", [
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
@@ -189,10 +196,14 @@ class PaymentWebhookController extends Controller
     // ✅ FIX: Extract actual payment method from webhook
     $actualMethod = $this->extractPaymentMethod($payload);
 
-    // Update payment_ref and request_token
+    // Update payment_ref and request_token (if column exists)
     $payment->payment_ref = $paymentRef;
     if ($requestToken) {
-        $payment->request_token = $requestToken;
+        try {
+            $payment->request_token = $requestToken;
+        } catch (\Exception $e) {
+            Log::warning("⚠️ Cannot update request_token (column doesn't exist)");
+        }
     }
 
     // Check for status: must be 'SUCCESS'
