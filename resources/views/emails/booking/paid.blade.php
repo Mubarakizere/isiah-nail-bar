@@ -1,44 +1,53 @@
 @component('mail::message')
-# 🎉 Your Payment is Confirmed!
+# Payment Confirmation
 
-Hi {{ $booking->customer->user->name ?? 'there' }},
+Dear {{ $booking->customer->user->name ?? 'Valued Customer' }},
 
-Thank you for booking with **Isaiah Nail Bar**.  
-✅ Your payment has been successfully received, and your appointment is confirmed!
+Thank you for your payment. Your booking has been confirmed and we look forward to serving you.
 
 ---
 
-### 💅 Services Booked:
+## Appointment Details
+
+**Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
+**Time:** {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}  
+**Service Provider:** {{ $booking->provider->name ?? 'To be assigned' }}  
+**Booking Reference:** {{ $booking->reference }}
+
+---
+
+## Services Booked
+
 @foreach($booking->services as $service)
-- **{{ $service->name }}** ({{ $service->duration_minutes }} mins) — RWF {{ number_format($service->price) }}
+- {{ $service->name }} ({{ $service->duration_minutes }} minutes) - RWF {{ number_format($service->price, 2) }}
 @endforeach
 
 ---
 
-@component('mail::panel')
-📅 **Date**: {{ \Carbon\Carbon::parse($booking->date)->format('D, M j, Y') }}  
-⏰ **Time**: {{ \Carbon\Carbon::parse($booking->time)->format('H:i') }}  
-👩‍🔧 **Provider**: {{ $booking->provider->name ?? '—' }}  
-@isset($booking->reference)
-🔖 **Ref**: {{ $booking->reference }}
-@endisset
-@endcomponent
+## Payment Summary
 
 @if($booking->deposit_amount)
-💰 **Amount Paid (Deposit):** RWF {{ number_format($booking->deposit_amount) }}  
-💳 **Remaining Balance:** RWF {{ number_format($booking->services->sum('price') - $booking->deposit_amount) }}
+**Deposit Paid:** RWF {{ number_format($booking->deposit_amount, 2) }}  
+**Remaining Balance:** RWF {{ number_format($booking->services->sum('price') - $booking->deposit_amount, 2) }}
 @else
-💰 **Total Paid:** RWF {{ number_format($booking->services->sum('price')) }}
+**Total Amount Paid:** RWF {{ number_format($booking->services->sum('price'), 2) }}
 @endif
 
-Your receipt is attached, and you can also view it online below.
+---
+
+Your receipt is attached to this email. You can also view it online using the button below.
 
 @component('mail::button', ['url' => route('booking.receipt', $booking->id)])
-📄 View Online Receipt
+View Receipt Online
 @endcomponent
 
-Thanks again,  
-**Isaiah Nail Bar** 💅
+---
 
-_📍 KG 4 Roundabout, Kigali • IG: [@isaiahnailbar](https://instagram.com/isaiahnailbar)_
+**Location:** KG 4 Roundabout, Kigali  
+**Follow us:** Instagram @isaiahnailbar
+
+We appreciate your business.
+
+Best regards,  
+Isaiah Nail Bar Team
 @endcomponent
