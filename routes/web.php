@@ -45,9 +45,9 @@ use App\Http\Controllers\Admin\AdminSlotController;
 // Default dashboard redirect by role
 Route::get('/dashboard', function () {
     if (Auth::check()) {
-        if (Auth::user()->role === 'admin') return redirect()->route('dashboard.admin');
-        if (Auth::user()->role === 'provider') return redirect()->route('dashboard.provider');
-        if (Auth::user()->role === 'customer') return redirect()->route('dashboard.customer');
+        if (Auth::user()->hasRole('admin')) return redirect()->route('dashboard.admin');
+        if (Auth::user()->hasRole('provider')) return redirect()->route('dashboard.provider');
+        if (Auth::user()->hasRole('customer')) return redirect()->route('dashboard.customer');
     }
     return redirect('/');
 })->middleware('auth')->name('dashboard');
