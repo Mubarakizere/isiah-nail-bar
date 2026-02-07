@@ -241,7 +241,7 @@
                 <a href="{{ route('booking.step1') }}" class="px-8 py-4 bg-gray-900 text-white font-medium rounded-full hover:bg-rose-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
                     Book Now
                 </a>
-                <a href="https://wa.me/250788421063" target="_blank" class="px-8 py-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-full hover:border-gray-900 hover:text-gray-900 transition-all">
+                <a href="https://wa.me/250790395169" target="_blank" class="px-8 py-4 bg-white border border-gray-200 text-gray-700 font-medium rounded-full hover:border-gray-900 hover:text-gray-900 transition-all">
                     WhatsApp Us
                 </a>
             </div>

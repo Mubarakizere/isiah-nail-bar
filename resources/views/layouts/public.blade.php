@@ -58,7 +58,7 @@
         "longitude": 30.108678
       },
       "url": "{{ url('/') }}",
-      "telephone": "+250788421063",
+      "telephone": "+250790395169",
       "priceRange": "$$",
       "openingHoursSpecification": [
         {
@@ -322,7 +322,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="ph ph-phone text-xl text-rose-500 flex-shrink-0"></i>
-                            <a href="tel:0788421063" class="hover:text-white transition-colors">0788 421 063</a>
+                            <a href="tel:0790395169" class="hover:text-white transition-colors">0790 395 169</a>
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="ph ph-envelope text-xl text-rose-500 flex-shrink-0"></i>

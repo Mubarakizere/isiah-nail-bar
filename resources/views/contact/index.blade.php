@@ -76,13 +76,13 @@
             <div class="space-y-10">
                 {{-- Quick Contact Grid --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <a href="tel:0788421063" class="p-6 bg-white border border-gray-100 rounded-2xl hover:border-gray-900 transition-colors group">
+                    <a href="tel:0790395169" class="p-6 bg-white border border-gray-100 rounded-2xl hover:border-gray-900 transition-colors group">
                         <i class="ph ph-phone text-3xl text-gray-400 group-hover:text-rose-500 transition-colors mb-4"></i>
                         <h3 class="font-serif text-lg text-gray-900 mb-1">Call Us</h3>
                         <p class="text-gray-500 font-light">+250 788 421 063</p>
                     </a>
                     
-                    <a href="https://wa.me/250788421063" target="_blank" class="p-6 bg-white border border-gray-100 rounded-2xl hover:border-gray-900 transition-colors group">
+                    <a href="https://wa.me/250790395169" target="_blank" class="p-6 bg-white border border-gray-100 rounded-2xl hover:border-gray-900 transition-colors group">
                         <i class="ph ph-whatsapp-logo text-3xl text-gray-400 group-hover:text-rose-500 transition-colors mb-4"></i>
                         <h3 class="font-serif text-lg text-gray-900 mb-1">WhatsApp</h3>
                         <p class="text-gray-500 font-light">Chat with us</p>

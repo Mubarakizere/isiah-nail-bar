@@ -158,7 +158,7 @@
                         <div>
                             <p class="text-sm text-gray-900 font-medium mb-1">Need help choosing?</p>
                             <p class="text-xs text-gray-600">Our support team is available to assist you.</p>
-                            <a href="https://wa.me/250788421063" target="_blank" class="text-xs font-bold text-rose-600 mt-2 inline-block hover:underline">Chat on WhatsApp</a>
+                            <a href="https://wa.me/250790395169" target="_blank" class="text-xs font-bold text-rose-600 mt-2 inline-block hover:underline">Chat on WhatsApp</a>
                         </div>
                     </div>
                 </div>
