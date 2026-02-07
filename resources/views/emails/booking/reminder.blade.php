@@ -1,31 +1,37 @@
-<x-mail::message>
-# ⏰ Appointment Reminder
+@component('mail::message')
+# Appointment Reminder
 
-Hi {{ $booking->customer->user->name ?? 'Valued Customer' }},
+Dear {{ $booking->customer->user->name ?? 'Valued Customer' }},
 
-This is a friendly reminder that your upcoming appointment at **Isaiah Nail Bar** is scheduled as follows:
-
-<x-mail::panel>
-**📅 Date:** {{ \Carbon\Carbon::parse($booking->date)->format('F j, Y') }}  
-**⏰ Time:** {{ \Carbon\Carbon::parse($booking->time)->format('h:i A') }}  
-**👩 Provider:** {{ $booking->provider->name ?? '-' }}
-</x-mail::panel>
+This is a reminder that you have an appointment scheduled with Isaiah Nail Bar tomorrow.
 
 ---
 
-### 💅 Services Booked:
+## Appointment Details
+
+**Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
+**Time:** {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}  
+**Service Provider:** {{ $booking->provider->name ?? 'To be assigned' }}
+
+---
+
+## Scheduled Services
+
 @foreach($booking->services as $service)
-- **{{ $service->name }}** ({{ $service->duration_minutes }} min)
+- {{ $service->name }} ({{ $service->duration_minutes }} minutes)
 @endforeach
 
-We’re excited to pamper you!  
-If you need to reschedule, please notify us at least 48 hours in advance.
+---
 
-<x-mail::button :url="url('/')">
-Visit Our Website
-</x-mail::button>
+## Important Information
 
-Thanks again,  
-**Isaiah Nail Bar Team**  
-_@isaiahnailbar • KG 4 Roundabout, Kigali_
-</x-mail::message>
+**Cancellation Policy:** If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance.
+
+**Location:** KG 4 Roundabout, Kigali  
+**Contact:** Instagram @isaiahnailbar
+
+We look forward to seeing you.
+
+Best regards,  
+Isaiah Nail Bar Team
+@endcomponent
