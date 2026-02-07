@@ -1,28 +1,46 @@
 @component('mail::message')
-# New Booking Received
+# New Booking Notification
 
-A new booking has been made by **{{ $booking->customer->user->name ?? '-' }}**.
+A new booking has been received and requires your attention.
 
-### 📋 Booking Details:
+**Customer:** {{ $booking->customer->user->name ?? 'Guest Customer' }}  
+**Booking Reference:** {{ $booking->reference }}  
+**Status:** {{ ucfirst($booking->status) }}
 
-- **Services:**
+---
+
+## Booking Details
+
+**Date & Time**  
+{{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }} at {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}
+
+**Assigned Provider**  
+{{ $booking->provider->name ?? 'Not assigned' }}
+
+**Selected Services**
 @foreach($booking->services as $service)
-  - {{ $service->name }} ({{ $service->duration_minutes }} mins) — RWF {{ number_format($service->price) }}
+- {{ $service->name }} ({{ $service->duration_minutes }} minutes) - RWF {{ number_format($service->price, 2) }}
 @endforeach
 
-- **Provider:** {{ $booking->provider->name ?? '-' }}
-- **Date & Time:** {{ \Carbon\Carbon::parse($booking->date)->format('D, M j, Y') }} at {{ \Carbon\Carbon::parse($booking->time)->format('H:i') }}
-- **Payment Option:** {{ ucfirst($booking->payment_option) }}
+**Total Amount:** RWF {{ number_format($booking->services->sum('price'), 2) }}
+
+---
+
+## Payment Information
+
+**Payment Method:** {{ ucfirst($booking->payment_option) }}
 @if($booking->deposit_amount)
-- **Deposit Paid:** RWF {{ number_format($booking->deposit_amount) }}
+**Deposit Paid:** RWF {{ number_format($booking->deposit_amount, 2) }}
 @endif
-- **Reference:** {{ $booking->reference }}
-- **Status:** {{ ucfirst($booking->status) }}
+
+---
 
 @component('mail::button', ['url' => url('/dashboard')])
-📂 View Booking in Admin
+View Booking Details
 @endcomponent
 
-Thanks,<br>
-**Isaiah Nail Bar**
+This is an automated notification from your booking management system.
+
+Best regards,  
+Isaiah Nail Bar Team
 @endcomponent
