@@ -1,30 +1,25 @@
 @component('mail::message')
-# Booking Confirmed!
+# Manual Booking Confirmation
 
-Hello {{ $customer->name }},
+Dear {{ $booking->customer->user->name ?? 'Valued Customer' }},
 
-Your booking at **Isaiah Nail Bar** has been confirmed!
-
-## Booking Details
-
-**Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
-**Time:** {{ $booking->time }}  
-**Provider:** {{ $booking->provider->name }}
-
-## Services
-
-@foreach($booking->services as $service)
-- {{ $service->name }} - RWF {{ number_format($service->price) }}
-@endforeach
+Your booking has been manually confirmed by our team. We look forward to serving you.
 
 ---
 
-**Total:** RWF {{ number_format($booking->services->sum('price')) }}
+## Appointment Details
 
-@if($booking->payment_option === 'deposit')
-**Deposit Paid:** RWF {{ number_format($booking->deposit_amount) }}  
-**Remaining:** RWF {{ number_format($booking->services->sum('price') - $booking->deposit_amount) }}
-@endif
+**Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
+**Time:** {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}  
+**Service Provider:** {{ $booking->provider->name ?? 'To be assigned' }}
+
+---
+
+## Services Booked
+
+@foreach($booking->services as $service)
+- {{ $service->name }} ({{ $service->duration_minutes }} minutes) - RWF {{ number_format($service->price, 2) }}
+@endforeach
 
 @component('mail::button', ['url' => route('booking.receipt', $booking->id)])
 View Receipt
