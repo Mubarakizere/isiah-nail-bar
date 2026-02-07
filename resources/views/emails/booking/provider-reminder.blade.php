@@ -1,24 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Provider Appointment Reminder</title>
-</head>
-<body style="font-family: Arial, sans-serif; color: #333;">
-    <h2>🔔 Upcoming Appointment Reminder</h2>
+@component('mail::message')
+# Appointment Reminder
 
-    <p>Hi {{ $booking->provider->name ?? 'Provider' }},</p>
+Dear {{ $booking->provider->name ?? 'Service Provider' }},
 
-    <p>You have an upcoming appointment scheduled with <strong>{{ $booking->customer->user->name ?? 'a client' }}</strong>.</p>
+This is a reminder about your upcoming appointment scheduled for tomorrow.
 
-    <ul>
-        <li><strong>Services:</strong> {{ $booking->services->pluck('name')->implode(', ') }}</li>
-        <li><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->date)->format('F j, Y') }}</li>
-        <li><strong>Time:</strong> {{ \Carbon\Carbon::parse($booking->time)->format('h:i A') }}</li>
-    </ul>
+---
 
-    <p>Please make sure you're ready on time. Thank you for providing excellent service through Isaiah Nail Bar!</p>
+## Appointment Details
 
-    <p style="margin-top: 20px;">– Isaiah Nail Bar Team</p>
-</body>
-</html>
+**Customer:** {{ $booking->customer->user->name ?? 'Client' }}  
+**Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
+**Time:** {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}
+
+---
+
+## Services to Provide
+
+{{ $booking->services->pluck('name')->implode(', ') }}
+
+---
+
+Please ensure you are prepared and arrive on time to provide excellent service to our customer.
+
+Thank you for your dedication to quality service.
+
+Best regards,  
+Isaiah Nail Bar Management
+@endcomponent
