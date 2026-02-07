@@ -1,37 +1,47 @@
 @component('mail::message')
-# Hello {{ $booking->customer->user->name ?? 'Valued Customer' }},
+# Booking Received
 
-## 🎉 Almost There! Your Appointment is Reserved
+Dear {{ $booking->customer->user->name ?? 'Valued Customer' }},
 
-We've reserved your time slot, but **payment is required** to confirm your booking.
+Thank you for choosing Isaiah Nail Bar. Your appointment request has been received and your time slot has been reserved.
 
-### Selected Services:
+**Payment Required:** Please complete your payment to confirm your booking.
+
+---
+
+## Appointment Details
+
+**Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
+**Time:** {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}  
+**Service Provider:** {{ $booking->provider->name ?? 'To be assigned' }}
+
+---
+
+## Services Selected
+
 @foreach($booking->services as $service)
-- **{{ $service->name }}** ({{ $service->duration_minutes }} mins) — RWF {{ number_format($service->price) }}
+- {{ $service->name }} ({{ $service->duration_minutes }} minutes) - RWF {{ number_format($service->price, 2) }}
 @endforeach
 
----
-
-### 📋 Booking Details:
-- **Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
-- **Time:** {{ \Carbon\Carbon::parse($booking->time)->format('h:i A') }}  
-- **Provider:** {{ $booking->provider->name ?? '-' }}  
-- **Amount Due:** RWF {{ number_format($booking->services->sum('price')) }}
-- **Status:** ⏳ Awaiting Payment
+**Total Amount Due:** RWF {{ number_format($booking->services->sum('price'), 2) }}
 
 ---
 
-### ⚠️ Important Notice
-Your booking will be **confirmed once payment is received**. Please complete your payment to secure your appointment slot.
+## Next Steps
+
+Your appointment slot is currently reserved. To confirm your booking, please complete the payment process.
+
+**Status:** Awaiting Payment
 
 @component('mail::button', ['url' => url('/')])
-Complete Payment Now
+Complete Payment
 @endcomponent
 
-Need help? Feel free to contact us!
+---
 
-Thanks for choosing us,  
-**Isaiah Nail Bar**
+**Need Assistance?**  
+Contact us on Instagram @isaiahnailbar or visit us at KG 4 Roundabout, Kigali.
 
-_📍 KG 4 Roundabout, Kigali • 📱 IG: @isaiahnailbar_
+Best regards,  
+Isaiah Nail Bar Team
 @endcomponent
