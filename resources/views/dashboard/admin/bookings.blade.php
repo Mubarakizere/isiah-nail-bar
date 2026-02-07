@@ -85,6 +85,7 @@
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700">Date & Time</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700">Status</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700">Payment</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700">Method</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700">Actions</th>
                 </tr>
             </thead>
@@ -158,6 +159,29 @@
                                 <span style="background: #F3F4F6; color: #6B7280; padding: 4px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase;">
                                     UNPAID
                                 </span>
+                            @endif
+                        </td>
+                        
+                        {{-- Payment Method --}}
+                        <td class="px-4 py-3">
+                            @php
+                                $paidPayment = $booking->payments->where('status', 'paid')->first();
+                                $paymentMethod = $paidPayment->actual_method_used ?? null;
+                            @endphp
+                            @if($paymentMethod)
+                                @if(strtolower($paymentMethod) === 'card')
+                                    <span style="background: #DBEAFE; color: #1E40AF; padding: 4px 8px; font-size: 11px; font-weight: 600;">
+                                        💳 CARD
+                                    </span>
+                                @elseif(strtolower($paymentMethod) === 'momo')
+                                    <span style="background: #FEF3C7; color: #92400E; padding: 4px 8px; font-size: 11px; font-weight: 600;">
+                                        📱 MOMO
+                                    </span>
+                                @else
+                                    <span class="text-xs text-gray-500">{{ strtoupper($paymentMethod) }}</span>
+                                @endif
+                            @else
+                                <span class="text-xs text-gray-400">—</span>
                             @endif
                         </td>
                         
