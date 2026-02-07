@@ -49,7 +49,7 @@
                     <div class="bg-gray-50 border border-gray-200 p-4">
                         <p class="font-semibold text-gray-900 mb-1">{{ $booking->customer->user->name ?? '-' }}</p>
                         <p class="text-sm text-gray-600">{{ $booking->customer->user->email ?? '-' }}</p>
-                        @if($booking->customer->user->phone)
+                        @if($booking->customer && $booking->customer->user && $booking->customer->user->phone)
                             <p class="text-sm text-gray-600">{{ $booking->customer->user->phone }}</p>
                         @endif
                     </div>
