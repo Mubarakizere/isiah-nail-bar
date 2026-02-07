@@ -153,23 +153,19 @@
                             </button>
                             <div class="absolute right-0 mt-4 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100">
                                 <div class="p-2">
-                                    @role('admin')
+                                    @if(Auth::user()->role === 'admin')
                                         <a href="{{ route('dashboard.admin') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-700 rounded-xl transition-colors">
                                             Admin Panel
                                         </a>
-                                    @endrole
-                                    @role('provider')
+                                    @elseif(Auth::user()->role === 'provider')
                                         <a href="{{ route('dashboard.provider') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-700 rounded-xl transition-colors">
                                             Provider Panel
                                         </a>
-                                    @endrole
-                                    @role('customer')
-                                        @if(Auth::user()->role !== 'admin')
-                                            <a href="{{ route('dashboard.customer') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-700 rounded-xl transition-colors">
-                                                My Bookings
-                                            </a>
-                                        @endif
-                                    @endrole
+                                    @elseif(Auth::user()->role === 'customer')
+                                        <a href="{{ route('dashboard.customer') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-rose-50 hover:text-rose-700 rounded-xl transition-colors">
+                                            My Bookings
+                                        </a>
+                                    @endif
                                     <hr class="my-2 border-gray-100">
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -228,23 +224,19 @@
 
                 @auth
                     <hr class="my-3 border-gray-100">
-                    @role('admin')
+                    @if(Auth::user()->role === 'admin')
                         <a href="{{ route('dashboard.admin') }}" class="block px-4 py-3 text-base font-medium text-gray-600 rounded-xl hover:bg-gray-50">
                             Admin Panel
                         </a>
-                    @endrole
-                    @role('provider')
+                    @elseif(Auth::user()->role === 'provider')
                         <a href="{{ route('dashboard.provider') }}" class="block px-4 py-3 text-base font-medium text-gray-600 rounded-xl hover:bg-gray-50">
                             Provider Panel
                         </a>
-                    @endrole
-                    @role('customer')
-                        @if(Auth::user()->role !== 'admin')
-                            <a href="{{ route('dashboard.customer') }}" class="block px-4 py-3 text-base font-medium text-gray-600 rounded-xl hover:bg-gray-50">
-                                My Bookings
-                            </a>
-                        @endif
-                    @endrole
+                    @elseif(Auth::user()->role === 'customer')
+                        <a href="{{ route('dashboard.customer') }}" class="block px-4 py-3 text-base font-medium text-gray-600 rounded-xl hover:bg-gray-50">
+                            My Bookings
+                        </a>
+                    @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="w-full text-left px-4 py-3 text-base font-medium text-red-600 rounded-xl hover:bg-gray-50">
