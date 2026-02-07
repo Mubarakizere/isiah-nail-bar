@@ -1,23 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Leave a Review</title>
-</head>
-<body style="font-family: sans-serif; color: #333;">
-    <h2>Hello {{ $booking->customer->user->name ?? 'Valued Customer' }},</h2>
-    <p>Thank you for trusting us with your recent appointment on {{ \Carbon\Carbon::parse($booking->date)->format('F j, Y') }}.</p>
-    <p>We hope you enjoyed your service at Isaiah Nail Bar! We'd love to hear your feedback.</p>
-    
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="https://share.google/OtbpRmUNfC1eA9kmZ" style="background-color: #e11d48; color: white; padding: 12px 24px; border-radius: 9999px; text-decoration: none; font-weight: bold; display: inline-block;">
-            Leave a Review on Google
-        </a>
-    </div>
+@component('mail::message')
+# Thank You for Your Visit
 
-    <p style="text-align: center; color: #6b7280; font-size: 0.875rem;">
-        Or reply to this email to let us know how we can improve.
-    </p>
+Dear {{ $booking->customer->user->name ?? 'Valued Customer' }},
 
-    <p style="margin-top: 30px;">Thank you,<br>Isaiah Nail Bar Team</p>
-</body>
-</html>
+Thank you for choosing Isaiah Nail Bar for your recent appointment on {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}.
+
+We hope you enjoyed your experience with us.
+
+---
+
+## Share Your Feedback
+
+Your opinion is important to us and helps others make informed decisions. We would greatly appreciate if you could take a moment to share your experience.
+
+@component('mail::button', ['url' => 'https://share.google/OtbpRmUNfC1eA9kmZ'])
+Leave a Review on Google
+@endcomponent
+
+Alternatively, you may reply to this email with any feedback or suggestions for improvement.
+
+---
+
+Thank you for your continued support.
+
+Best regards,  
+Isaiah Nail Bar Team
+@endcomponent
