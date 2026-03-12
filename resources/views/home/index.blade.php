@@ -30,10 +30,10 @@
             @foreach($featuredServices as $service)
                 <div class="group cursor-pointer">
                     <div class="relative aspect-[4/5] overflow-hidden rounded-2xl mb-6 bg-gray-100">
-                        <img src="{{ $service->image ? asset('storage/' . $service->image) : asset('images/default-service.jpg') }}" 
+                        <img src="{{ $service->image ? asset('storage/' . $service->image) : asset('images/default-service.jpg') }}"
                              alt="{{ $service->name }}"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
-                        
+
                         {{-- Booking Overlay --}}
                         <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center">
                             <a href="{{ route('booking.step1') }}" class="px-6 py-3 bg-white text-gray-900 rounded-full font-medium text-sm hover:bg-rose-50 transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
@@ -41,7 +41,7 @@
                             </a>
                         </div>
                     </div>
-                    
+
                     <div class="text-center group-hover:-translate-y-1 transition-transform duration-300">
                         <h5 class="text-xl font-serif text-gray-900 mb-2 group-hover:text-rose-600 transition-colors">{{ $service->name }}</h5>
                         <div class="flex items-center justify-center gap-3 text-sm">
@@ -87,7 +87,7 @@
                     @endforeach
                 </div>
             </div>
-            
+
             <div class="order-1 lg:order-2">
                 <span class="text-rose-600 font-medium tracking-widest text-sm uppercase mb-3 block">Why Choose Us</span>
                 <h2 class="text-4xl md:text-5xl font-serif font-medium text-gray-900 mb-6 leading-tight">
@@ -96,7 +96,7 @@
                 <p class="text-lg text-gray-500 font-light leading-relaxed mb-8">
                     At Isaiah Nail Bar, we believe self-care is an art form. Every detail of our salon is designed to provide you with a moment of tranquility and luxury. From our ergonomic chairs to our selected playlists, we ensure your visit is nothing short of perfect.
                 </p>
-                
+
                 <div class="flex items-center gap-8">
                     <div>
                         <span class="text-3xl font-serif text-gray-900 block">500+</span>
@@ -127,7 +127,7 @@
             </h2>
             <p class="text-gray-400 font-light">Join our community of satisfied clients</p>
         </div>
-        
+
         <div x-data="{
                 activeSlide: 0,
                 slides: {{ $reviews->count() }},
@@ -137,9 +137,9 @@
                 prev() {
                     this.activeSlide = (this.activeSlide === 0) ? this.slides - 1 : this.activeSlide - 1;
                 }
-             }" 
+             }"
              class="relative">
-            
+
             {{-- Carousel Nav --}}
             <button @click="prev()" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-12 h-12 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-lg hidden md:flex">
                 <i class="ph ph-caret-left text-xl"></i>
@@ -185,7 +185,7 @@
                         <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-4">
                             {{ $review->comment }}
                         </p>
-                        
+
                         <a href="https://share.google/OtbpRmUNfC1eA9kmZ" target="_blank" class="text-rose-600 text-sm font-medium hover:underline inline-flex items-center gap-1">
                             Read more
                             <i class="ph ph-arrow-right"></i>
@@ -193,11 +193,11 @@
                     </div>
                 @endforeach
             </div>
-            
+
             {{-- Mobile Dots --}}
             <div class="flex justify-center gap-2 mt-4 md:hidden">
                 @foreach($reviews as $key => $review)
-                    <div class="w-2 h-2 rounded-full transition-colors duration-300" 
+                    <div class="w-2 h-2 rounded-full transition-colors duration-300"
                          :class="{ 'bg-rose-500': activeSlide === {{ $key }}, 'bg-gray-600': activeSlide !== {{ $key }} }"></div>
                 @endforeach
             </div>
@@ -213,7 +213,7 @@
             <h2 class="text-4xl font-serif font-medium text-gray-900 mb-8">
                 Ready for your glow up?
             </h2>
-            
+
             <div class="space-y-6 mb-10">
                 <div class="flex items-start gap-4">
                     <div class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center shadow-sm flex-shrink-0">
@@ -224,7 +224,7 @@
                         <p class="text-gray-500">KG 4 Roundabout, Gisementi, Kigali</p>
                     </div>
                 </div>
-                
+
                 <div class="flex items-start gap-4">
                     <div class="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center shadow-sm flex-shrink-0">
                         <i class="ph ph-clock text-rose-500 text-lg"></i>
@@ -232,7 +232,7 @@
                     <div>
                         <h5 class="font-bold text-gray-900">Opening Hours</h5>
                         <p class="text-gray-500">Mon - Sat: 8:00 AM - 8:00 PM</p>
-                        <p class="text-gray-500">Sunday: 10:00 AM - 6:00 PM</p>
+                        <p class="text-gray-500">Sunday: OFF</p>
                     </div>
                 </div>
             </div>
@@ -246,15 +246,15 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="h-96 lg:h-auto bg-gray-200 relative">
-             <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15950.019185121285!2d30.108678!3d-1.954736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca6ee46244f67%3A0x6291244078657662!2sKisimenti!5e0!3m2!1sen!2srw!4v1683838383838!5m2!1sen!2srw" 
-                width="100%" 
-                height="100%" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy" 
+             <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15950.019185121285!2d30.108678!3d-1.954736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca6ee46244f67%3A0x6291244078657662!2sKisimenti!5e0!3m2!1sen!2srw!4v1683838383838!5m2!1sen!2srw"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
                 class="absolute inset-0 transition-all duration-700">
             </iframe>
