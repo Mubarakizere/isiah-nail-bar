@@ -300,6 +300,8 @@ class BookingController extends Controller
         $request->validate([
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'required',
+            'location_type' => 'required|in:salon,home',
+            'address' => 'required_if:location_type,home|string|max:255|nullable',
         ]);
 
         $chosenDate = Carbon::parse($request->booking_date)->toDateString();
@@ -325,6 +327,8 @@ class BookingController extends Controller
         session([
             'booking.date' => $chosenDate,
             'booking.time' => $chosenTime->format('H:i'),
+            'booking.is_home_service' => $request->location_type === 'home',
+            'booking.address' => $request->address,
         ]);
 
         // Redirect to login if user not authenticated
@@ -355,7 +359,9 @@ class BookingController extends Controller
         }
 
         $services = Service::whereIn('id', $serviceIds)->get();
-        $totalPrice = $services->sum('price');
+        $baseTotal = $services->sum('price');
+        $multiplier = session('booking.is_home_service') ? 2 : 1;
+        $totalPrice = $baseTotal * $multiplier;
         $depositAmount = round($totalPrice * 0.4);
         $provider = Provider::findOrFail(session('booking.provider_id'));
 
@@ -380,7 +386,9 @@ class BookingController extends Controller
         ]);
 
         $serviceIds = session('booking.service_ids', []);
-        $totalPrice = $this->calculateTotalPrice($serviceIds);
+        $baseTotal = $this->calculateTotalPrice($serviceIds);
+        $multiplier = session('booking.is_home_service') ? 2 : 1;
+        $totalPrice = $baseTotal * $multiplier;
 
         session([
             'booking.payment_option' => $request->payment_option,
@@ -407,7 +415,9 @@ class BookingController extends Controller
         ]);
 
         $services = Service::whereIn('id', session('booking.service_ids'))->get();
-        $totalPrice = $services->sum('price');
+        $baseTotal = $services->sum('price');
+        $multiplier = session('booking.is_home_service') ? 2 : 1;
+        $totalPrice = $baseTotal * $multiplier;
         $provider = Provider::findOrFail(session('booking.provider_id'));
 
         return view('booking.step5', [
@@ -482,7 +492,9 @@ class BookingController extends Controller
         $serviceIds = session('booking.service_ids');
         $services = Service::whereIn('id', $serviceIds)->get();
         $paymentOption = session('booking.payment_option');
-        $totalPrice = $services->sum('price');
+        $baseTotal = $services->sum('price');
+        $multiplier = session('booking.is_home_service') ? 2 : 1;
+        $totalPrice = $baseTotal * $multiplier;
         $amount = $paymentOption === 'deposit' ? session('booking.deposit_amount') : $totalPrice;
         $phone = $this->normalizePhoneNumber(session('booking.payment_phone'));
         $paymentMethod = session('booking.payment_method');
@@ -542,6 +554,8 @@ class BookingController extends Controller
             'service_id' => null,
             'date' => session('booking.date'),
             'time' => session('booking.time'),
+            'is_home_service' => session('booking.is_home_service', false),
+            'address' => session('booking.address'),
             'payment_option' => $data['paymentOption'],
             'deposit_amount' => $data['paymentOption'] === 'deposit' ? session('booking.deposit_amount') : null,
             'status' => 'pending',
@@ -613,6 +627,7 @@ class BookingController extends Controller
             'provider_name' => $booking->provider->name ?? '',
             'date' => $booking->date,
             'time' => $booking->time,
+            'location' => $booking->is_home_service ? 'Home Service (' . $booking->address . ')' : 'In-Salon',
             'payment' => ucfirst($booking->payment_option),
         ]);
         

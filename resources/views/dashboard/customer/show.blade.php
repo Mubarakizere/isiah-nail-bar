@@ -43,7 +43,12 @@
 
             <div class="text-center mb-8">
                 <h1 class="text-2xl font-serif font-bold text-gray-900">Reservation Details</h1>
-                <p class="text-sm text-gray-500 mt-1">Order #{{ $booking->id }}</p>
+                <p class="text-sm text-gray-500 mt-1 mb-3">Order #{{ $booking->id }}</p>
+                @if($booking->is_home_service)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 border border-rose-100 text-rose-700 text-sm font-bold rounded-full shadow-sm">
+                        <i class="ph ph-house"></i> Home Service: {{ $booking->address }}
+                    </span>
+                @endif
             </div>
 
             {{-- Main Details Grid --}}

@@ -6,7 +6,7 @@
 @if($role === 'admin')
     <div x-data="{
         viewOpen: {{ request()->routeIs('dashboard.admin', 'dashboard.admin.bookings', 'dashboard.admin.reports', 'admin.providers.performance') ? 'true' : 'false' }},
-        managementOpen: {{ request()->routeIs('admin.categories.*', 'admin.services.*', 'admin.providers.*', 'admin.team_members.*', 'admin.slots.*', 'admin.messages', 'admin.webmail.*', ' admin.gallery-instagram.*', 'admin.tags.*', 'admin.reviews.*') ? 'true' : 'false' }},
+        managementOpen: {{ request()->routeIs('admin.categories.*', 'admin.services.*', 'admin.providers.*', 'admin.team_members.*', 'admin.slots.*', 'admin.messages', 'admin.webmail.*', 'admin.gallery-instagram.*', 'admin.tags.*', 'admin.reviews.*', 'admin.hero-slides.*') ? 'true' : 'false' }},
         toolsOpen: {{ request()->routeIs('admin.bookings.manual.*', 'admin.services.pending', 'admin.emails.*', 'admin.webhooks.*') ? 'true' : 'false' }}
     }" class="space-y-2">
         
@@ -94,6 +94,12 @@
                    class="group flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.webmail.*') ? 'bg-rose-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                     <i class="ph ph-envelope-open text-base"></i>
                     <span>Webmail</span>
+                </a>
+
+                <a href="{{ route('admin.hero-slides.index') }}" 
+                   class="group flex items-center gap-2 px-3 py-2 text-sm font-medium transition-colors {{ request()->routeIs('admin.hero-slides.*') ? 'bg-rose-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <i class="ph ph-slideshow text-base"></i>
+                    <span>Hero Slides</span>
                 </a>
 
                 <a href="{{ route('admin.gallery-instagram.index') }}" 

@@ -6,9 +6,8 @@
 
 
 @php
-    $totalPrice = $services->sum('price');
-    $depositAmount = round($totalPrice * 0.4);
     $isLocal = app()->environment('local');
+    $isHomeService = session('booking.is_home_service', false);
 @endphp
 
 {{-- Hero Header --}}
@@ -193,6 +192,19 @@
                                     <span class="text-rose-400 font-medium">{{ $provider->name }}</span>
                                 </div>
                             </div>
+
+                            @if($isHomeService)
+                            <div class="bg-rose-900/30 border border-rose-500/30 rounded-xl p-4 mb-6 relative z-10 text-sm">
+                                <div class="flex items-start gap-3">
+                                    <i class="ph ph-house text-rose-400 text-xl mt-0.5"></i>
+                                    <div>
+                                        <p class="text-white font-medium mb-1">Home Service Selected</p>
+                                        <p class="text-gray-300">{{ session('booking.address') }}</p>
+                                        <p class="text-rose-400 text-xs mt-2 italic">+100% Price applied to total</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
 
                             {{-- Services --}}
                             <div class="space-y-2 mb-6 relative z-10 max-h-[25vh] overflow-y-auto custom-scrollbar pr-2">

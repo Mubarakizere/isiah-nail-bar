@@ -56,6 +56,22 @@
                         </div>
                     </div>
 
+                    {{-- Location Card --}}
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-start gap-5">
+                       <div class="w-12 h-12 rounded-full {{ session('booking.is_home_service') ? 'bg-rose-50 text-rose-500' : 'bg-green-50 text-green-500' }} flex items-center justify-center shrink-0">
+                            <i class="ph {{ session('booking.is_home_service') ? 'ph-house' : 'ph-storefront' }} text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-serif text-gray-900 mb-1">Where</h3>
+                            <p class="text-xl font-bold text-gray-900">{{ session('booking.is_home_service') ? 'Home Service' : 'In-Salon Service' }}</p>
+                            @if(session('booking.is_home_service'))
+                                <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ session('booking.address') }}</p>
+                            @else
+                                <p class="text-sm text-gray-500 mt-1">At our luxury studio</p>
+                            @endif
+                        </div>
+                    </div>
+
                     {{-- Services List --}}
                     <div>
                          <h3 class="text-lg font-serif text-gray-900 mb-4 flex items-center gap-2">
@@ -77,9 +93,17 @@
                                 </div>
                             @endforeach
 
-                             <div class="pt-4 mt-4 border-t border-gray-200 flex justify-between items-center">
-                                <span class="font-serif">Subtotal</span>
-                                <span class="font-bold text-lg">RWF {{ number_format($services->sum('price')) }}</span>
+                            <div class="pt-4 mt-4 border-t border-gray-200 space-y-2">
+                                @if(session('booking.is_home_service'))
+                                <div class="flex justify-between items-center text-rose-500 text-sm">
+                                    <span>Home Service Premium</span>
+                                    <span>+100%</span>
+                                </div>
+                                @endif
+                                <div class="flex justify-between items-center">
+                                    <span class="font-serif">Total</span>
+                                    <span class="font-bold text-lg">RWF {{ number_format($totalPrice) }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -209,7 +233,7 @@
                                  <div class="h-px bg-gray-800 my-4"></div>
                                  <div class="flex justify-between items-end">
                                     <span class="text-lg">Grand Total</span>
-                                    <span class="text-3xl font-serif text-white">RWF {{ number_format($services->sum('price')) }}</span>
+                                    <span class="text-3xl font-serif text-white">RWF {{ number_format($totalPrice) }}</span>
                                 </div>
                             </div>
 

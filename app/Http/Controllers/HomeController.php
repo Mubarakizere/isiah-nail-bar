@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use App\Models\Service;
+use App\Models\HeroSlide;
 
 class HomeController extends Controller
 {
@@ -18,6 +19,9 @@ class HomeController extends Controller
         // Reviews from Database
         $reviews = \App\Models\Review::latest()->take(10)->get();
 
-        return view('home.index', compact('services', 'featuredServices', 'reviews'));
+        // Hero Slides for the carousel
+        $heroSlides = HeroSlide::active()->ordered()->get();
+
+        return view('home.index', compact('services', 'featuredServices', 'reviews', 'heroSlides'));
     }
 }

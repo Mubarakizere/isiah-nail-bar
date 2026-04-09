@@ -110,6 +110,11 @@
                         <td class="px-4 py-3 text-sm text-gray-900">
                             <div>{{ \Carbon\Carbon::parse($booking->date)->format('M d, Y') }}</div>
                             <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($booking->time)->format('h:i A') }}</div>
+                            @if($booking->is_home_service)
+                                <div class="text-[10px] bg-rose-50 text-rose-600 font-bold px-1.5 py-0.5 rounded mt-1 inline-flex items-center gap-1 border border-rose-100">
+                                    <i class="ph ph-house"></i> {{ Str::limit($booking->address, 15) }}
+                                </div>
+                            @endif
                         </td>
                         
                         {{-- Booking Status --}}

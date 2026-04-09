@@ -102,6 +102,12 @@
                                             </div>
                                             <span class="font-medium text-gray-900">{{ $booking->customer->user->name ?? 'Guest' }}</span>
                                         </div>
+                                        @if($booking->is_home_service)
+                                            <div class="mt-1.5 text-xs text-rose-600 font-bold flex items-start gap-1">
+                                                <i class="ph ph-house mt-0.5"></i> 
+                                                <span class="break-words max-w-[150px]">{{ Str::limit($booking->address, 20) }}</span>
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">

@@ -15,6 +15,8 @@ class Booking extends Model
         'notes',
         'deposit_amount',
         'reference',
+        'is_home_service',
+        'address',
     ];
 
     protected $casts = [

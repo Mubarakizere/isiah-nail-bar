@@ -26,6 +26,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\ProviderController;
 use App\Http\Controllers\Admin\ProviderWorkingHourController;
 use App\Http\Controllers\HomeController;
@@ -378,6 +379,10 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
         Route::resource('/categories', \App\Http\Controllers\Admin\CategoryController::class)->names('admin.categories');
         Route::resource('team-members', \App\Http\Controllers\Admin\TeamMemberController::class)->names('admin.team_members');
         Route::resource('/tags', \App\Http\Controllers\TagController::class)->except(['show'])->names('admin.tags');
+
+        // Hero Slides
+        Route::resource('hero-slides', HeroSlideController::class)->names('admin.hero-slides');
+        Route::patch('hero-slides/{heroSlide}/toggle', [HeroSlideController::class, 'toggleActive'])->name('admin.hero-slides.toggle');
 
         Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');
         Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');

@@ -110,6 +110,48 @@
                         </div>
                     </div>
 
+                    {{-- Location Selection --}}
+                    <div class="mt-10">
+                        <h3 class="text-lg font-serif text-gray-900 mb-4 flex items-center gap-2">
+                             <span class="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-sm font-bold">3</span>
+                             Select Location
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <label class="relative cursor-pointer block">
+                                <input type="radio" name="location_type" value="salon" class="peer hidden" checked onchange="toggleAddressField()">
+                                <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm transition-all duration-300 peer-checked:border-gray-900 peer-checked:ring-1 peer-checked:ring-gray-900 peer-checked:bg-gray-50 h-full flex flex-col justify-center">
+                                    <h4 class="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                                        <i class="ph ph-storefront text-xl"></i> In-Salon Service
+                                    </h4>
+                                    <p class="text-sm text-gray-500">Standard pricing at our luxury studio.</p>
+                                </div>
+                            </label>
+
+                            <label class="relative cursor-pointer block">
+                                <input type="radio" name="location_type" value="home" class="peer hidden" onchange="toggleAddressField()">
+                                <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm transition-all duration-300 peer-checked:border-gray-900 peer-checked:ring-1 peer-checked:ring-gray-900 peer-checked:bg-gray-50 h-full flex flex-col justify-center">
+                                    <h4 class="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                                        <i class="ph ph-house text-xl"></i> Home Service
+                                    </h4>
+                                    <p class="text-sm text-rose-500 font-medium">+100% (Double Total Price)</p>
+                                </div>
+                            </label>
+                        </div>
+                        @error('location_type')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+
+                        <div id="address_field_container" class="hidden animate-fade-in-up bg-white p-4 rounded-xl border border-gray-200">
+                            <label class="block text-sm font-medium text-gray-900 mb-2">Service Address <span class="text-rose-500">*</span></label>
+                            <textarea name="address" id="address" rows="2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors" placeholder="Enter your full address (Street, House number, Area)...">{{ old('address') }}</textarea>
+                            @error('address')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                            <p class="text-sm text-gray-500 mt-2"><i class="ph ph-info"></i> Please ensure the location is accessible.</p>
+                        </div>
+                    </div>
+
                     <div class="flex justify-between items-center pt-8 mt-8 border-t border-gray-100">
                         <a href="{{ route('booking.step2') }}" class="text-gray-500 hover:text-gray-900 font-medium flex items-center gap-2 transition-colors">
                             <i class="ph ph-arrow-left"></i> Back to Artist
@@ -190,5 +232,34 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.3s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
+
+<script>
+function toggleAddressField() {
+    const isHome = document.querySelector('input[name="location_type"]:checked').value === 'home';
+    const container = document.getElementById('address_field_container');
+    const addressInput = document.getElementById('address');
+    
+    if (isHome) {
+        container.classList.remove('hidden');
+        addressInput.setAttribute('required', 'required');
+    } else {
+        container.classList.add('hidden');
+        addressInput.removeAttribute('required');
+        addressInput.value = '';
+    }
+}
+
+// Initial state on page load (in case of old inputs)
+document.addEventListener('DOMContentLoaded', toggleAddressField);
+</script>
 @endpush

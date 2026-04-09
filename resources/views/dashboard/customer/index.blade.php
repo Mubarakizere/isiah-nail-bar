@@ -37,6 +37,11 @@
                                     <p class="text-sm text-gray-500">
                                         at {{ \Carbon\Carbon::parse($booking->time)->format('H:i') }}
                                     </p>
+                                    @if($booking->is_home_service)
+                                        <p class="text-xs font-bold text-rose-600 mt-1 flex items-center gap-1">
+                                            <i class="ph ph-house"></i> Home Service
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
                              @php
