@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasColumn('bookings', 'pickup_location_id')) {
-            Schema::table('bookings', function (Blueprint $table) {
-                // Remove orphaned columns from previous failed migration
-                $table->dropColumn(['pickup_location_id', 'pickup_fee', 'pickup_address']);
+        // Clean up orphaned columns from previous failed migration attempt
+        $columnsToDrop = [];
+        foreach (['pickup_location_id', 'pickup_fee', 'pickup_address'] as $col) {
+            if (Schema::hasColumn('bookings', $col)) {
+                $columnsToDrop[] = $col;
+            }
+        }
+        if (!empty($columnsToDrop)) {
+            Schema::table('bookings', function (Blueprint $table) use ($columnsToDrop) {
+                $table->dropColumn($columnsToDrop);
             });
         }
 
