@@ -107,6 +107,11 @@
                                                 <i class="ph ph-house mt-0.5"></i> 
                                                 <span class="break-words max-w-[150px]">{{ Str::limit($booking->address, 20) }}</span>
                                             </div>
+                                        @elseif($booking->pickup_location_id)
+                                            <div class="mt-1.5 text-xs text-blue-600 font-bold flex items-start gap-1">
+                                                <i class="ph ph-car mt-0.5"></i> 
+                                                <span class="break-words max-w-[150px]">Pickup at {{ Str::limit($booking->pickup_address, 20) }}</span>
+                                            </div>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">

@@ -99,6 +99,17 @@
                                     <span>Home Service Premium</span>
                                     <span>+100%</span>
                                 </div>
+                                @elseif(isset($pickupLoc) && session('booking.pickup_location_id'))
+                                <div class="flex justify-between items-center text-blue-500 text-sm">
+                                    <div class="flex items-center gap-1">
+                                        <i class="ph ph-car"></i>
+                                        <span>Pickup: {{ $pickupLoc->name }}</span>
+                                    </div>
+                                    <span>+{{ number_format($pickupLoc->fee) }} RWF</span>
+                                </div>
+                                <div class="text-xs text-gray-500 pl-5">
+                                    Address: {{ session('booking.pickup_address') }}
+                                </div>
                                 @endif
                                 <div class="flex justify-between items-center">
                                     <span class="font-serif">Total</span>

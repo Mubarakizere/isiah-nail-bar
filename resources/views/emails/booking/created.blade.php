@@ -14,6 +14,11 @@ Thank you for choosing Isaiah Nail Bar. Your appointment request has been receiv
 **Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
 **Time:** {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}  
 **Service Provider:** {{ $booking->provider->name ?? 'To be assigned' }}
+@if($booking->is_home_service)
+**Home Service:** {{ $booking->address }}
+@elseif($booking->pickup_location_id)
+**Transport Pickup:** {{ $booking->pickupLocation->name ?? 'Route' }} ({{ $booking->pickup_address }})
+@endif
 
 ---
 
@@ -23,7 +28,12 @@ Thank you for choosing Isaiah Nail Bar. Your appointment request has been receiv
 - {{ $service->name }} ({{ $service->duration_minutes }} minutes) - RWF {{ number_format($service->price, 2) }}
 @endforeach
 
-**Total Amount Due:** RWF {{ number_format($booking->services->sum('price'), 2) }}
+@php
+    $emailTotal = $booking->services->sum('price');
+    if ($booking->is_home_service) $emailTotal *= 2;
+    if ($booking->pickup_fee) $emailTotal += $booking->pickup_fee;
+@endphp
+**Total Amount Due:** RWF {{ number_format($emailTotal, 2) }}
 
 ---
 

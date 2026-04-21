@@ -204,6 +204,17 @@
                                     </div>
                                 </div>
                             </div>
+                            @elseif(isset($pickupLoc) && session('booking.pickup_location_id'))
+                            <div class="bg-blue-900/30 border border-blue-500/30 rounded-xl p-4 mb-6 relative z-10 text-sm">
+                                <div class="flex items-start gap-3">
+                                    <i class="ph ph-car text-blue-400 text-xl mt-0.5"></i>
+                                    <div>
+                                        <p class="text-white font-medium mb-1">Pickup Transport Requested</p>
+                                        <p class="text-gray-300">{{ session('booking.pickup_address') }}</p>
+                                        <p class="text-blue-400 text-xs mt-2 italic">+{{ number_format($pickupLoc->fee) }} RWF added to total</p>
+                                    </div>
+                                </div>
+                            </div>
                             @endif
 
                             {{-- Services --}}

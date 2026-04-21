@@ -384,6 +384,8 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
         Route::resource('hero-slides', HeroSlideController::class)->names('admin.hero-slides');
         Route::patch('hero-slides/{heroSlide}/toggle', [HeroSlideController::class, 'toggleActive'])->name('admin.hero-slides.toggle');
 
+        Route::resource('pickup-locations', \App\Http\Controllers\Admin\PickupLocationController::class)->names('admin.pickup-locations')->except(['create', 'show', 'edit']);
+
         Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');
         Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 

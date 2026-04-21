@@ -17,12 +17,25 @@ A new booking has been received and requires your attention.
 **Assigned Provider**  
 {{ $booking->provider->name ?? 'Not assigned' }}
 
+@if($booking->is_home_service)
+**Home Service Location**  
+{{ $booking->address }}
+@elseif($booking->pickup_location_id)
+**Pickup Requested**  
+{{ $booking->pickupLocation->name ?? 'Route' }} ({{ $booking->pickup_address }})
+@endif
+
 **Selected Services**
 @foreach($booking->services as $service)
 - {{ $service->name }} ({{ $service->duration_minutes }} minutes) - RWF {{ number_format($service->price, 2) }}
 @endforeach
 
-**Total Amount:** RWF {{ number_format($booking->services->sum('price'), 2) }}
+@php
+    $emailTotal = $booking->services->sum('price');
+    if ($booking->is_home_service) $emailTotal *= 2;
+    if ($booking->pickup_fee) $emailTotal += $booking->pickup_fee;
+@endphp
+**Total Amount:** RWF {{ number_format($emailTotal, 2) }}
 
 ---
 

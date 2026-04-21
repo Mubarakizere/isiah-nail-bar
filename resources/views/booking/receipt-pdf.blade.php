@@ -84,6 +84,11 @@
         <tr><td class="label">Provider:</td><td>{{ $booking->provider->name ?? '-' }}</td></tr>
         <tr><td class="label">Date:</td><td>{{ \Carbon\Carbon::parse($booking->date)->format('D, M j Y') }}</td></tr>
         <tr><td class="label">Time:</td><td>{{ \Carbon\Carbon::parse($booking->time)->format('h:i A') }}</td></tr>
+        @if($booking->is_home_service)
+        <tr><td class="label">Home Service:</td><td>{{ $booking->address }}</td></tr>
+        @elseif($booking->pickup_location_id)
+        <tr><td class="label">Transport Pickup:</td><td>{{ $booking->pickupLocation->name ?? 'Route' }} ({{ $booking->pickup_address }})</td></tr>
+        @endif
         <tr><td class="label">Payment Option:</td><td>{{ ucfirst($booking->payment_option) }}</td></tr>
     </table>
 
@@ -110,12 +115,27 @@
     <div class="section-title">Payment Summary</div>
     <table class="table">
         <tr>
-            <td class="label">Total Services Price:</td>
+            <td class="label">Base Services Price:</td>
             <td style="font-weight: bold;">RWF {{ number_format($booking->services->sum('price')) }}</td>
+        </tr>
+        @if($booking->is_home_service)
+        <tr><td class="label">Home Service Premium:</td><td style="font-weight: bold;">+100% (RWF {{ number_format($booking->services->sum('price')) }})</td></tr>
+        @elseif($booking->pickup_fee)
+        <tr><td class="label">Pickup Transport Fee:</td><td style="font-weight: bold;">RWF {{ number_format($booking->pickup_fee) }}</td></tr>
+        @endif
+
+        @php
+            $pdfTotal = $booking->services->sum('price');
+            if ($booking->is_home_service) $pdfTotal *= 2;
+            if ($booking->pickup_fee) $pdfTotal += $booking->pickup_fee;
+        @endphp
+        <tr>
+            <td class="label">Grand Total:</td>
+            <td style="font-weight: bold;">RWF {{ number_format($pdfTotal) }}</td>
         </tr>
         @if($booking->deposit_amount)
             <tr><td class="label">Deposit Paid:</td><td>RWF {{ number_format($booking->deposit_amount) }}</td></tr>
-            <tr><td class="label">Remaining Balance:</td><td>RWF {{ number_format($booking->services->sum('price') - $booking->deposit_amount) }}</td></tr>
+            <tr><td class="label">Remaining Balance:</td><td>RWF {{ number_format($pdfTotal - $booking->deposit_amount) }}</td></tr>
         @else
             <tr><td class="label">Paid in Full:</td><td>Yes</td></tr>
         @endif

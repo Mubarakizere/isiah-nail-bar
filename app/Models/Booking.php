@@ -17,6 +17,9 @@ class Booking extends Model
         'reference',
         'is_home_service',
         'address',
+        'pickup_location_id',
+        'pickup_fee',
+        'pickup_address',
     ];
 
     protected $casts = [
@@ -47,6 +50,11 @@ class Booking extends Model
     public function customer()
     {
         return $this->belongsTo(\App\Models\Customer::class, 'customer_id');
+    }
+
+    public function pickupLocation()
+    {
+        return $this->belongsTo(\App\Models\PickupLocation::class);
     }
 
     public function review()

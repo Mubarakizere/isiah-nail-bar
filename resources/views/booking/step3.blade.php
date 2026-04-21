@@ -150,6 +150,43 @@
                             @enderror
                             <p class="text-sm text-gray-500 mt-2"><i class="ph ph-info"></i> Please ensure the location is accessible.</p>
                         </div>
+
+                        {{-- Pickup Section (Only for In-Salon) --}}
+                        <div id="pickup_container" class="mt-4 animate-fade-in-up bg-white p-4 rounded-xl border border-gray-200">
+                            <label class="flex items-center cursor-pointer mb-3 relative">
+                                <input type="checkbox" name="wants_pickup" id="wants_pickup" value="1" class="peer hidden" onchange="togglePickupFields()" {{ old('wants_pickup') ? 'checked' : '' }}>
+                                <div class="w-5 h-5 rounded border border-gray-300 flex items-center justify-center mr-3 peer-checked:bg-gray-900 peer-checked:border-gray-900 transition-colors">
+                                    <i class="ph ph-check text-white opacity-0 peer-checked:opacity-100 text-xs"></i>
+                                </div>
+                                <span class="font-medium text-gray-900">Need Transport / Pickup?</span>
+                                <span class="ml-2 text-xs text-rose-500 bg-rose-50 px-2 py-1 rounded-full">New</span>
+                            </label>
+
+                            <div id="pickup_fields" class="{{ old('wants_pickup') ? '' : 'hidden' }} space-y-4 pt-2 border-t border-gray-100">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-900 mb-1">Pickup Location <span class="text-rose-500">*</span></label>
+                                    <select name="pickup_location_id" id="pickup_location_id" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors">
+                                        <option value="">Select a location</option>
+                                        @foreach($pickupLocations as $loc)
+                                            <option value="{{ $loc->id }}" {{ old('pickup_location_id') == $loc->id ? 'selected' : '' }}>
+                                                {{ $loc->name }} (+{{ number_format($loc->fee) }} RWF)
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('pickup_location_id')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-900 mb-1">Exact Address <span class="text-rose-500">*</span></label>
+                                    <textarea name="pickup_address" id="pickup_address" rows="2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors" placeholder="Where should we pick you up?">{{ old('pickup_address') }}</textarea>
+                                    @error('pickup_address')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex justify-between items-center pt-8 mt-8 border-t border-gray-100">
@@ -249,17 +286,51 @@ function toggleAddressField() {
     const container = document.getElementById('address_field_container');
     const addressInput = document.getElementById('address');
     
+    // Pickup elements
+    const pickupContainer = document.getElementById('pickup_container');
+    const wantsPickupCheckbox = document.getElementById('wants_pickup');
+    
     if (isHome) {
         container.classList.remove('hidden');
         addressInput.setAttribute('required', 'required');
+        
+        // Hide pickup section if home service
+        pickupContainer.classList.add('hidden');
+        wantsPickupCheckbox.checked = false;
+        togglePickupFields();
     } else {
         container.classList.add('hidden');
         addressInput.removeAttribute('required');
         addressInput.value = '';
+        
+        // Show pickup section if in-salon
+        pickupContainer.classList.remove('hidden');
+    }
+}
+
+function togglePickupFields() {
+    const isPickup = document.getElementById('wants_pickup').checked;
+    const fields = document.getElementById('pickup_fields');
+    const locationSelect = document.getElementById('pickup_location_id');
+    const pickupAddressInput = document.getElementById('pickup_address');
+    
+    if (isPickup) {
+        fields.classList.remove('hidden');
+        locationSelect.setAttribute('required', 'required');
+        pickupAddressInput.setAttribute('required', 'required');
+    } else {
+        fields.classList.add('hidden');
+        locationSelect.removeAttribute('required');
+        pickupAddressInput.removeAttribute('required');
+        locationSelect.value = '';
+        pickupAddressInput.value = '';
     }
 }
 
 // Initial state on page load (in case of old inputs)
-document.addEventListener('DOMContentLoaded', toggleAddressField);
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAddressField();
+    togglePickupFields();
+});
 </script>
 @endpush

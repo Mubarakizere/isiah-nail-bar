@@ -45,8 +45,12 @@
                 <h1 class="text-2xl font-serif font-bold text-gray-900">Reservation Details</h1>
                 <p class="text-sm text-gray-500 mt-1 mb-3">Order #{{ $booking->id }}</p>
                 @if($booking->is_home_service)
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 border border-rose-100 text-rose-700 text-sm font-bold rounded-full shadow-sm">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 border border-rose-100 text-rose-700 text-sm font-bold rounded-full shadow-sm mt-2">
                         <i class="ph ph-house"></i> Home Service: {{ $booking->address }}
+                    </span>
+                @elseif($booking->pickup_location_id)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 text-blue-700 text-sm font-bold rounded-full shadow-sm mt-2">
+                        <i class="ph ph-car"></i> Pickup: {{ $booking->pickup_address }} ({{ $booking->pickupLocation->name ?? '' }})
                     </span>
                 @endif
             </div>

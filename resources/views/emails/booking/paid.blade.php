@@ -12,6 +12,11 @@ Thank you for your payment. Your booking has been confirmed and we look forward 
 **Date:** {{ \Carbon\Carbon::parse($booking->date)->format('l, F j, Y') }}  
 **Time:** {{ \Carbon\Carbon::parse($booking->time)->format('g:i A') }}  
 **Service Provider:** {{ $booking->provider->name ?? 'To be assigned' }}  
+@if($booking->is_home_service)
+**Home Service:** {{ $booking->address }}
+@elseif($booking->pickup_location_id)
+**Transport Pickup:** {{ $booking->pickupLocation->name ?? 'Route' }} ({{ $booking->pickup_address }})
+@endif
 **Booking Reference:** {{ $booking->reference }}
 
 ---
@@ -26,11 +31,16 @@ Thank you for your payment. Your booking has been confirmed and we look forward 
 
 ## Payment Summary
 
+@php
+    $emailTotal = $booking->services->sum('price');
+    if ($booking->is_home_service) $emailTotal *= 2;
+    if ($booking->pickup_fee) $emailTotal += $booking->pickup_fee;
+@endphp
 @if($booking->deposit_amount)
 **Deposit Paid:** RWF {{ number_format($booking->deposit_amount, 2) }}  
-**Remaining Balance:** RWF {{ number_format($booking->services->sum('price') - $booking->deposit_amount, 2) }}
+**Remaining Balance:** RWF {{ number_format($emailTotal - $booking->deposit_amount, 2) }}
 @else
-**Total Amount Paid:** RWF {{ number_format($booking->services->sum('price'), 2) }}
+**Total Amount Paid:** RWF {{ number_format($emailTotal, 2) }}
 @endif
 
 ---

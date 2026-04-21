@@ -41,6 +41,10 @@
                                         <p class="text-xs font-bold text-rose-600 mt-1 flex items-center gap-1">
                                             <i class="ph ph-house"></i> Home Service
                                         </p>
+                                    @elseif($booking->pickup_location_id)
+                                        <p class="text-xs font-bold text-blue-600 mt-1 flex items-center gap-1">
+                                            <i class="ph ph-car"></i> Pickup Request
+                                        </p>
                                     @endif
                                 </div>
                             </div>

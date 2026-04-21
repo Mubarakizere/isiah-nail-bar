@@ -183,11 +183,14 @@ class BookingController extends Controller
             $selectedDate
         );
 
+        $pickupLocations = \App\Models\PickupLocation::where('is_active', true)->get();
+
         return view('booking.step3', compact(
             'selectedDate',
             'services',
             'provider',
-            'slotsWithStatus'
+            'slotsWithStatus',
+            'pickupLocations'
         ));
     }
 
@@ -302,6 +305,9 @@ class BookingController extends Controller
             'booking_time' => 'required',
             'location_type' => 'required|in:salon,home',
             'address' => 'required_if:location_type,home|string|max:255|nullable',
+            'wants_pickup' => 'nullable|boolean',
+            'pickup_location_id' => 'required_if:wants_pickup,1|exists:pickup_locations,id|nullable',
+            'pickup_address' => 'required_if:wants_pickup,1|string|max:255|nullable',
         ]);
 
         $chosenDate = Carbon::parse($request->booking_date)->toDateString();
@@ -329,6 +335,8 @@ class BookingController extends Controller
             'booking.time' => $chosenTime->format('H:i'),
             'booking.is_home_service' => $request->location_type === 'home',
             'booking.address' => $request->address,
+            'booking.pickup_location_id' => $request->wants_pickup ? $request->pickup_location_id : null,
+            'booking.pickup_address' => $request->wants_pickup ? $request->pickup_address : null,
         ]);
 
         // Redirect to login if user not authenticated
@@ -361,7 +369,12 @@ class BookingController extends Controller
         $services = Service::whereIn('id', $serviceIds)->get();
         $baseTotal = $services->sum('price');
         $multiplier = session('booking.is_home_service') ? 2 : 1;
-        $totalPrice = $baseTotal * $multiplier;
+        $pickupFee = 0;
+        if (session('booking.pickup_location_id')) {
+            $pickupLoc = \App\Models\PickupLocation::find(session('booking.pickup_location_id'));
+            if ($pickupLoc) $pickupFee = $pickupLoc->fee;
+        }
+        $totalPrice = ($baseTotal * $multiplier) + $pickupFee;
         $depositAmount = round($totalPrice * 0.4);
         $provider = Provider::findOrFail(session('booking.provider_id'));
 
@@ -370,7 +383,8 @@ class BookingController extends Controller
             'provider',
             'totalPrice',
             'depositAmount',
-            'paymentsDisabled'
+            'paymentsDisabled',
+            'pickupLoc'
         ));
     }
 
@@ -388,7 +402,12 @@ class BookingController extends Controller
         $serviceIds = session('booking.service_ids', []);
         $baseTotal = $this->calculateTotalPrice($serviceIds);
         $multiplier = session('booking.is_home_service') ? 2 : 1;
-        $totalPrice = $baseTotal * $multiplier;
+        $pickupFee = 0;
+        if (session('booking.pickup_location_id')) {
+            $pickupLoc = \App\Models\PickupLocation::find(session('booking.pickup_location_id'));
+            if ($pickupLoc) $pickupFee = $pickupLoc->fee;
+        }
+        $totalPrice = ($baseTotal * $multiplier) + $pickupFee;
 
         session([
             'booking.payment_option' => $request->payment_option,
@@ -417,7 +436,12 @@ class BookingController extends Controller
         $services = Service::whereIn('id', session('booking.service_ids'))->get();
         $baseTotal = $services->sum('price');
         $multiplier = session('booking.is_home_service') ? 2 : 1;
-        $totalPrice = $baseTotal * $multiplier;
+        $pickupFee = 0;
+        if (session('booking.pickup_location_id')) {
+            $pickupLoc = \App\Models\PickupLocation::find(session('booking.pickup_location_id'));
+            if ($pickupLoc) $pickupFee = $pickupLoc->fee;
+        }
+        $totalPrice = ($baseTotal * $multiplier) + $pickupFee;
         $provider = Provider::findOrFail(session('booking.provider_id'));
 
         return view('booking.step5', [
@@ -427,6 +451,7 @@ class BookingController extends Controller
             'depositAmount' => round($totalPrice * 0.4),
             'paymentOption' => session('booking.payment_option') === 'deposit' ? 'Deposit' : 'Full Payment',
             'paymentMethod' => session('booking.payment_method'),
+            'pickupLoc' => $pickupLoc ?? null,
         ]);
     }
 
@@ -494,7 +519,12 @@ class BookingController extends Controller
         $paymentOption = session('booking.payment_option');
         $baseTotal = $services->sum('price');
         $multiplier = session('booking.is_home_service') ? 2 : 1;
-        $totalPrice = $baseTotal * $multiplier;
+        $pickupFee = 0;
+        if (session('booking.pickup_location_id')) {
+            $pickupLoc = \App\Models\PickupLocation::find(session('booking.pickup_location_id'));
+            if ($pickupLoc) $pickupFee = $pickupLoc->fee;
+        }
+        $totalPrice = ($baseTotal * $multiplier) + $pickupFee;
         $amount = $paymentOption === 'deposit' ? session('booking.deposit_amount') : $totalPrice;
         $phone = $this->normalizePhoneNumber(session('booking.payment_phone'));
         $paymentMethod = session('booking.payment_method');
@@ -537,6 +567,7 @@ class BookingController extends Controller
             'paymentOption' => $paymentOption,
             'paymentMethod' => $paymentMethod,
             'totalPrice' => $totalPrice,
+            'pickupFee' => $pickupFee,
             'amount' => $amount,
             'phone' => $phone,
             'reference' => (string) Str::uuid(),
@@ -556,6 +587,9 @@ class BookingController extends Controller
             'time' => session('booking.time'),
             'is_home_service' => session('booking.is_home_service', false),
             'address' => session('booking.address'),
+            'pickup_location_id' => session('booking.pickup_location_id'),
+            'pickup_fee' => $data['pickupFee'] ?? 0,
+            'pickup_address' => session('booking.pickup_address'),
             'payment_option' => $data['paymentOption'],
             'deposit_amount' => $data['paymentOption'] === 'deposit' ? session('booking.deposit_amount') : null,
             'status' => 'pending',

@@ -114,6 +114,11 @@
                                 <div class="text-[10px] bg-rose-50 text-rose-600 font-bold px-1.5 py-0.5 rounded mt-1 inline-flex items-center gap-1 border border-rose-100">
                                     <i class="ph ph-house"></i> {{ Str::limit($booking->address, 15) }}
                                 </div>
+                            @elseif($booking->pickup_location_id)
+                                <div class="text-[10px] bg-blue-50 text-blue-600 font-bold px-1.5 py-0.5 rounded mt-1 flex flex-col gap-0.5 border border-blue-100 mt-1">
+                                    <span class="inline-flex items-center gap-1"><i class="ph ph-car"></i> {{ $booking->pickupLocation->name ?? 'Pickup' }}</span>
+                                    <span class="font-normal">{{ Str::limit($booking->pickup_address, 15) }}</span>
+                                </div>
                             @endif
                         </td>
                         

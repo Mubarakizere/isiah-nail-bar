@@ -72,6 +72,18 @@
                         <p class="text-xs text-gray-500 mb-1">Provider</p>
                         <p class="font-semibold text-gray-900">{{ $booking->provider->name ?? '-' }}</p>
                     </div>
+                    @if($booking->is_home_service)
+                        <div class="bg-rose-50 border border-rose-200 p-4 mt-4">
+                            <p class="text-xs text-rose-700 mb-1 font-bold">Location (Home Service)</p>
+                            <p class="font-semibold text-gray-900">{{ $booking->address }}</p>
+                        </div>
+                    @elseif($booking->pickup_location_id)
+                        <div class="bg-blue-50 border border-blue-200 p-4 mt-4">
+                            <p class="text-xs text-blue-700 mb-1 font-bold">Transport / Pickup Request</p>
+                            <p class="font-semibold text-gray-900">Pickup Area: {{ $booking->pickupLocation->name ?? 'Configured Route' }}</p>
+                            <p class="text-sm text-gray-600 mt-1">Exact Address: {{ $booking->pickup_address }}</p>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Services --}}
@@ -91,11 +103,27 @@
                                     <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">RWF {{ number_format($service->price) }}</td>
                                 </tr>
                             @endforeach
+                            @if($booking->is_home_service)
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-rose-600 font-bold">Home Service Premium</td>
+                                    <td class="px-4 py-3 text-sm text-rose-600 text-right font-medium">+100%</td>
+                                </tr>
+                            @elseif($booking->pickup_location_id)
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-blue-600 font-bold">Pickup: {{ $booking->pickupLocation->name ?? 'Route' }}</td>
+                                    <td class="px-4 py-3 text-sm text-blue-600 text-right font-medium">RWF {{ number_format($booking->pickup_fee) }}</td>
+                                </tr>
+                            @endif
                         </tbody>
                         <tfoot class="bg-gray-50 border-t-2 border-gray-300">
                             <tr>
                                 <td class="px-4 py-4 text-sm font-bold text-gray-900">TOTAL</td>
-                                <td class="px-4 py-4 text-right text-lg font-bold text-gray-900">RWF {{ number_format($booking->services->sum('price')) }}</td>
+                                @php
+                                    $receiptTotal = $booking->services->sum('price');
+                                    if ($booking->is_home_service) $receiptTotal *= 2;
+                                    if ($booking->pickup_fee) $receiptTotal += $booking->pickup_fee;
+                                @endphp
+                                <td class="px-4 py-4 text-right text-lg font-bold text-gray-900">RWF {{ number_format($receiptTotal) }}</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -109,6 +137,8 @@
                             $totalPaid = $booking->payments->where('status', 'paid')->sum('amount');
                             $latestPayment = $booking->payments->sortByDesc('created_at')->first();
                             $totalAmount = $booking->services->sum('price');
+                            if ($booking->is_home_service) $totalAmount *= 2;
+                            if ($booking->pickup_fee) $totalAmount += $booking->pickup_fee;
                         @endphp
                         
                         <div class="grid grid-cols-2 gap-4 mb-3">
