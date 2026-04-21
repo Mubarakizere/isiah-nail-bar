@@ -52,13 +52,9 @@
                                 <button onclick="openEditModal({{ $location->id }}, '{{ addslashes($location->name) }}', {{ $location->fee }}, {{ $location->is_active ? 'true' : 'false' }})" class="text-blue-500 hover:text-blue-600 rounded-full">
                                     <i class="ph ph-pencil-simple text-lg"></i>
                                 </button>
-                                <form action="{{ route('admin.pickup-locations.destroy', $location) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this location?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-600 rounded-full">
-                                        <i class="ph ph-trash text-lg"></i>
-                                    </button>
-                                </form>
+                                <button type="button" onclick="openDeleteModal('{{ route('admin.pickup-locations.destroy', $location) }}', '{{ addslashes($location->name) }}')" class="text-red-500 hover:text-red-600 rounded-full">
+                                    <i class="ph ph-trash text-lg"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -140,5 +136,32 @@ function openEditModal(id, name, fee, isActive) {
     document.getElementById('edit_is_active').checked = isActive;
     document.getElementById('edit-modal').classList.remove('hidden');
 }
+
+function openDeleteModal(action, name) {
+    document.getElementById('delete-form').action = action;
+    document.getElementById('delete-location-name').textContent = name;
+    document.getElementById('delete-modal').classList.remove('hidden');
+}
 </script>
+
+{{-- Delete Confirmation Modal --}}
+<div id="delete-modal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-sm mx-4 overflow-hidden">
+        <div class="p-6 text-center">
+            <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+                <i class="ph ph-warning text-3xl text-red-500"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Delete Location</h3>
+            <p class="text-sm text-gray-500">Are you sure you want to delete <strong id="delete-location-name" class="text-gray-800"></strong>? This action cannot be undone.</p>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
+            <button type="button" onclick="document.getElementById('delete-modal').classList.add('hidden')" class="btn bg-white border border-gray-200 text-gray-800 hover:bg-gray-50 rounded-lg px-4 py-2 text-sm font-medium">Cancel</button>
+            <form id="delete-form" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn bg-red-600 text-white hover:bg-red-700 rounded-lg px-4 py-2 text-sm font-medium">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
