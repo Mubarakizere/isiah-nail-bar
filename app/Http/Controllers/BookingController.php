@@ -370,6 +370,7 @@ class BookingController extends Controller
         $baseTotal = $services->sum('price');
         $multiplier = session('booking.is_home_service') ? 2 : 1;
         $pickupFee = 0;
+        $pickupLoc = null;
         if (session('booking.pickup_location_id')) {
             $pickupLoc = \App\Models\PickupLocation::find(session('booking.pickup_location_id'));
             if ($pickupLoc) $pickupFee = $pickupLoc->fee;
