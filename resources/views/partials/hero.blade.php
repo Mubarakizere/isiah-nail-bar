@@ -20,20 +20,20 @@
                  if (this.transitioning) return;
                  this.transitioning = true;
                  this.current = (this.current + 1) % this.total;
-                 setTimeout(() => this.transitioning = false, 800);
+                 setTimeout(() => this.transitioning = false, 1000);
              },
              prev() {
                  if (this.transitioning) return;
                  this.transitioning = true;
                  this.current = (this.current - 1 + this.total) % this.total;
-                 setTimeout(() => this.transitioning = false, 800);
+                 setTimeout(() => this.transitioning = false, 1000);
              },
              goTo(index) {
                  if (this.transitioning || index === this.current) return;
                  this.stopAutoplay();
                  this.transitioning = true;
                  this.current = index;
-                 setTimeout(() => this.transitioning = false, 800);
+                 setTimeout(() => this.transitioning = false, 1000);
                  this.startAutoplay();
              }
          }"
@@ -43,18 +43,17 @@
     @if($heroSlides->count())
         {{-- Slide Images --}}
         @foreach($heroSlides as $index => $slide)
-            <div class="absolute inset-0 z-0 transition-all duration-[1200ms] ease-in-out"
+            <div class="absolute inset-0 z-0"
                  x-show="current === {{ $index }}"
-                 x-transition:enter="transition-opacity duration-[1200ms] ease-in-out"
+                 x-transition:enter="transition-opacity duration-1000 ease-in-out"
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition-opacity duration-[1200ms] ease-in-out"
+                 x-transition:leave="transition-opacity duration-1000 ease-in-out"
                  x-transition:leave-start="opacity-100"
                  x-transition:leave-end="opacity-0">
 
                 {{-- Background Image with Ken Burns effect --}}
-                <div class="absolute inset-0 hero-slide-image"
-                     :class="{ 'hero-zoom-active': current === {{ $index }} }">
+                <div class="absolute inset-0 animate-ken-burns">
                     <img src="{{ asset('storage/' . $slide->image) }}"
                          alt="{{ $slide->title }}"
                          class="w-full h-full object-cover">
@@ -199,13 +198,12 @@
 
 <style>
     /* Ken Burns zoom effect */
-    .hero-slide-image {
-        transform: scale(1);
-        transition: transform 8s ease-out;
+    @keyframes kenBurns {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.08); }
     }
-    .hero-zoom-active .hero-slide-image,
-    .hero-slide-image.hero-zoom-active {
-        transform: scale(1.08);
+    .animate-ken-burns {
+        animation: kenBurns 10s ease-out forwards;
     }
 
     /* Hero entrance animations */
