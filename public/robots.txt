@@ -1,2 +1,28 @@
 User-agent: *
-Disallow:
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /booking/step2
+Disallow: /booking/step3
+Disallow: /booking/step4
+Disallow: /booking/step5
+Disallow: /booking/payment*
+Disallow: /booking/retry*
+Disallow: /profile
+Disallow: /email/verify
+
+# Allow all public content
+Allow: /
+Allow: /services
+Allow: /services/*
+Allow: /about
+Allow: /contact
+Allow: /gallery
+Allow: /faq
+Allow: /providers
+Allow: /booking$
+
+# Sitemap
+Sitemap: https://isaiahnailbar.com/sitemap.xml

@@ -1,6 +1,38 @@
 @extends('layouts.public')
 
-@section('title', 'Gallery - Our Works')
+@section('title', 'Nail Art Gallery | Before & After Photos - Isaiah Nail Bar Kigali')
+
+@section('meta_description', 'Browse our nail art gallery showcasing stunning manicure, pedicure, gel polish & acrylic nail designs at Isaiah Nail Bar in Kigali, Rwanda. See our work and get inspired for your next appointment!')
+@section('meta_keywords', 'nail art gallery Kigali, nail designs Rwanda, manicure photos Kigali, pedicure gallery Rwanda, gel nails photos, acrylic nails gallery Rwanda, Isaiah Nail Bar gallery, nail inspiration Kigali')
+
+@push('schema')
+{{-- ImageGallery Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ImageGallery",
+  "name": "Isaiah Nail Bar Gallery",
+  "description": "Stunning nail art, manicure and pedicure photos from Isaiah Nail Bar in Kigali, Rwanda",
+  "url": "{{ url('/gallery') }}",
+  "creator": {
+    "@type": "NailSalon",
+    "@id": "{{ url('/') }}/#business"
+  }
+}
+</script>
+
+{{-- BreadcrumbList Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+    {"@type": "ListItem", "position": 2, "name": "Gallery", "item": "{{ url('/gallery') }}"}
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 

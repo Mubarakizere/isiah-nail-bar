@@ -1,6 +1,63 @@
 @extends('layouts.public')
 
-@section('title', $service->name)
+@section('title', $service->name . ' | Nail Service in Kigali - Isaiah Nail Bar')
+
+@section('meta_description', Str::limit(($service->description ?? $service->name . ' service at Isaiah Nail Bar') . ' - RWF ' . number_format($service->price) . '. Book your ' . $service->name . ' appointment at Kigali\'s #1 nail salon. Expert technicians, premium products.', 160))
+@section('meta_keywords', strtolower($service->name) . ' Kigali, ' . strtolower($service->name) . ' Rwanda, ' . strtolower($service->name) . ' price, nail salon ' . strtolower($service->category->name ?? 'services') . ' Kigali, Isaiah Nail Bar ' . strtolower($service->name))
+
+@if($service->image)
+@section('og_image', asset('storage/' . $service->image))
+@endif
+
+@push('schema')
+{{-- Service Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "{{ $service->name }}",
+  "description": "{{ $service->description ?? $service->name . ' service at Isaiah Nail Bar, Kigali' }}",
+  @if($service->image)
+  "image": "{{ asset('storage/' . $service->image) }}",
+  @endif
+  "provider": {
+    "@type": "NailSalon",
+    "@id": "{{ url('/') }}/#business"
+  },
+  "areaServed": {
+    "@type": "City",
+    "name": "Kigali"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "{{ $service->price }}",
+    "priceCurrency": "RWF",
+    "availability": "https://schema.org/InStock",
+    "url": "{{ route('booking.step1') }}"
+  }
+  @if($service->reviews->count() > 0)
+  ,"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ round($service->reviews->avg('rating'), 1) }}",
+    "reviewCount": "{{ $service->reviews->count() }}"
+  }
+  @endif
+}
+</script>
+
+{{-- BreadcrumbList Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+    {"@type": "ListItem", "position": 2, "name": "Services", "item": "{{ url('/services') }}"},
+    {"@type": "ListItem", "position": 3, "name": "{{ $service->name }}", "item": "{{ url('/services/' . $service->id) }}"}
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 <div class="bg-gray-50 py-12">

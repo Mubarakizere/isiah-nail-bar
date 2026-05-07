@@ -1,6 +1,46 @@
 @extends('layouts.public')
 
-@section('title', 'About Isaiah Nail Bar')
+@section('title', 'About Isaiah Nail Bar | Kigali\'s Premier Luxury Nail Salon')
+
+@section('meta_description', 'Learn about Isaiah Nail Bar, Kigali\'s #1 luxury nail salon. 3+ years of excellence, 500+ happy clients, and 10,000+ manicures. Expert nail technicians, premium products & hospital-grade hygiene in Gisementi, Rwanda.')
+@section('meta_keywords', 'about Isaiah Nail Bar, nail salon Kigali story, luxury nail salon Rwanda, Gisementi nail salon, best nail technician Kigali, nail art experts Rwanda, nail salon hygiene standards Kigali')
+
+@push('schema')
+{{-- Organization Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "{{ url('/') }}/#organization",
+  "name": "Isaiah Nail Bar",
+  "url": "{{ url('/') }}",
+  "logo": "{{ asset('storage/logo.png') }}",
+  "description": "Kigali's premier luxury nail salon offering world-class manicure, pedicure, and nail art services since 2022.",
+  "foundingDate": "2022",
+  "foundingLocation": {
+    "@type": "Place",
+    "name": "Kigali, Rwanda"
+  },
+  "areaServed": {"@type": "City", "name": "Kigali"},
+  "sameAs": [
+    "https://www.instagram.com/isaiah_nails_art_kigali_rwanda",
+    "https://www.facebook.com/isaiahnailbar"
+  ]
+}
+</script>
+
+{{-- BreadcrumbList Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+    {"@type": "ListItem", "position": 2, "name": "About", "item": "{{ url('/about') }}"}
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 

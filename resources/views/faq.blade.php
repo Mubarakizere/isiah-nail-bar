@@ -1,14 +1,89 @@
 @extends('layouts.public')
 
-@section('title', 'Frequently Asked Questions')
+@section('title', 'FAQ | Nail Salon Booking, Payments & Policies - Isaiah Nail Bar Kigali')
+
+@section('meta_description', 'Frequently asked questions about Isaiah Nail Bar in Kigali, Rwanda. Learn about booking deposits, payment methods (MTN MoMo, card), cancellation policy, opening hours & more.')
+@section('meta_keywords', 'Isaiah Nail Bar FAQ, nail salon booking Kigali, nail salon deposit Rwanda, MTN MoMo nail salon, nail appointment Kigali, cancel nail appointment Rwanda, nail salon payment methods Rwanda')
+
+@push('schema')
+{{-- FAQPage Schema — enables Google rich FAQ snippets --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is a deposit required to book an appointment at Isaiah Nail Bar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, a non-refundable deposit of 40% is required to secure your booking. This amount will be deducted from your final payment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the available payment methods at Isaiah Nail Bar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We accept payments via MTN Mobile Money, Cash, or Bank Transfer depending on service type. Payment instructions will be provided after confirming the booking."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if I'm late to my nail appointment?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "If you are more than 15 minutes late, your appointment may be canceled and your deposit forfeited. Please arrive on time to avoid disruptions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I cancel or reschedule my nail appointment?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, but cancellations must be made at least 48 hours before the appointment. Otherwise, the deposit will be forfeited. Rescheduling is allowed within the same notice period."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I bring someone with me to my appointment at Isaiah Nail Bar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you may bring one guest. However, they must remain quiet and respectful to maintain a relaxing atmosphere for all clients."
+      }
+    }
+  ]
+}
+</script>
+
+{{-- BreadcrumbList Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+    {"@type": "ListItem", "position": 2, "name": "FAQ", "item": "{{ url('/faq') }}"}
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 
 {{-- Header --}}
-<div class="bg-blue-600 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold text-white mb-3">Frequently Asked Questions</h1>
-        <p class="text-lg text-blue-100">Find answers to common questions about booking, payments, and policies</p>
+<div class="relative bg-gray-900 py-24 overflow-hidden">
+    <div class="absolute inset-0 opacity-30">
+        <img src="{{ asset('storage/banner.jpg') }}" alt="Isaiah Nail Bar FAQ - Frequently Asked Questions" class="w-full h-full object-cover">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12">
+        <span class="text-rose-400 font-medium tracking-widest text-sm uppercase mb-3 block">Need Answers?</span>
+        <h1 class="text-4xl md:text-6xl font-serif text-white mb-6">Frequently Asked Questions</h1>
+        <p class="text-xl text-gray-300 font-light max-w-2xl mx-auto">
+            Find answers to common questions about booking, payments, and policies at Isaiah Nail Bar Kigali.
+        </p>
     </div>
 </div>
 

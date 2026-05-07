@@ -1,6 +1,47 @@
 @extends('layouts.public')
 
-@section('title', 'Contact Us')
+@section('title', 'Contact Isaiah Nail Bar | Book Appointment Kigali Rwanda')
+
+@section('meta_description', 'Contact Isaiah Nail Bar in Kigali, Rwanda. Call +250 790 395 169, WhatsApp us, or visit our salon at KG 4 Roundabout, Gisementi. Open Mon-Sat 8AM-8PM. Book your nail appointment today!')
+@section('meta_keywords', 'contact Isaiah Nail Bar, nail salon phone Kigali, nail salon location Gisementi, nail salon WhatsApp Rwanda, book nail appointment Kigali, nail salon address Rwanda, nail salon opening hours Kigali')
+
+@push('schema')
+{{-- ContactPage Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact Isaiah Nail Bar",
+  "description": "Contact Isaiah Nail Bar in Kigali, Rwanda for appointments, inquiries, and bookings.",
+  "url": "{{ url('/contact') }}",
+  "mainEntity": {
+    "@type": "NailSalon",
+    "@id": "{{ url('/') }}/#business",
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "telephone": "+250790395169",
+        "contactType": "customer service",
+        "availableLanguage": ["English", "French", "Kinyarwanda"],
+        "areaServed": "RW"
+      }
+    ]
+  }
+}
+</script>
+
+{{-- BreadcrumbList Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+    {"@type": "ListItem", "position": 2, "name": "Contact", "item": "{{ url('/contact') }}"}
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 

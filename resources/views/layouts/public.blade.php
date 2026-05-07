@@ -1,32 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en-RW" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title') | Isaiah Nail Bar</title>
+    <title>@yield('title', 'Best Nail Salon in Kigali, Rwanda') | Isaiah Nail Bar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    {{-- Google Search Console Verification --}}
+    <meta name="google-site-verification" content="BaLKRgYxXegAadUyR5v7HVL8TXTSsXK3nGdpa6Wie58">
+
     {{-- SEO Meta --}}
-    <meta name="description" content="@yield('meta_description', 'Isaiah Nail Bar – The Best Nail Salon in Rwanda. Luxury Manicure, Pedicure, and Nail Art Services in Kigali.')">
-    <meta name="keywords" content="@yield('meta_keywords', 'Nail Salon Rwanda, Best Nails Kigali, Isaiah Nail Bar, Luxury Manicure Kigali, Gel Polish Rwanda, Acrylic Nails Kigali, Beauty Salon Gisementi')">
+    <meta name="description" content="@yield('meta_description', 'Isaiah Nail Bar – The #1 Nail Salon in Rwanda. Luxury manicure, pedicure, gel polish, acrylic nails & nail art in Kigali. Book online today!')">
+    <meta name="keywords" content="@yield('meta_keywords', 'nail salon Rwanda, best nails Kigali, Isaiah Nail Bar, manicure Kigali, pedicure Kigali, gel polish Rwanda, acrylic nails Kigali, nail art Rwanda, beauty salon Gisementi, nail salon near me Kigali, nail technician Rwanda, luxury nails Rwanda, nail salon Kigali city, best manicure Rwanda, nail spa Kigali')">
     <meta name="author" content="Isaiah Nail Bar">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="en-RW" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="en" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="x-default" href="{{ url()->current() }}">
+    <meta name="geo.region" content="RW-01">
+    <meta name="geo.placename" content="Kigali">
+    <meta name="geo.position" content="-1.954736;30.108678">
+    <meta name="ICBM" content="-1.954736, 30.108678">
 
     {{-- Open Graph / Facebook --}}
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('title', 'Isaiah Nail Bar') | Best Nail Salon in Rwanda">
-    <meta property="og:description" content="@yield('meta_description', 'Experience luxury nail care at Isaiah Nail Bar. Top-rated manicure and pedicure services in Kigali.')">
+    <meta property="og:description" content="@yield('meta_description', 'Experience luxury nail care at Isaiah Nail Bar. Rwanda\'s top-rated manicure, pedicure & nail art salon in Kigali. Book online!')">
     <meta property="og:image" content="@yield('og_image', asset('storage/cover.jpg'))">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Isaiah Nail Bar">
-    <meta property="og:locale" content="en_US">
+    <meta property="og:locale" content="en_RW">
 
     {{-- Twitter --}}
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="@yield('title', 'Isaiah Nail Bar') | Best Nail Salon in Rwanda">
-    <meta property="twitter:description" content="@yield('meta_description', 'Experience luxury nail care at Isaiah Nail Bar. Top-rated manicure and pedicure services in Kigali.')">
-    <meta property="twitter:image" content="@yield('og_image', asset('storage/cover.jpg'))">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="@yield('title', 'Isaiah Nail Bar') | Best Nail Salon in Rwanda">
+    <meta name="twitter:description" content="@yield('meta_description', 'Experience luxury nail care at Isaiah Nail Bar. Rwanda\'s top-rated manicure, pedicure & nail art salon in Kigali. Book online!')">
+    <meta name="twitter:image" content="@yield('og_image', asset('storage/cover.jpg'))">
 
     {{-- Favicons --}}
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
@@ -36,14 +48,27 @@
     
     @stack('meta')
 
-    {{-- Schema.org JSON-LD --}}
+    {{-- Schema.org JSON-LD: NailSalon (Global) --}}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "NailSalon",
+      "@id": "{{ url('/') }}/#business",
       "name": "Isaiah Nail Bar",
-      "image": "{{ asset('storage/logo.png') }}",
-      "description": "Kigali's premier nail salon offering luxury manicure, pedicure, and nail art services.",
+      "alternateName": "Isaiah Nails Art Kigali Rwanda",
+      "image": [
+        "{{ asset('storage/logo.png') }}",
+        "{{ asset('storage/cover.jpg') }}",
+        "{{ asset('storage/banner.jpg') }}"
+      ],
+      "logo": "{{ asset('storage/logo.png') }}",
+      "description": "Isaiah Nail Bar is the #1 luxury nail salon in Kigali, Rwanda. We offer premium manicure, pedicure, gel polish, acrylic nails, and nail art services with top-rated hygiene standards. Book your appointment online today.",
+      "url": "{{ url('/') }}",
+      "telephone": "+250790395169",
+      "email": "info@isaiahnailbar.com",
+      "priceRange": "$$",
+      "currenciesAccepted": "RWF",
+      "paymentAccepted": "MTN Mobile Money, Cash, Bank Transfer, Credit Card",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "KG 4 Roundabout",
@@ -57,20 +82,19 @@
         "latitude": -1.954736,
         "longitude": 30.108678
       },
-      "url": "{{ url('/') }}",
-      "telephone": "+250790395169",
-      "priceRange": "$$",
+      "hasMap": "https://www.google.com/maps?cid=7100839316027291234",
+      "areaServed": {
+        "@type": "City",
+        "name": "Kigali",
+        "containedInPlace": {
+          "@type": "Country",
+          "name": "Rwanda"
+        }
+      },
       "openingHoursSpecification": [
         {
           "@type": "OpeningHoursSpecification",
-          "dayOfWeek": [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday"
-          ],
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
           "opens": "08:00",
           "closes": "20:00"
         },
@@ -82,22 +106,82 @@
         }
       ],
       "sameAs": [
-        "https://www.instagram.com/isaiahnailbar",
+        "https://www.instagram.com/isaiah_nails_art_kigali_rwanda",
         "https://www.facebook.com/isaiahnailbar"
-      ]
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Nail Services",
+        "itemListElement": [
+          {
+            "@type": "OfferCatalog",
+            "name": "Manicure Services",
+            "itemListElement": [
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Classic Manicure"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Gel Manicure"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Acrylic Nails"}}
+            ]
+          },
+          {
+            "@type": "OfferCatalog",
+            "name": "Pedicure Services",
+            "itemListElement": [
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Classic Pedicure"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Gel Pedicure"}},
+              {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Spa Pedicure"}}
+            ]
+          }
+        ]
+      }
     }
     </script>
+
+    {{-- Schema.org JSON-LD: WebSite with SearchAction --}}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "{{ url('/') }}/#website",
+      "url": "{{ url('/') }}",
+      "name": "Isaiah Nail Bar",
+      "description": "Rwanda's #1 luxury nail salon. Book manicure, pedicure & nail art in Kigali.",
+      "publisher": {
+        "@id": "{{ url('/') }}/#business"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "{{ url('/services') }}?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      },
+      "inLanguage": "en"
+    }
+    </script>
+
+    {{-- Per-page schema injection point --}}
+    @stack('schema')
 
     {{-- Tailwind CSS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
+    {{-- Performance: DNS Prefetch --}}
+    <link rel="dns-prefetch" href="https://fonts.bunny.net">
+    <link rel="dns-prefetch" href="https://www.google.com">
+    <link rel="dns-prefetch" href="https://www.instagram.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+
     {{-- Phosphor Icons --}}
     <link href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" rel="stylesheet">
 
     {{-- Google Fonts --}}
-    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700&display=swap" rel="stylesheet">
     <link href="https://fonts.bunny.net/css?family=playfair-display:400,600,700&display=swap" rel="stylesheet">
+
+    {{-- Google Analytics placeholder - add your GA4 ID when ready --}}
+    @yield('google_analytics')
 
     <style>
         /* CustomScrollbar */
@@ -284,14 +368,14 @@
                         Experience the epitome of luxury nail care in Kigali. We blend artistic excellence with premium products to ensure your hands and feet look their absolute best.
                     </p>
                     <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-rose-600 transition-all duration-300">
+                        <a href="https://www.facebook.com/isaiahnailbar" target="_blank" rel="noopener noreferrer" aria-label="Follow Isaiah Nail Bar on Facebook" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-rose-600 transition-all duration-300">
                             <i class="ph ph-facebook-logo text-xl"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-rose-600 transition-all duration-300">
+                        <a href="https://www.instagram.com/isaiah_nails_art_kigali_rwanda" target="_blank" rel="noopener noreferrer" aria-label="Follow Isaiah Nail Bar on Instagram" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-rose-600 transition-all duration-300">
                             <i class="ph ph-instagram-logo text-xl"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-rose-600 transition-all duration-300">
-                            <i class="ph ph-twitter-logo text-xl"></i>
+                        <a href="https://wa.me/250790395169" target="_blank" rel="noopener noreferrer" aria-label="Chat with Isaiah Nail Bar on WhatsApp" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-rose-600 transition-all duration-300">
+                            <i class="ph ph-whatsapp-logo text-xl"></i>
                         </a>
                     </div>
                 </div>

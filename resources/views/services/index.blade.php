@@ -1,6 +1,61 @@
 @extends('layouts.public')
 
-@section('title', 'Our Luxury Nail Services')
+@section('title', 'Nail Services Menu | Manicure, Pedicure & Nail Art Prices in Kigali')
+
+@section('meta_description', 'View our complete nail service menu with prices. Manicure from RWF 3,000, pedicure, gel polish, acrylic nails, nail art & more at Isaiah Nail Bar Kigali, Rwanda. Book online!')
+@section('meta_keywords', 'nail services Kigali, manicure prices Rwanda, pedicure prices Kigali, gel polish price Rwanda, acrylic nails cost Kigali, nail art prices Rwanda, nail salon menu Kigali, Isaiah Nail Bar services, nail treatment Kigali')
+
+@push('schema')
+{{-- ItemList Schema for Services --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Isaiah Nail Bar Service Menu",
+  "description": "Complete nail service menu with prices at Isaiah Nail Bar, Kigali Rwanda",
+  "numberOfItems": {{ $categories->sum(fn($c) => $c->services->count()) }},
+  "itemListElement": [
+    @php $position = 1; @endphp
+    @foreach($categories as $category)
+      @foreach($category->services->sortBy('price') as $service)
+      {
+        "@type": "ListItem",
+        "position": {{ $position++ }},
+        "item": {
+          "@type": "Service",
+          "name": "{{ $service->name }}",
+          "description": "{{ Str::limit($service->description ?? $service->name . ' service at Isaiah Nail Bar', 150) }}",
+          "provider": {
+            "@type": "NailSalon",
+            "@id": "{{ url('/') }}/#business"
+          },
+          "areaServed": {"@type": "City", "name": "Kigali"},
+          "offers": {
+            "@type": "Offer",
+            "price": "{{ $service->price }}",
+            "priceCurrency": "RWF",
+            "availability": "https://schema.org/InStock"
+          }
+        }
+      }@if(!$loop->last || !$loop->parent->last),@endif
+      @endforeach
+    @endforeach
+  ]
+}
+</script>
+
+{{-- BreadcrumbList Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
+    {"@type": "ListItem", "position": 2, "name": "Services", "item": "{{ url('/services') }}"}
+  ]
+}
+</script>
+@endpush
 
 @section('content')
 

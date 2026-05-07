@@ -1,10 +1,48 @@
 @extends('layouts.public')
 
-@section('title', 'Best Nail Salon in Rwanda | Luxury Manicure & Pedicure')
+@section('title', 'Best Nail Salon in Kigali, Rwanda | Luxury Manicure & Pedicure')
+
+@section('meta_description', 'Isaiah Nail Bar is the #1 nail salon in Kigali, Rwanda. Premium manicure, pedicure, gel polish, acrylic nails & nail art by expert technicians. ⭐ 4.9 rated. Book your appointment online today!')
+@section('meta_keywords', 'best nail salon Rwanda, nail salon Kigali, manicure Kigali, pedicure Kigali, gel nails Rwanda, acrylic nails Kigali, nail art Kigali, luxury nail salon Rwanda, nail salon near me Kigali, Isaiah Nail Bar, Gisementi nail salon, nail technician Kigali, best manicure Rwanda, nail spa Rwanda, beauty salon Kigali')
 
 @push('meta')
-    <meta name="description" content="Isaiah Nail Bar is the best nail salon in Rwanda, offering premium manicure, pedicure, gel polish, and acrylic services in Kigali. Book your appointment today!">
-    <meta name="keywords" content="Best Nail Salon Rwanda, Nails Kigali, Manicure Kigali, Pedicure Kigali, Gisementi Salon, Luxury Nails Rwanda">
+    <meta name="description" content="Isaiah Nail Bar is the #1 nail salon in Kigali, Rwanda. Premium manicure, pedicure, gel polish, acrylic nails & nail art by expert technicians. ⭐ 4.9 rated. Book online today!">
+    <meta name="keywords" content="best nail salon Rwanda, nail salon Kigali, manicure Kigali, pedicure Kigali, gel nails Rwanda, acrylic nails Kigali, nail art Kigali, luxury nail salon Rwanda, nail salon near me Kigali, Isaiah Nail Bar, Gisementi nail salon, nail technician Kigali, best manicure Rwanda, nail spa Rwanda, beauty salon Kigali">
+@endpush
+
+@push('schema')
+{{-- AggregateRating Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NailSalon",
+  "@id": "{{ url('/') }}/#business",
+  "name": "Isaiah Nail Bar",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ $averageRating }}",
+    "reviewCount": "{{ $reviewCount }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  }
+}
+</script>
+
+{{-- BreadcrumbList Schema --}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ url('/') }}"
+    }
+  ]
+}
+</script>
 @endpush
 
 @section('hero')

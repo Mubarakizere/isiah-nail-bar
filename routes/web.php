@@ -14,6 +14,7 @@ use App\Models\Category;
 use App\Models\ServiceTag;
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
@@ -43,6 +44,9 @@ use App\Http\Controllers\Admin\AdminSlotController;
   Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
+// Dynamic Sitemap
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
 // Default dashboard redirect by role
 Route::get('/dashboard', function () {
     if (Auth::check()) {
@@ -54,10 +58,6 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 // Public routes
-Route::get('/', function () {
-    $services = Service::latest()->take(6)->get();
-    return view('home.index', compact('services'));
-});
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/faq', 'faq')->name('faq');
 Route::view('/about', 'about')->name('about');
