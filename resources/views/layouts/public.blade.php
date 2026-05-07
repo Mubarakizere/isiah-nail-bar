@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en-RW" class="scroll-smooth">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TD89634794"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TD89634794');
+    </script>
+
     <meta charset="UTF-8">
     <title>@yield('title', 'Best Nail Salon in Kigali, Rwanda') | Isaiah Nail Bar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -167,6 +176,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     {{-- Performance: DNS Prefetch --}}
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://fonts.bunny.net">
     <link rel="dns-prefetch" href="https://www.google.com">
     <link rel="dns-prefetch" href="https://www.instagram.com">
@@ -180,8 +190,7 @@
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700&display=swap" rel="stylesheet">
     <link href="https://fonts.bunny.net/css?family=playfair-display:400,600,700&display=swap" rel="stylesheet">
 
-    {{-- Google Analytics placeholder - add your GA4 ID when ready --}}
-    @yield('google_analytics')
+
 
     <style>
         /* CustomScrollbar */
