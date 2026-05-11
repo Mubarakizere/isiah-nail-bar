@@ -386,6 +386,9 @@
                         <a href="https://wa.me/250790395169" target="_blank" rel="noopener noreferrer" aria-label="Chat with Isaiah Nail Bar on WhatsApp" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-rose-600 transition-all duration-300">
                             <i class="ph ph-whatsapp-logo text-xl"></i>
                         </a>
+                        <a href="https://g.page/r/CS4QpNuz_MJkEAE/review" target="_blank" rel="noopener noreferrer" aria-label="Review Isaiah Nail Bar on Google" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-yellow-500 transition-all duration-300">
+                            <i class="ph ph-google-logo text-xl"></i>
+                        </a>
                     </div>
                 </div>
 
@@ -398,6 +401,12 @@
                         <li><a href="{{ url('/gallery') }}" class="text-sm hover:text-rose-400 transition-colors">Gallery</a></li>
                         <li><a href="{{ route('about') }}" class="text-sm hover:text-rose-400 transition-colors">About Us</a></li>
                         <li><a href="{{ url('/contact') }}" class="text-sm hover:text-rose-400 transition-colors">Contact</a></li>
+                        <li>
+                            <a href="https://g.page/r/CS4QpNuz_MJkEAE/review" target="_blank" class="text-sm hover:text-yellow-400 transition-colors inline-flex items-center gap-1.5">
+                                <i class="ph ph-star text-yellow-400"></i>
+                                Review Us on Google
+                            </a>
+                        </li>
                     </ul>
                 </div>
 

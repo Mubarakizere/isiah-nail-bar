@@ -20,13 +20,15 @@
 
     ---
 
-    ## Share Your Feedback
+    ## ⭐ Leave Us a Google Review
 
-    Your opinion matters to us. We would greatly appreciate it if you could take a moment to share your experience.
+    Your feedback helps us grow and helps other clients find us. We'd be so grateful if you could take just **30 seconds** to share your experience on Google.
 
-    @component('mail::button', ['url' => $reviewUrl ?? url('/')])
-    Leave a Review
+    @component('mail::button', ['url' => 'https://g.page/r/CS4QpNuz_MJkEAE/review', 'color' => 'primary'])
+    ⭐ Review Us on Google
     @endcomponent
+
+    Even a simple star rating makes a big difference! ❤️
 
     ---
 
@@ -37,3 +39,4 @@
     @endcomponent
 </body>
 </html>
+

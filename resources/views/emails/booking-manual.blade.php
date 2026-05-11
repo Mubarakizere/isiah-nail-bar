@@ -27,6 +27,14 @@ View Receipt
 
 We look forward to seeing you!
 
+---
+
+💬 **After your visit**, we'd love a quick Google review! It helps other clients discover us.
+
+@component('mail::button', ['url' => 'https://g.page/r/CS4QpNuz_MJkEAE/review'])
+⭐ Review Us on Google
+@endcomponent
+
 Thanks,<br>
 {{ config('app.name') }}
 @endcomponent

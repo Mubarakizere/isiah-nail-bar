@@ -32,6 +32,10 @@ This is a reminder that you have an appointment scheduled with Isaiah Nail Bar t
 
 We look forward to seeing you.
 
+---
+
+💅 **After your visit**, we'd love to hear about your experience! You can leave us a review here: [Review on Google](https://g.page/r/CS4QpNuz_MJkEAE/review)
+
 Best regards,  
 Isaiah Nail Bar Team
 @endcomponent

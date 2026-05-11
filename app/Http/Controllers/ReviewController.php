@@ -7,6 +7,7 @@ use App\Models\{Review, Service, Booking, User};
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Notifications\NewReviewNotification;
+use Carbon\Carbon;
 
 class ReviewController extends Controller
 {
@@ -78,6 +79,71 @@ class ReviewController extends Controller
     {
         $reviews = Review::with(['service', 'customer.user'])->latest()->paginate(10);
         return view('dashboard.admin.reviews.index', compact('reviews'));
+    }
+
+    // Admin: show form to add a Google review
+    public function adminCreate()
+    {
+        return view('dashboard.admin.reviews.create');
+    }
+
+    // Admin: store a manually-added Google review
+    public function adminStore(Request $request)
+    {
+        $request->validate([
+            'reviewer_name' => 'required|string|max:255',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string',
+            'source' => 'required|in:google,internal',
+            'avatar_url' => 'nullable|url|max:2048',
+            'review_date' => 'nullable|date',
+        ]);
+
+        $review = Review::create([
+            'reviewer_name' => $request->reviewer_name,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+            'source' => $request->source,
+            'avatar_url' => $request->avatar_url,
+        ]);
+
+        // Backdate the created_at if a review date was provided
+        if ($request->filled('review_date')) {
+            $review->created_at = Carbon::parse($request->review_date);
+            $review->save();
+        }
+
+        return redirect()->route('admin.reviews.index')
+            ->with('success', 'Google review added successfully!');
+    }
+
+    // Admin: show form to edit a review
+    public function adminEdit(Review $review)
+    {
+        return view('dashboard.admin.reviews.edit', compact('review'));
+    }
+
+    // Admin: update a review
+    public function adminUpdate(Request $request, Review $review)
+    {
+        $request->validate([
+            'reviewer_name' => 'required|string|max:255',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string',
+            'source' => 'required|in:google,internal',
+            'avatar_url' => 'nullable|url|max:2048',
+        ]);
+
+        $review->update([
+            'reviewer_name' => $request->reviewer_name,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+            'source' => $request->source,
+            'avatar_url' => $request->avatar_url,
+        ]);
+
+        return redirect()->route('admin.reviews.index')
+            ->with('success', 'Review updated successfully!');
     }
 
     // Admin: delete review

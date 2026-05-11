@@ -387,6 +387,10 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
         Route::resource('pickup-locations', \App\Http\Controllers\Admin\PickupLocationController::class)->names('admin.pickup-locations')->except(['create', 'show', 'edit']);
 
         Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');
+        Route::get('/reviews/create', [ReviewController::class, 'adminCreate'])->name('admin.reviews.create');
+        Route::post('/reviews', [ReviewController::class, 'adminStore'])->name('admin.reviews.store');
+        Route::get('/reviews/{review}/edit', [ReviewController::class, 'adminEdit'])->name('admin.reviews.edit');
+        Route::put('/reviews/{review}', [ReviewController::class, 'adminUpdate'])->name('admin.reviews.update');
         Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 
         // Webmail

@@ -58,6 +58,14 @@ View Receipt Online
 
 We appreciate your business.
 
+---
+
+💬 **Love your nails?** We'd be so grateful if you could leave us a quick Google review. It takes just 30 seconds!
+
+@component('mail::button', ['url' => 'https://g.page/r/CS4QpNuz_MJkEAE/review'])
+⭐ Review Us on Google
+@endcomponent
+
 Best regards,  
 Isaiah Nail Bar Team
 @endcomponent

@@ -20,6 +20,21 @@
         </div>
     @endif
 
+    {{-- Action Bar --}}
+    <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <p class="text-sm text-gray-500">
+                Showing <span class="font-medium text-gray-900">{{ $reviews->total() }}</span> reviews
+                · <span class="font-medium text-blue-600">{{ \App\Models\Review::where('source', 'google')->count() }} from Google</span>
+            </p>
+        </div>
+        <a href="{{ route('admin.reviews.create') }}" 
+           class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-rose-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-sm">
+            <i class="ph ph-google-logo"></i>
+            Add Google Review
+        </a>
+    </div>
+
     {{-- Reviews Table Card --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         @if($reviews->count())
@@ -130,16 +145,23 @@
 
                                 {{-- Actions --}}
                                 <td class="px-6 py-4">
-                                    <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" 
-                                          onsubmit="return confirm('Are you sure you want to delete this review?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors">
-                                            <i class="ph ph-trash"></i>
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('admin.reviews.edit', $review->id) }}" 
+                                           class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors">
+                                            <i class="ph ph-pencil-simple"></i>
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" 
+                                              onsubmit="return confirm('Are you sure you want to delete this review?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors">
+                                                <i class="ph ph-trash"></i>
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -158,9 +180,14 @@
                     <i class="ph ph-star text-3xl text-gray-400"></i>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
-                <p class="text-gray-500 max-w-sm mx-auto">
-                    Customer reviews will appear here once they start submitting feedback.
+                <p class="text-gray-500 max-w-sm mx-auto mb-6">
+                    Start by adding your Google Business reviews to showcase on your homepage.
                 </p>
+                <a href="{{ route('admin.reviews.create') }}" 
+                   class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-rose-600 transition-all shadow-lg">
+                    <i class="ph ph-google-logo"></i>
+                    Add Your First Google Review
+                </a>
             </div>
         @endif
     </div>
@@ -199,9 +226,9 @@
                     <i class="ph ph-google-logo text-2xl text-blue-600"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500">External Reviews</p>
+                    <p class="text-sm text-gray-500">Google Reviews</p>
                     <p class="text-2xl font-bold text-gray-900">
-                        {{ $reviews->where('source', 'google')->count() }}
+                        {{ \App\Models\Review::where('source', 'google')->count() }}
                     </p>
                 </div>
             </div>

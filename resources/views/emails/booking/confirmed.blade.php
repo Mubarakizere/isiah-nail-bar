@@ -43,6 +43,14 @@ Thank you for choosing Isaiah Nail Bar. Your payment has been successfully proce
 
 We look forward to serving you.
 
+---
+
+💬 **Enjoyed your experience?** We'd love to hear from you! Leave us a quick review on Google — it means the world to us.
+
+@component('mail::button', ['url' => 'https://g.page/r/CS4QpNuz_MJkEAE/review'])
+⭐ Review Us on Google
+@endcomponent
+
 Best regards,  
 Isaiah Nail Bar Team
 @endcomponent

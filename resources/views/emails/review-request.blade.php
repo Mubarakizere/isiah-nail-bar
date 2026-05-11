@@ -9,15 +9,15 @@ We hope you enjoyed your experience with us.
 
 ---
 
-## Share Your Feedback
+## ⭐ Leave Us a Google Review
 
-Your opinion is important to us and helps others make informed decisions. We would greatly appreciate if you could take a moment to share your experience.
+Your opinion is incredibly important to us and helps other clients discover Isaiah Nail Bar. We would be so grateful if you could take just **30 seconds** to leave us a review on Google.
 
-@component('mail::button', ['url' => 'https://share.google/OtbpRmUNfC1eA9kmZ'])
-Leave a Review on Google
+@component('mail::button', ['url' => 'https://g.page/r/CS4QpNuz_MJkEAE/review', 'color' => 'primary'])
+⭐ Review Us on Google
 @endcomponent
 
-Alternatively, you may reply to this email with any feedback or suggestions for improvement.
+Even a simple star rating makes a huge difference for our small business. Thank you for supporting us!
 
 ---
 
@@ -26,3 +26,4 @@ Thank you for your continued support.
 Best regards,  
 Isaiah Nail Bar Team
 @endcomponent
+
