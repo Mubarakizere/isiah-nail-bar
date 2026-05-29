@@ -40,6 +40,7 @@ use App\Http\Controllers\PaymentWebhookController;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Admin\AdminSlotController;
+use App\Http\Controllers\Admin\SettingController;
 
   Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['signed', 'throttle:6,1'])
@@ -378,6 +379,8 @@ Route::post('/slots/unblock', [AdminSlotController::class, 'unblock'])->name('ad
         Route::get('/bookings/{id}/receipt', [\App\Http\Controllers\Admin\BookingController::class, 'receipt'])->name('admin.booking.receipt');
         Route::resource('/categories', \App\Http\Controllers\Admin\CategoryController::class)->names('admin.categories');
         Route::resource('team-members', \App\Http\Controllers\Admin\TeamMemberController::class)->names('admin.team_members');
+        Route::get('/settings', [SettingController::class, 'index'])->name('admin.settings.index');
+        Route::post('/settings', [SettingController::class, 'store'])->name('admin.settings.store');
         Route::resource('/tags', \App\Http\Controllers\TagController::class)->except(['show'])->names('admin.tags');
 
         // Hero Slides

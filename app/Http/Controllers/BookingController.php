@@ -640,6 +640,13 @@ class BookingController extends Controller
                 'isaiebm4@gmail.com'
             ];
             
+            // Add additional emails from settings
+            $setting = \App\Models\Setting::where('key', 'booking_alert_emails')->first();
+            if ($setting && !empty($setting->value)) {
+                $additionalEmails = array_map('trim', explode(',', $setting->value));
+                $adminEmails = array_merge($adminEmails, $additionalEmails);
+            }
+            
             // Filter out empty or duplicate emails
             $adminEmails = array_unique(array_filter($adminEmails));
 
