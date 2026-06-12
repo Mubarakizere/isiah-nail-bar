@@ -182,7 +182,7 @@
         </div>
 
         @php
-            // Sort reviews: Google reviews first, then internal
+            /* Sort reviews: Google reviews first, then internal */
             $sortedReviews = $reviews->sortByDesc(function($review) {
                 return $review->source === 'google' ? 1 : 0;
             })->values();
