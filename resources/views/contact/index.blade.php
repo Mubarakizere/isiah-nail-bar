@@ -9,7 +9,7 @@
 {{-- ContactPage Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "ContactPage",
   "name": "Contact Isaiah Nail Bar",
   "description": "Contact Isaiah Nail Bar in Kigali, Rwanda for appointments, inquiries, and bookings.",
@@ -33,7 +33,7 @@
 {{-- BreadcrumbList Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},

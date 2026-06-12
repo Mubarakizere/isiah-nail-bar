@@ -13,12 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        DB::statement("ALTER TABLE bookings MODIFY COLUMN status ENUM('pending', 'accepted', 'declined', 'completed', 'cancelled') DEFAULT 'pending'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE bookings MODIFY COLUMN status ENUM('pending', 'accepted', 'declined', 'completed', 'cancelled') DEFAULT 'pending'");
+        }
     }
 
     public function down()
     {
-        DB::statement("ALTER TABLE bookings MODIFY COLUMN status ENUM('pending', 'completed') DEFAULT 'pending'");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE bookings MODIFY COLUMN status ENUM('pending', 'completed') DEFAULT 'pending'");
+        }
     }
 
 };

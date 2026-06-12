@@ -14,7 +14,7 @@
 {{-- AggregateRating Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "NailSalon",
   "@id": "{{ url('/') }}/#business",
   "name": "Isaiah Nail Bar",
@@ -31,7 +31,7 @@
 {{-- BreadcrumbList Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {

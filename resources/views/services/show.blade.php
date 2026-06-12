@@ -13,7 +13,7 @@
 {{-- Service Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "Service",
   "name": "{{ $service->name }}",
   "description": "{{ $service->description ?? $service->name . ' service at Isaiah Nail Bar, Kigali' }}",
@@ -48,7 +48,7 @@
 {{-- BreadcrumbList Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},

@@ -60,7 +60,7 @@
     {{-- Schema.org JSON-LD: NailSalon (Global) --}}
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+      "@@context": "https://schema.org",
       "@type": "NailSalon",
       "@id": "{{ url('/') }}/#business",
       "name": "Isaiah Nail Bar",
@@ -148,7 +148,7 @@
     {{-- Schema.org JSON-LD: WebSite with SearchAction --}}
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+      "@@context": "https://schema.org",
       "@type": "WebSite",
       "@id": "{{ url('/') }}/#website",
       "url": "{{ url('/') }}",

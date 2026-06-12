@@ -9,7 +9,7 @@
 {{-- ItemList Schema for Services --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "ItemList",
   "name": "Isaiah Nail Bar Service Menu",
   "description": "Complete nail service menu with prices at Isaiah Nail Bar, Kigali Rwanda",
@@ -47,7 +47,7 @@
 {{-- BreadcrumbList Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},

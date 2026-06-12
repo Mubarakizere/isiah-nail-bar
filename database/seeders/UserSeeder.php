@@ -11,21 +11,25 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+        $providerRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'provider']);
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer']);
+
         // Admin
-        User::create([
+        $admin = User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
-            'role' => 'admin',
         ]);
+        $admin->assignRole($adminRole);
 
         // Provider
         $providerUser = User::create([
             'name' => 'Provider User',
             'email' => 'provider@example.com',
             'password' => Hash::make('password'),
-            'role' => 'provider',
         ]);
+        $providerUser->assignRole($providerRole);
 
         Provider::create([
             'name' => 'Gloria Nails',

@@ -9,7 +9,7 @@
 {{-- Organization Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "Organization",
   "@id": "{{ url('/') }}/#organization",
   "name": "Isaiah Nail Bar",
@@ -32,7 +32,7 @@
 {{-- BreadcrumbList Schema --}}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
+  "@@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url('/') }}"},
