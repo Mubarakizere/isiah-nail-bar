@@ -1,4 +1,4 @@
-@component('mail::message')
+<x-mail::message>
 # Welcome to Isaiah Nail Bar
 
 Dear {{ $provider->name }},
@@ -14,9 +14,9 @@ Please use the following credentials to access your account:
 **Email:** {{ $provider->email }}  
 **Password:** {{ $password }}
 
-@component('mail::button', ['url' => $loginUrl])
+<x-mail::button :url="$loginUrl">
 Login to Your Account
-@endcomponent
+</x-mail::button>
 
 ---
 
@@ -45,4 +45,4 @@ If you have any questions or need assistance, please contact our management team
 
 Best regards,  
 Isaiah Nail Bar Management
-@endcomponent
+</x-mail::message>
