@@ -25,6 +25,6 @@ class ProviderCredentialsMail extends Mailable
     public function build()
     {
         return $this->subject('Your Isaiah Nail Bar Provider Account Credentials')
-                    ->view('emails.provider-credentials');
+                    ->markdown('emails.provider-credentials');
     }
 }
