@@ -93,16 +93,14 @@ class SendBookingReminder implements ShouldQueue
                 Log::warning("⚠️ No provider phone for Booking ID {$this->booking->id}");
             }
 
-            // 📧 Email to Provider (optional)
-            if ($providerEmail) {
+            // 📧 Email to Provider (uses general emails if provider has no personal email)
+            foreach ($provider->getNotificationEmails() as $notifyEmail) {
                 try {
-                    Mail::to($providerEmail)->send(new \App\Mail\ProviderBookingReminderMail($this->booking));
-                    Log::info("✅ Email sent to provider {$providerEmail} for Booking ID {$this->booking->id}");
+                    Mail::to($notifyEmail)->send(new \App\Mail\ProviderBookingReminderMail($this->booking));
+                    Log::info("✅ Email sent to provider {$notifyEmail} for Booking ID {$this->booking->id}");
                 } catch (\Exception $e) {
-                    Log::error("❌ Email to provider failed for Booking ID {$this->booking->id}: " . $e->getMessage());
+                    Log::error("❌ Email to provider {$notifyEmail} failed for Booking ID {$this->booking->id}: " . $e->getMessage());
                 }
-            } else {
-                Log::warning("⚠️ No provider email for Booking ID {$this->booking->id}");
             }
         }
     }

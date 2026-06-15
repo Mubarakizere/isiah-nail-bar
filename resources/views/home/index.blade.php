@@ -182,97 +182,162 @@
         </div>
 
         @php
-            /* Sort reviews: Google reviews first, then internal */
             $sortedReviews = $reviews->sortByDesc(function($review) {
                 return $review->source === 'google' ? 1 : 0;
             })->values();
+            $totalReviews = $sortedReviews->count();
         @endphp
 
         <div x-data="{
-                activeSlide: 0,
-                slides: {{ $sortedReviews->count() }},
+                current: 0,
+                total: {{ $totalReviews }},
+                perPage: 3,
+                autoplayInterval: null,
+                touchStartX: 0,
+                touchEndX: 0,
+                init() {
+                    this.updatePerPage();
+                    window.addEventListener('resize', () => this.updatePerPage());
+                    this.startAutoplay();
+                },
+                updatePerPage() {
+                    if (window.innerWidth < 768) {
+                        this.perPage = 1;
+                    } else if (window.innerWidth < 1024) {
+                        this.perPage = 2;
+                    } else {
+                        this.perPage = 3;
+                    }
+                    if (this.current > this.maxSlide()) this.current = this.maxSlide();
+                },
+                maxSlide() {
+                    return Math.max(0, this.total - this.perPage);
+                },
                 next() {
-                    this.activeSlide = (this.activeSlide === this.slides - 1) ? 0 : this.activeSlide + 1;
+                    if (this.current >= this.maxSlide()) {
+                        this.current = 0;
+                    } else {
+                        this.current = Math.min(this.current + this.perPage, this.maxSlide());
+                    }
                 },
                 prev() {
-                    this.activeSlide = (this.activeSlide === 0) ? this.slides - 1 : this.activeSlide - 1;
+                    if (this.current <= 0) {
+                        this.current = this.maxSlide();
+                    } else {
+                        this.current = Math.max(this.current - this.perPage, 0);
+                    }
+                },
+                goTo(index) {
+                    this.current = Math.min(index, this.maxSlide());
+                },
+                startAutoplay() {
+                    this.autoplayInterval = setInterval(() => this.next(), 5000);
+                },
+                stopAutoplay() {
+                    clearInterval(this.autoplayInterval);
+                },
+                resetAutoplay() {
+                    this.stopAutoplay();
+                    this.startAutoplay();
+                },
+                handleTouchStart(e) {
+                    this.touchStartX = e.changedTouches[0].screenX;
+                },
+                handleTouchEnd(e) {
+                    this.touchEndX = e.changedTouches[0].screenX;
+                    const diff = this.touchStartX - this.touchEndX;
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) { this.next(); } else { this.prev(); }
+                        this.resetAutoplay();
+                    }
+                },
+                dotCount() {
+                    return Math.ceil(this.total / this.perPage);
+                },
+                activeDot() {
+                    return Math.floor(this.current / this.perPage);
                 }
              }"
+             @mouseenter="stopAutoplay()"
+             @mouseleave="startAutoplay()"
              class="relative">
 
             {{-- Carousel Nav --}}
-            <button @click="prev()" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-12 h-12 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-lg hidden md:flex">
-                <i class="ph ph-caret-left text-xl"></i>
+            <button @click="prev(); resetAutoplay()" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-gray-900 transition-all duration-300 shadow-lg hidden md:flex group">
+                <i class="ph ph-caret-left text-xl group-hover:-translate-x-0.5 transition-transform"></i>
             </button>
-            <button @click="next()" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 w-12 h-12 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-lg hidden md:flex">
-                <i class="ph ph-caret-right text-xl"></i>
+            <button @click="next(); resetAutoplay()" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-gray-900 transition-all duration-300 shadow-lg hidden md:flex group">
+                <i class="ph ph-caret-right text-xl group-hover:translate-x-0.5 transition-transform"></i>
             </button>
 
-            {{-- Reviews Grid --}}
-            <style>
-                .hide-scrollbar::-webkit-scrollbar {
-                    display: none;
-                }
-                .hide-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-            </style>
-            <div class="overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory flex gap-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 md:overflow-visible" x-ref="carousel">
-                @foreach($sortedReviews as $review)
-                    <div class="min-w-[85vw] md:min-w-0 snap-center bg-white rounded-2xl p-8 hover:-translate-y-1 transition-transform duration-300 relative group">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                @if($review->avatar_url)
-                                    <img src="{{ $review->avatar_url }}" alt="{{ $review->reviewer_name }}" class="w-12 h-12 rounded-full object-cover">
-                                @else
-                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
-                                        {{ strtoupper(substr($review->reviewer_name ?? $review->booking->customer->user->name ?? 'A', 0, 1)) }}
+            {{-- Reviews Carousel Track --}}
+            <div class="overflow-hidden rounded-2xl"
+                 @touchstart="handleTouchStart($event)"
+                 @touchend="handleTouchEnd($event)">
+                <div class="flex transition-transform duration-700 ease-in-out"
+                     :style="'transform: translateX(-' + (current * (100 / perPage)) + '%)'">
+                    @foreach($sortedReviews as $review)
+                        <div class="flex-shrink-0 px-3"
+                             :style="'width: ' + (100 / perPage) + '%'">
+                            <div class="bg-white rounded-2xl p-8 hover:-translate-y-1 transition-transform duration-300 relative group h-full">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        @if($review->avatar_url)
+                                            <img src="{{ $review->avatar_url }}" alt="{{ $review->reviewer_name }}" class="w-12 h-12 rounded-full object-cover">
+                                        @else
+                                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                                {{ strtoupper(substr($review->reviewer_name ?? $review->booking->customer->user->name ?? 'A', 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <h4 class="font-bold text-gray-900 text-sm">{{ $review->reviewer_name ?? $review->booking->customer->user->name ?? 'Anonymous' }}</h4>
+                                            <p class="text-xs text-gray-500">{{ $review->created_at->diffForHumans() }}</p>
+                                        </div>
                                     </div>
+                                    @if($review->source === 'google')
+                                        <div class="flex-shrink-0">
+                                            <svg class="w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="flex text-yellow-400 mb-4 text-sm">
+                                    @for($i = 0; $i < 5; $i++)
+                                        <i class="ph-fill ph-star{{ $i < $review->rating ? '' : '-half' }}"></i>
+                                    @endfor
+                                </div>
+
+                                <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-4">
+                                    {{ $review->comment }}
+                                </p>
+
+                                @if($review->source === 'google')
+                                    <span class="text-xs text-gray-400 inline-flex items-center gap-1">
+                                        <i class="ph ph-seal-check text-blue-500"></i>
+                                        Posted on Google
+                                    </span>
                                 @endif
-                                <div>
-                                    <h4 class="font-bold text-gray-900 text-sm">{{ $review->reviewer_name ?? $review->booking->customer->user->name ?? 'Anonymous' }}</h4>
-                                    <p class="text-xs text-gray-500">{{ $review->created_at->diffForHumans() }}</p>
-                                </div>
                             </div>
-                            @if($review->source === 'google')
-                                <div class="flex-shrink-0">
-                                    <svg class="w-6 h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                                    </svg>
-                                </div>
-                            @endif
                         </div>
-
-                        <div class="flex text-yellow-400 mb-4 text-sm">
-                            @for($i = 0; $i < 5; $i++)
-                                <i class="ph-fill ph-star{{ $i < $review->rating ? '' : '-half' }}"></i>
-                            @endfor
-                        </div>
-
-                        <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-4">
-                            {{ $review->comment }}
-                        </p>
-
-                        @if($review->source === 'google')
-                            <span class="text-xs text-gray-400 inline-flex items-center gap-1">
-                                <i class="ph ph-seal-check text-blue-500"></i>
-                                Posted on Google
-                            </span>
-                        @endif
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
 
-            {{-- Mobile Dots --}}
-            <div class="flex justify-center gap-2 mt-4 md:hidden">
-                @foreach($sortedReviews as $key => $review)
-                    <div class="w-2 h-2 rounded-full transition-colors duration-300"
-                         :class="{ 'bg-rose-500': activeSlide === {{ $key }}, 'bg-gray-600': activeSlide !== {{ $key }} }"></div>
-                @endforeach
+            {{-- Dot Indicators --}}
+            <div class="flex justify-center gap-2 mt-8">
+                <template x-for="i in dotCount()" :key="i">
+                    <button @click="goTo((i - 1) * perPage); resetAutoplay()"
+                            class="w-2.5 h-2.5 rounded-full transition-all duration-300"
+                            :class="activeDot() === (i - 1)
+                                ? 'bg-rose-500 w-8 shadow-[0_0_10px_rgba(244,63,94,0.5)]'
+                                : 'bg-white/30 hover:bg-white/60'">
+                    </button>
+                </template>
             </div>
         </div>
 

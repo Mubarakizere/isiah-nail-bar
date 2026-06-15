@@ -1,0 +1,158 @@
+
+
+<?php $__env->startSection('title', 'Manage Categories'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="p-6">
+    
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Categories</h1>
+                <p class="text-gray-600">Manage service categories</p>
+            </div>
+            <a href="<?php echo e(route('admin.categories.create')); ?>" 
+               class="px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition">
+                <i class="ph ph-plus-circle mr-2"></i>Add Category
+            </a>
+        </div>
+    </div>
+
+    
+    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Slug</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Created</th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <?php $__empty_1 = true; $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="font-semibold text-gray-900"><?php echo e($category->name); ?></span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-500"><?php echo e($category->slug); ?></span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                <?php echo e($category->created_at->diffForHumans()); ?>
+
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="<?php echo e(route('admin.categories.edit', $category->id)); ?>" 
+                                       class="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition">
+                                        <i class="ph ph-pencil-simple"></i>
+                                    </a>
+                                    <button type="button"
+                                            class="px-3 py-1.5 bg-red-100 text-red-700 text-sm font-semibold rounded-lg hover:bg-red-200 transition btn-delete"
+                                            data-url="<?php echo e(route('admin.categories.destroy', $category->id)); ?>"
+                                            data-name="<?php echo e($category->name); ?>">
+                                        <i class="ph ph-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center">
+                                <i class="ph ph-folder-notch-open text-5xl text-gray-300 mb-3"></i>
+                                <p class="text-gray-500 font-semibold">No categories found</p>
+                                <p class="text-gray-400 text-sm mt-1">Create your first category to get started</p>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        
+        <?php if($categories->hasPages()): ?>
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <?php echo e($categories->links()); ?>
+
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+
+<div id="confirmDeleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-warning text-2xl text-red-600"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Confirm Deletion</h3>
+                    <p class="text-sm text-gray-600">This action cannot be undone</p>
+                </div>
+            </div>
+            <p class="text-gray-700 mb-6">
+                Are you sure you want to delete <strong id="delete-item-name" class="text-gray-900"></strong>?
+            </p>
+            <div class="flex gap-3">
+                <button type="button" 
+                        onclick="closeDeleteModal()"
+                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition">
+                    Cancel
+                </button>
+                <form method="POST" id="deleteForm" class="flex-1">
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('DELETE'); ?>
+                    <button type="submit" 
+                            class="w-full px-4 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">
+                        <i class="ph ph-trash mr-1"></i>Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+const modal = document.getElementById('confirmDeleteModal');
+const deleteForm = document.getElementById('deleteForm');
+const itemNameSpan = document.getElementById('delete-item-name');
+
+document.querySelectorAll('.btn-delete').forEach(button => {
+    button.addEventListener('click', function () {
+        const action = this.getAttribute('data-url');
+        const name = this.getAttribute('data-name');
+        
+        itemNameSpan.textContent = name;
+        deleteForm.setAttribute('action', action);
+        
+        modal.classList.remove('hidden');
+    });
+});
+
+function closeDeleteModal() {
+    modal.classList.add('hidden');
+}
+
+// Close on outside click
+modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+        closeDeleteModal();
+    }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeDeleteModal();
+    }
+});
+</script>
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.dashboard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\mouba\isaiahnailbar\resources\views\admin\categories\index.blade.php ENDPATH**/ ?>

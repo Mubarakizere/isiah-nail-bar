@@ -628,9 +628,11 @@ class BookingController extends Controller
                 Mail::to($booking->customer->user->email)->send(new BookingCreated($booking));
             }
 
-            // Send to Provider
-            if ($booking->provider && $booking->provider->email) {
-                Mail::to($booking->provider->email)->send(new \App\Mail\ProviderNewBooking($booking));
+            // Send to Provider (uses general emails if provider has no personal email)
+            if ($booking->provider) {
+                foreach ($booking->provider->getNotificationEmails() as $providerEmail) {
+                    Mail::to($providerEmail)->send(new \App\Mail\ProviderNewBooking($booking));
+                }
             }
 
             // Send to Admin (Original + New Recipients)

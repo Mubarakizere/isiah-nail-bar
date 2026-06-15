@@ -1,0 +1,426 @@
+
+
+<?php $__env->startSection('title', 'Nail Services Menu | Manicure, Pedicure & Nail Art Prices in Kigali'); ?>
+
+<?php $__env->startSection('meta_description', 'View our complete nail service menu with prices. Manicure from RWF 3,000, pedicure, gel polish, acrylic nails, nail art & more at Isaiah Nail Bar Kigali, Rwanda. Book online!'); ?>
+<?php $__env->startSection('meta_keywords', 'nail services Kigali, manicure prices Rwanda, pedicure prices Kigali, gel polish price Rwanda, acrylic nails cost Kigali, nail art prices Rwanda, nail salon menu Kigali, Isaiah Nail Bar services, nail treatment Kigali'); ?>
+
+<?php $__env->startPush('schema'); ?>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Isaiah Nail Bar Service Menu",
+  "description": "Complete nail service menu with prices at Isaiah Nail Bar, Kigali Rwanda",
+  "numberOfItems": <?php echo e($categories->sum(fn($c) => $c->services->count())); ?>,
+  "itemListElement": [
+    <?php $position = 1; ?>
+    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+      <?php $__currentLoopData = $category->services->sortBy('price'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+      {
+        "@type": "ListItem",
+        "position": <?php echo e($position++); ?>,
+        "item": {
+          "@type": "Service",
+          "name": "<?php echo e($service->name); ?>",
+          "description": "<?php echo e(Str::limit($service->description ?? $service->name . ' service at Isaiah Nail Bar', 150)); ?>",
+          "provider": {
+            "@type": "NailSalon",
+            "@id": "<?php echo e(url('/')); ?>/#business"
+          },
+          "areaServed": {"@type": "City", "name": "Kigali"},
+          "offers": {
+            "@type": "Offer",
+            "price": "<?php echo e($service->price); ?>",
+            "priceCurrency": "RWF",
+            "availability": "https://schema.org/InStock"
+          }
+        }
+      }<?php if(!$loop->last || !$loop->parent->last): ?>,<?php endif; ?>
+      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+  ]
+}
+</script>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "<?php echo e(url('/')); ?>"},
+    {"@type": "ListItem", "position": 2, "name": "Services", "item": "<?php echo e(url('/services')); ?>"}
+  ]
+}
+</script>
+<?php $__env->stopPush(); ?>
+
+<?php $__env->startSection('content'); ?>
+
+
+<div class="relative bg-gray-900 py-24 overflow-hidden">
+    <div class="absolute inset-0 opacity-40">
+        <img src="<?php echo e(asset('storage/banner.jpg')); ?>" alt="Services Banner" class="w-full h-full object-cover">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12">
+        <span class="text-rose-400 font-medium tracking-widest text-sm uppercase mb-3 block animate-fade-in-up">Our Expertise</span>
+        <h1 class="text-4xl md:text-6xl font-serif text-white mb-6 animate-fade-in-up delay-100">Service Menu</h1>
+        <p class="text-xl text-gray-300 font-light max-w-2xl mx-auto animate-fade-in-up delay-200 mb-8">
+            Discover our curated selection of nail treatments, designed to provide the ultimate in care and relaxation.
+        </p>
+        
+        
+        <button onclick="sharePage()" class="inline-flex items-center gap-2 px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all animate-fade-in-up delay-300">
+            <i class="ph ph-share-network text-lg"></i>
+            <span>Share Menu</span>
+        </button>
+    </div>
+</div>
+
+
+<section class="py-16 bg-white min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 sticky top-24 z-30 bg-white/95 backdrop-blur-md py-4 transition-all duration-300 border-b border-gray-100" id="filterBar">
+            
+            <div class="overflow-x-auto scrollbar-hide w-full md:w-auto -mx-4 px-4 md:mx-0 md:px-0">
+                <div class="flex gap-2 min-w-max">
+                    <button onclick="filterCategory('all', this)" 
+                            class="category-tab active px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-transparent bg-gray-900 text-white">
+                        All Services
+                    </button>
+                    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <button onclick="filterCategory('<?php echo e($category->id); ?>', this)" 
+                                class="category-tab px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 bg-white">
+                            <?php echo e($category->name); ?>
+
+                        </button>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </div>
+            </div>
+
+            
+            <div class="relative w-full md:w-72">
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="Search treatments..." 
+                       class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all">
+                <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+        </div>
+
+        <?php if($categories->count() > 0): ?>
+            <div id="servicesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php $__currentLoopData = $category->services->sortBy('price'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div id="service-<?php echo e($service->id); ?>" class="service-card group cursor-pointer" 
+                             onclick="openServiceModal(<?php echo e(json_encode([
+                                'id' => $service->id,
+                                'name' => $service->name,
+                                'price' => number_format($service->price),
+                                'duration' => $service->duration,
+                                'category' => $category->name,
+                                'description' => $service->description,
+                                'image' => $service->image ? asset('storage/' . $service->image) : null
+                            ])); ?>)"
+                             data-category="<?php echo e($category->id); ?>"
+                             data-name="<?php echo e(strtolower($service->name)); ?>"
+                             data-description="<?php echo e(strtolower($service->description ?? '')); ?>">
+                            
+                            
+                            <div class="relative aspect-[4/3] mb-4 overflow-hidden rounded-lg bg-gray-100">
+                                <?php if($service->image): ?>
+                                    <img src="<?php echo e(asset('storage/' . $service->image)); ?>" alt="<?php echo e($service->name); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                <?php else: ?>
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                                        <i class="ph ph-sparkle text-3xl"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+
+                                
+                                <button onclick="shareService(event, <?php echo e($service->id); ?>, <?php echo e(json_encode($service->name)); ?>, <?php echo e(json_encode($service->description ?? '')); ?>)" 
+                                        class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white text-gray-900 rounded-full shadow-sm backdrop-blur-sm transition-all z-10 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300 delay-75"
+                                        title="Share Service">
+                                    <i class="ph ph-share-network"></i>
+                                </button>
+                            </div>
+
+                            
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <h3 class="text-lg font-serif text-gray-900 group-hover:text-rose-600 transition-colors"><?php echo e($service->name); ?></h3>
+                                    <p class="text-sm text-gray-500 mt-1 line-clamp-2"><?php echo e($service->description); ?></p>
+                                    <?php if($service->duration): ?>
+                                        <div class="flex items-center gap-1 mt-2 text-xs text-gray-400">
+                                            <i class="ph ph-clock"></i>
+                                            <span><?php echo e($service->duration); ?> mins</span>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="text-right">
+                                    <span class="block text-lg font-medium text-gray-900 whitespace-nowrap">
+                                        <?php echo e(number_format($service->price)); ?> <span class="text-xs text-gray-500 font-normal">RWF</span>
+                                    </span>
+                                    <button class="mt-2 text-sm font-medium text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
+                                        Book <i class="ph ph-arrow-right text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+
+            
+            <div id="noResults" class="hidden text-center py-24">
+                <i class="ph ph-magnifying-glass text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No services found matching your criteria.</p>
+            </div>
+        <?php else: ?>
+            <div class="text-center py-24">
+                <p class="text-gray-500">Our service menu is currently being updated.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
+
+
+<div id="serviceModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" onclick="closeServiceModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl transform transition-all" onclick="event.stopPropagation()">
+        
+        <div id="modalImageContainer" class="hidden relative h-48 sm:h-64">
+            <img id="modalImage" src="" alt="" class="w-full h-full object-cover">
+            <button onclick="closeServiceModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+        <div id="modalNoImageHeader" class="hidden p-6 pb-0 flex justify-end">
+            <button onclick="closeServiceModal()" class="text-gray-400 hover:text-gray-600">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-8">
+            <span id="modalCategory" class="text-xs font-bold tracking-widest text-rose-600 uppercase mb-2 block"></span>
+            <div class="flex justify-between items-start gap-4 mb-6">
+                <h3 id="modalTitle" class="text-2xl font-serif text-gray-900"></h3>
+                <div class="text-right">
+                    <span id="modalPrice" class="text-xl font-medium text-gray-900 block"></span>
+                    <span id="modalDuration" class="text-sm text-gray-500 block"></span>
+                </div>
+            </div>
+            
+            <p id="modalDescription" class="text-gray-600 leading-relaxed mb-8 font-light"></p>
+            
+            <div class="flex gap-3">
+                <a id="modalBookBtn" href="#" class="flex-1 block py-4 bg-gray-900 text-white text-center font-medium rounded-full hover:bg-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                    Book Appointment
+                </a>
+                <button id="modalShareBtn" onclick="shareCurrentModalService()" class="px-4 py-4 border border-gray-200 text-gray-900 rounded-full hover:bg-gray-50 transition-all flex items-center justify-center">
+                    <i class="ph ph-share-network text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+// Filter Logic
+function filterCategory(catId, btn) {
+    // Reset buttons
+    document.querySelectorAll('.category-tab').forEach(b => {
+        b.classList.remove('bg-gray-900', 'text-white', 'border-transparent');
+        b.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+    });
+    
+    // Active button style
+    btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+    btn.classList.add('bg-gray-900', 'text-white', 'border-transparent');
+    
+    // Filter
+    const cards = document.querySelectorAll('.service-card');
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    let hasVisible = false;
+
+    cards.forEach(card => {
+        const matchesCat = catId === 'all' || card.dataset.category === catId;
+        const matchesSearch = card.dataset.name.includes(searchTerm) || card.dataset.description.includes(searchTerm);
+        
+        if (matchesCat && matchesSearch) {
+            card.style.display = 'block';
+            card.classList.add('animate-fade-in');
+            hasVisible = true;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    document.getElementById('noResults').classList.toggle('hidden', hasVisible);
+}
+
+// Search Logic
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    // Trigger current active filter re-run
+    const activeBtn = document.querySelector('.category-tab.bg-gray-900'); // roughly finds active
+    const activeCat = activeBtn ? activeBtn.getAttribute('onclick').match(/'([^']+)'/)[1] : 'all';
+    filterCategory(activeCat, activeBtn || document.querySelector('.category-tab'));
+});
+
+// Modal Logic
+function openServiceModal(service) {
+    document.getElementById('modalTitle').textContent = service.name;
+    document.getElementById('modalCategory').textContent = service.category;
+    document.getElementById('modalPrice').textContent = 'RWF ' + service.price;
+    document.getElementById('modalDescription').textContent = service.description || 'No description available.';
+    document.getElementById('modalBookBtn').href = '<?php echo e(route("booking.step1")); ?>?service_id=' + service.id;
+    
+    if (service.duration) {
+        document.getElementById('modalDuration').textContent = service.duration + ' mins';
+        document.getElementById('modalDuration').style.display = 'block';
+    } else {
+        document.getElementById('modalDuration').style.display = 'none';
+    }
+    
+    // Set share data for modal button
+    const url = new URL(window.location.href.split('?')[0]);
+    url.searchParams.set('service', service.id);
+    
+    currentServiceShareData = {
+        title: service.name + ' - <?php echo e(config("app.name")); ?>',
+        text: 'Check out this service: ' + service.name,
+        url: url.toString()
+    };
+
+    const imgContainer = document.getElementById('modalImageContainer');
+    const noImgHeader = document.getElementById('modalNoImageHeader');
+    
+    if (service.image) {
+        document.getElementById('modalImage').src = service.image;
+        imgContainer.classList.remove('hidden');
+        noImgHeader.classList.add('hidden');
+    } else {
+        imgContainer.classList.add('hidden');
+        noImgHeader.classList.remove('hidden');
+    }
+
+    const modal = document.getElementById('serviceModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex'); // Ensure flex is on
+    document.body.style.overflow = 'hidden';
+}
+
+function closeServiceModal() {
+    document.getElementById('serviceModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    
+    // Clear URL param without refreshing if it exists
+    const url = new URL(window.location);
+    if (url.searchParams.has('service')) {
+        url.searchParams.delete('service');
+        window.history.replaceState({}, '', url);
+    }
+}
+
+// Sharing Logic
+async function sharePage() {
+    const shareData = {
+        title: '<?php echo e(config("app.name")); ?> - Service Menu',
+        text: 'Check out the luxury nail services at <?php echo e(config("app.name")); ?>!',
+        url: window.location.href.split('?')[0]
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copied to clipboard!');
+        }
+    } catch (err) {
+        console.error('Error sharing:', err);
+    }
+}
+
+let currentServiceShareData = null;
+
+async function shareService(event, id, name, description) {
+    if(event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+
+    const url = new URL(window.location.href.split('?')[0]);
+    url.searchParams.set('service', id);
+    
+    const shareData = {
+        title: name + ' - <?php echo e(config("app.name")); ?>',
+        text: 'Check out this service: ' + name,
+        url: url.toString()
+    };
+    
+    // Store for modal
+    currentServiceShareData = shareData;
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Service link copied to clipboard!');
+        }
+    } catch (err) {
+        console.error('Error sharing:', err);
+    }
+}
+
+function shareCurrentModalService() {
+    if (currentServiceShareData) {
+        shareService(null, null, currentServiceShareData.title, ''); // Reuse stored data logic manually or refactor
+        // Actually simpler to just call navigator logic directly since we have data
+        try {
+            if (navigator.share) {
+                navigator.share(currentServiceShareData);
+            } else {
+                navigator.clipboard.writeText(currentServiceShareData.url);
+                alert('Service link copied to clipboard!');
+            }
+        } catch (err) {}
+    }
+}
+
+// Auto-open from URL
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceId = urlParams.get('service');
+    
+    if (serviceId) {
+        const card = document.getElementById('service-' + serviceId);
+        if (card) {
+            // Wait slightly for any animations/loading
+            setTimeout(() => {
+                card.click();
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+    }
+});
+
+// Fade in animation style
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+`;
+document.head.appendChild(style);
+</script>
+<?php $__env->stopPush(); ?>
+
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.public', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\mouba\isaiahnailbar\resources\views\services\index.blade.php ENDPATH**/ ?>

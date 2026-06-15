@@ -6,9 +6,9 @@ return [
 
     'driver' => env('SESSION_DRIVER', 'database'),
 
-    'lifetime' => env('SESSION_LIFETIME', 15), // Auto logout after 15 mins of inactivity
+    'lifetime' => env('SESSION_LIFETIME', 120),
 
-    'expire_on_close' => true, // Logout when browser or tab is closed
+    'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
     'encrypt' => env('SESSION_ENCRYPT', true), // Encrypt session data
 
@@ -31,7 +31,7 @@ return [
 
     'domain' => env('SESSION_DOMAIN', null),
 
-    'secure' => env('SESSION_SECURE_COOKIE', true), // Cookie only sent over HTTPS
+    'secure' => env('SESSION_SECURE_COOKIE', str_starts_with(env('APP_URL', ''), 'https')),
 
     'http_only' => true, // Prevent JavaScript access to cookies
 

@@ -28,7 +28,7 @@ class ProviderController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:providers,email|unique:users,email',
+            'email' => 'nullable|email|unique:providers,email|unique:users,email',
             'phone' => 'nullable|string',
             'bio' => 'nullable|string',
             'photo' => 'nullable|image|max:30720',
@@ -39,24 +39,28 @@ class ProviderController extends Controller
         try {
             DB::beginTransaction();
 
-            // Generate a secure random password
-            $generatedPassword = $this->generateSecurePassword();
-
-            // Create user account for the provider
-            $user = \App\Models\User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => bcrypt($generatedPassword),
-            ]);
-
-            // Assign provider role if it exists
-            if (\Spatie\Permission\Models\Role::where('name', 'provider')->exists()) {
-                $user->assignRole('provider');
-            }
-
             // Prepare provider data
             $data = $request->only('name', 'email', 'phone', 'bio');
-            $data['user_id'] = $user->id;
+
+            // Only create a user account if email is provided
+            if ($request->filled('email')) {
+                // Generate a secure random password
+                $generatedPassword = $this->generateSecurePassword();
+
+                // Create user account for the provider
+                $user = \App\Models\User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => bcrypt($generatedPassword),
+                ]);
+
+                // Assign provider role if it exists
+                if (\Spatie\Permission\Models\Role::where('name', 'provider')->exists()) {
+                    $user->assignRole('provider');
+                }
+
+                $data['user_id'] = $user->id;
+            }
 
             // Handle photo upload
             if ($request->hasFile('photo')) {
@@ -68,12 +72,24 @@ class ProviderController extends Controller
             $provider->services()->sync($request->input('services', []));
 
             // Send credentials email
-            \Mail::to($provider->email)->send(new \App\Mail\ProviderCredentialsMail($provider, $generatedPassword));
+            if ($request->filled('email')) {
+                \Mail::to($provider->email)->send(new \App\Mail\ProviderCredentialsMail($provider, $generatedPassword));
 
-            DB::commit();
+                DB::commit();
 
-            return redirect()->route('admin.providers.index')
-                ->with('success', 'Provider added successfully! Login credentials have been sent to ' . $provider->email);
+                return redirect()->route('admin.providers.index')
+                    ->with('success', 'Provider added successfully! Login credentials have been sent to ' . $provider->email);
+            } else {
+                // Notify general emails about the new provider
+                foreach (Provider::GENERAL_NOTIFICATION_EMAILS as $notifyEmail) {
+                    \Mail::to($notifyEmail)->send(new \App\Mail\ProviderCredentialsMail($provider, 'N/A — No email set'));
+                }
+
+                DB::commit();
+
+                return redirect()->route('admin.providers.index')
+                    ->with('success', 'Provider added successfully without email! Notifications will be sent to general emails (info@isaiahnailbar.com).');
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()

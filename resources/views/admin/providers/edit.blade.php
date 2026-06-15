@@ -57,12 +57,17 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Email <span class="text-gray-400 text-xs font-normal">(Optional)</span>
+                            </label>
                             <input type="email" 
                                    name="email" 
                                    value="{{ old('email', $provider->email) }}"
                                    placeholder="provider@example.com"
                                    class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition outline-none">
+                            <p class="text-xs text-gray-500 mt-1">
+                                If empty, notifications go to <strong>info@isaiahnailbar.com</strong>.
+                            </p>
                         </div>
                     </div>
 

@@ -42,8 +42,12 @@
             <div>
                 <h3 class="font-bold text-blue-900 mb-1">🔐 Password & Login Credentials</h3>
                 <p class="text-blue-700 text-sm">
-                    A secure random password will be automatically generated for this provider. 
-                    Login credentials will be sent to their email address immediately after creation.
+                    If an email is provided, a secure random password will be automatically generated 
+                    and login credentials will be sent to their email address immediately after creation.
+                </p>
+                <p class="text-blue-700 text-sm mt-1">
+                    <strong>Email is optional.</strong> If no email is provided, all notifications for this 
+                    provider will be sent to <strong>info@isaiahnailbar.com</strong> and <strong>isaiebm4@gmail.com</strong>.
                 </p>
             </div>
         </div>
@@ -68,17 +72,20 @@
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     </div>
 
-                    {{-- Email --}}
+                    {{-- Email (Optional) --}}
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Email <span class="text-red-600">*</span>
+                            Email <span class="text-gray-400 text-xs font-normal">(Optional)</span>
                         </label>
                         <input type="email" 
                                name="email" 
                                value="{{ old('email') }}"
-                               required
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                        <p class="text-xs text-gray-500 mt-1">Login credentials will be sent to this email</p>
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                               placeholder="provider@example.com">
+                        <p class="text-xs text-gray-500 mt-1">
+                            If provided, login credentials will be sent here. 
+                            Otherwise, notifications go to <strong>info@isaiahnailbar.com</strong>.
+                        </p>
                     </div>
 
                     {{-- Phone --}}

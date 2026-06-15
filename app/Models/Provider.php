@@ -6,7 +6,30 @@ use Illuminate\Database\Eloquent\Model;
 
 class Provider extends Model
 {
+    /**
+     * General notification emails used when a provider has no personal email.
+     */
+    const GENERAL_NOTIFICATION_EMAILS = [
+        'info@isaiahnailbar.com',
+        'isaiebm4@gmail.com',
+    ];
+
     protected $fillable = ['name', 'email', 'phone', 'bio', 'photo', 'user_id', 'active'];
+
+    /**
+     * Get the email(s) to use for notifications.
+     * Returns the provider's own email if set, otherwise the general notification emails.
+     *
+     * @return array
+     */
+    public function getNotificationEmails(): array
+    {
+        if (!empty($this->email)) {
+            return [$this->email];
+        }
+
+        return self::GENERAL_NOTIFICATION_EMAILS;
+    }
 
     public function bookings()
     {

@@ -289,12 +289,13 @@ class PaymentWebhookController extends Controller
             Log::error("❌ Email to customer failed: " . $e->getMessage());
         }
 
-        // ✅ Send Email to Provider
+        // ✅ Send Email to Provider (uses general emails if provider has no personal email)
         try {
-            $providerEmail = $booking->provider->email ?? null;
-            if ($providerEmail) {
-                Mail::to($providerEmail)->send(new ProviderNewBooking($booking));
-                Log::info("📧 Email sent to provider: $providerEmail");
+            if ($booking->provider) {
+                foreach ($booking->provider->getNotificationEmails() as $providerEmail) {
+                    Mail::to($providerEmail)->send(new ProviderNewBooking($booking));
+                    Log::info("📧 Email sent to provider: $providerEmail");
+                }
             }
         } catch (\Exception $e) {
             Log::error("❌ Email to provider failed: " . $e->getMessage());
