@@ -45,12 +45,12 @@
         @foreach($heroSlides as $index => $slide)
             <div class="absolute inset-0 z-0"
                  x-show="current === {{ $index }}"
-                 x-transition:enter="transition-all duration-[1500ms] ease-out"
-                 x-transition:enter-start="opacity-0 scale-105 translate-x-12"
-                 x-transition:enter-end="opacity-100 scale-100 translate-x-0"
-                 x-transition:leave="transition-all duration-[1500ms] ease-in"
-                 x-transition:leave-start="opacity-100 scale-100 translate-x-0"
-                 x-transition:leave-end="opacity-0 scale-95 -translate-x-12">
+                 x-transition:enter="transition-opacity duration-1000 ease-in-out"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition-opacity duration-1000 ease-in-out"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0">
 
                 {{-- Background Image with Ken Burns effect --}}
                 <div class="absolute inset-0 animate-ken-burns">
@@ -72,12 +72,12 @@
         @foreach($heroSlides as $index => $slide)
             <div class="container mx-auto px-4 relative z-10 text-center"
                  x-show="current === {{ $index }}"
-                 x-transition:enter="transition-all duration-[1200ms] delay-500 ease-out"
-                 x-transition:enter-start="opacity-0 translate-y-12 blur-sm"
-                 x-transition:enter-end="opacity-100 translate-y-0 blur-0"
-                 x-transition:leave="transition-all duration-[800ms] ease-in"
-                 x-transition:leave-start="opacity-100 translate-y-0 blur-0"
-                 x-transition:leave-end="opacity-0 -translate-y-8 blur-sm">
+                 x-transition:enter="transition-all duration-700 delay-300 ease-out"
+                 x-transition:enter-start="opacity-0 translate-y-8"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition-all duration-500 ease-in"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-4">
 
                 <div class="max-w-5xl mx-auto space-y-8">
 
