@@ -48,7 +48,7 @@
                     {{-- Phone & Email --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Phone <span class="text-gray-400 text-xs font-normal">(Optional)</span></label>
                             <input type="text" 
                                    name="phone" 
                                    value="{{ old('phone', $provider->phone) }}"
@@ -99,7 +99,13 @@
 
                     {{-- Assign Services --}}
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-3">Assign Services</label>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-sm font-semibold text-gray-700">Assign Services</label>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="document.querySelectorAll('input[name=\'services[]\']').forEach(el => el.checked = true)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition font-medium border border-gray-200">Select All</button>
+                                <button type="button" onclick="document.querySelectorAll('input[name=\'services[]\']').forEach(el => el.checked = false)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition font-medium border border-gray-200">Deselect All</button>
+                            </div>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             @foreach ($services as $service)
                                 <label class="flex items-center gap-3 p-3 rounded-lg border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition cursor-pointer">

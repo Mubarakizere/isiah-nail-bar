@@ -91,7 +91,7 @@
                     {{-- Phone --}}
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Phone
+                            Phone <span class="text-gray-400 text-xs font-normal">(Optional)</span>
                         </label>
                         <input type="text" 
                                name="phone" 
@@ -123,9 +123,15 @@
 
                     {{-- Assign Services --}}
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-3">
-                            Assign Services
-                        </label>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-sm font-semibold text-gray-700">
+                                Assign Services
+                            </label>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="document.querySelectorAll('input[name=\'services[]\']').forEach(el => el.checked = true)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition font-medium border border-gray-200">Select All</button>
+                                <button type="button" onclick="document.querySelectorAll('input[name=\'services[]\']').forEach(el => el.checked = false)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition font-medium border border-gray-200">Deselect All</button>
+                            </div>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             @foreach ($services as $service)
                                 <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
