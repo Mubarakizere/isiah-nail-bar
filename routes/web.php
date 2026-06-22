@@ -259,17 +259,7 @@ Route::get('/calendar/sync', [ProviderCalendarController::class, 'exportICal'])
 })->name('provider.booking.complete');
 
 
-            Route::put('/dashboard/admin/booking/{id}', function ($id) {
-    $booking = Booking::findOrFail($id);
-    $status = request('status');
 
-    if (in_array($status, ['pending', 'accepted', 'declined', 'completed', 'cancelled'])) {
-        $booking->status = $status;
-        $booking->save();
-    }
-
-    return back()->with('status', 'Booking status updated successfully.');
-})->name('dashboard.admin.update');
             Route::post('/booking/{id}/{action}', function ($id, $action) {
     $booking = \App\Models\Booking::where('id', $id)
         ->where('provider_id', auth()->user()->provider->id)
@@ -332,7 +322,7 @@ Route::get('/calendar/sync', [ProviderCalendarController::class, 'exportICal'])
     Route::delete('/gallery-instagram/{galleryInstagram}', [\App\Http\Controllers\Admin\GalleryInstagramController::class, 'destroy'])->name('admin.gallery-instagram.destroy');
         Route::get('/', [AdminBookingController::class, 'adminDashboard'])->name('dashboard.admin');
         Route::get('/bookings', [AdminBookingController::class, 'index'])->name('dashboard.admin.bookings');
-        Route::put('/dashboard/admin/booking/{id}', [AdminBookingController::class, 'update'])
+        Route::put('/booking/{id}', [AdminBookingController::class, 'update'])
     ->name('dashboard.admin.update');
 
 

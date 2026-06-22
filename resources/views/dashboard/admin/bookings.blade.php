@@ -226,7 +226,7 @@
                                     </form>
                                 @endif
 
-                                <a href="{{ route('booking.receipt', $booking->id) }}" 
+                                <a href="{{ route('admin.booking.receipt', $booking->id) }}" 
                                    class="px-2 py-1 bg-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-300" 
                                    title="View Receipt">
                                     Receipt
