@@ -58,7 +58,7 @@
                                     #{{ $booking->id }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="font-medium text-gray-900">{{ $booking->service->name ?? 'N/A' }}</span>
+                                    <span class="font-medium text-gray-900">{{ $booking->services->pluck('name')->join(', ') ?: 'N/A' }}</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="text-gray-700">{{ $booking->provider->name ?? 'N/A' }}</span>

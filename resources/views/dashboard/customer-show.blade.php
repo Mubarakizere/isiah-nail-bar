@@ -6,7 +6,7 @@
 
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">{{ $booking->service->name }}</h5>
+            <h5 class="card-title">{{ $booking->services->pluck('name')->join(', ') }}</h5>
             <p><strong>Provider:</strong> {{ $booking->provider->name }}</p>
             <p><strong>Date:</strong> {{ $booking->date }} at {{ $booking->time }}</p>
             <p><strong>Status:</strong> {{ ucfirst($booking->status) }}</p>

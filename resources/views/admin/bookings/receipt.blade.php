@@ -9,7 +9,7 @@
     <div class="card shadow-sm p-4">
         <ul class="list-group list-group-flush mb-4">
             <li class="list-group-item"><strong>Customer:</strong> {{ $booking->customer->user->name }}</li>
-            <li class="list-group-item"><strong>Service:</strong> {{ $booking->service->name }}</li>
+            <li class="list-group-item"><strong>Service:</strong> {{ $booking->services->pluck('name')->join(', ') }}</li>
             <li class="list-group-item"><strong>Provider:</strong> {{ $booking->provider->user->name }}</li>
             <li class="list-group-item"><strong>Date:</strong> {{ \Carbon\Carbon::parse($booking->date)->format('D, M j Y') }}</li>
             <li class="list-group-item"><strong>Time:</strong> {{ \Carbon\Carbon::parse($booking->time)->format('H:i') }}</li>

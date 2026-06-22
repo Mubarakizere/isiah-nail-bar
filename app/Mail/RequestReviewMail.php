@@ -21,6 +21,6 @@ class RequestReviewMail extends Mailable
     public function build()
     {
         return $this->subject('We’d love your feedback!')
-            ->view('emails.review-request');
+            ->markdown('emails.review-request');
     }
 }

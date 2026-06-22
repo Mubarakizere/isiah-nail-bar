@@ -62,7 +62,7 @@
                 <tr>
                     <td>{{ $booking->id }}</td>
                     <td>{{ $booking->customer->user->name ?? '-' }}</td>
-                    <td>{{ $booking->service->name ?? 'Deleted Service' }}</td>
+                    <td>{{ $booking->services->pluck('name')->join(', ') ?: 'Deleted Service' }}</td>
                     <td>{{ $booking->date }}</td>
                     <td>{{ \Carbon\Carbon::parse($booking->time)->format('H:i') }}</td>
                     <td>{{ ucfirst($booking->status) }}</td>
@@ -70,7 +70,7 @@
                         @if($booking->deposit_amount && !$booking->is_fully_paid)
                             RWF {{ number_format($booking->deposit_amount) }} (Deposit)
                         @else
-                            RWF {{ number_format($booking->service->price ?? 0) }}
+                            RWF {{ number_format($booking->services->sum('price')) }}
                         @endif
                     </td>
                 </tr>
