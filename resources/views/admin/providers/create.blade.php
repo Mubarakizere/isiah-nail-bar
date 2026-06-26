@@ -35,6 +35,18 @@
         </div>
     @endif
 
+    {{-- Session Error --}}
+    @if (session('error'))
+        <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
+            <div class="flex items-start gap-3">
+                <i class="ph ph-warning text-2xl text-red-600 mt-0.5"></i>
+                <div class="flex-1">
+                    <h3 class="font-bold text-red-900 mb-2">Error:</h3>
+                    <p class="text-red-700 text-sm">{{ session('error') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
     {{-- Info Alert --}}
     <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
         <div class="flex items-start gap-3">

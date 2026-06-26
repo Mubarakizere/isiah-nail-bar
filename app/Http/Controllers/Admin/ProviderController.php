@@ -92,6 +92,7 @@ class ProviderController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Provider creation failed: ' . $e->getMessage(), ['exception' => $e]);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Failed to create provider: ' . $e->getMessage());
