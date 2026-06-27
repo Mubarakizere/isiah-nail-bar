@@ -73,8 +73,14 @@ return [
     |
     */
 
-    'links' => [
-        public_path('storage') => storage_path('app/public'),
-    ],
+    'links' => env('FILESYSTEM_PUBLIC_ROOT')
+        ? [
+            // On shared hosting: link from public_html/storage → storage/app/public
+            env('FILESYSTEM_PUBLIC_ROOT') => storage_path('app/public'),
+        ]
+        : [
+            // Default: link from public/storage → storage/app/public
+            public_path('storage') => storage_path('app/public'),
+        ],
 
 ];
