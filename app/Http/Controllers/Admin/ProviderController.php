@@ -12,10 +12,20 @@ use Carbon\Carbon;
 
 class ProviderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $providers = Provider::latest()->paginate(10);
-        return view('admin.providers.index', compact('providers'));
+        $search = $request->input('search');
+
+        $providers = Provider::when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                             ->orWhere('email', 'like', "%{$search}%")
+                             ->orWhere('phone', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10)
+            ->appends(['search' => $search]);
+
+        return view('admin.providers.index', compact('providers', 'search'));
     }
 
     public function create()
