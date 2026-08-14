@@ -39,6 +39,13 @@ Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
+    Route::get('verify-email/status', function (\Illuminate\Http\Request $request) {
+        if ($request->user() && $request->user()->hasVerifiedEmail()) {
+            return response()->json(['verified' => true, 'redirect' => route('dashboard', absolute: false)]);
+        }
+        return response()->json(['verified' => false]);
+    })->name('email.check-status');
+
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
