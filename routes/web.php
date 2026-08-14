@@ -41,10 +41,6 @@ use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Admin\AdminSlotController;
 use App\Http\Controllers\Admin\SettingController;
-
-  Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
 // Dynamic Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -182,7 +178,11 @@ Route::post('/booking/retry-payment/{id}', [BookingController::class, 'retryPaym
         Route::get('/booking/pay-remaining/{id}', [BookingController::class, 'payRemaining'])->name('customer.booking.payRemaining');
 Route::post('/booking/pay-remaining/{id}', [BookingController::class, 'payRemainingPost'])->name('customer.booking.payRemainingPost');
 
-        Route::post('/notifications/{id}/mark', fn($id) => tap(Auth::user()->notifications()->find($id), fn($n) => $n?->markAsRead()))->name('notifications.mark');
+        Route::post('/notifications/mark-all', function () {
+            Auth::user()->unreadNotifications->markAsRead();
+            return back()->with('status', 'All notifications marked as read.');
+        })->name('customer.notifications.markAll');
+        Route::post('/notifications/{id}/mark', fn($id) => tap(Auth::user()->notifications()->find($id), fn($n) => $n?->markAsRead()))->name('customer.notifications.mark');
         Route::get('/reviews', [CustomerReviewController::class, 'index'])->name('customer.reviews.index');
         Route::delete('/reviews/{id}', [CustomerReviewController::class, 'destroy'])->name('customer.reviews.destroy');
     });
@@ -281,7 +281,7 @@ Route::get('/calendar/sync', [ProviderCalendarController::class, 'exportICal'])
                Route::post('/notifications/mark-all', function () {
     auth()->user()->unreadNotifications->markAsRead();
     return back()->with('status', 'All notifications marked as read.');
-})->name('notifications.markAll');
+})->name('provider.notifications.markAll');
 
         Route::get('/services', fn() => view('dashboard.provider.services.index', [
             'services' => Auth::user()->provider->services()->paginate(10)
@@ -294,13 +294,13 @@ Route::get('/calendar/sync', [ProviderCalendarController::class, 'exportICal'])
         Route::post('/notifications/{id}/mark', function ($id) {
             Auth::user()->notifications()->findOrFail($id)?->markAsRead();
             return back();
-        })->name('notifications.mark');
+        })->name('provider.notifications.mark');
         Route::get('/dashboard/provider/earnings/report', [\App\Http\Controllers\ProviderEarningsController::class, 'downloadReport'])
         ->middleware('role:provider')
         ->name('provider.earnings.pdf');
         Route::get('/services/{service}/edit', [ProviderServiceController::class, 'edit'])->name('provider.services.edit');
-        Route::post('/services/{service}/update', [ProviderServiceController::class, 'update'])->name('provider.services.update');
-        Route::put('/services/{service}', [ProviderServiceController::class, 'update'])->name('provider.services.update');
+        Route::match(['post', 'put'], '/services/{service}/update', [ProviderServiceController::class, 'update'])->name('provider.services.update');
+        Route::put('/services/{service}', [ProviderServiceController::class, 'update']);
         Route::delete('/services/{service}', [ProviderServiceController::class, 'destroy'])->name('provider.services.destroy');
         Route::get('/services/request', [ProviderServiceController::class, 'create'])->name('provider.services.request');
         Route::post('/services/request', [ProviderServiceController::class, 'store'])->name('provider.services.store');

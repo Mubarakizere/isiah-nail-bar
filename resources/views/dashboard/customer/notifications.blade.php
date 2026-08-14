@@ -10,7 +10,7 @@
 
     @if ($notifications->count())
         <div class="d-flex justify-content-end mb-3">
-            <form action="{{ route('notifications.markAll') }}" method="POST">
+            <form action="{{ route('customer.notifications.markAll') }}" method="POST">
                 @csrf
                 <button class="btn btn-sm btn-outline-secondary">
                     <i class="ph ph-check-circle me-1"></i> Mark All as Read
@@ -27,7 +27,7 @@
                     </div>
 
                     @if (is_null($notification->read_at))
-                        <form action="{{ route('notifications.mark', $notification->id) }}" method="POST">
+                        <form action="{{ route('customer.notifications.mark', $notification->id) }}" method="POST">
                             @csrf
                             <button class="btn btn-sm btn-outline-primary">Mark as Read</button>
                         </form>
