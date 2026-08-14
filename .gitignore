@@ -2,6 +2,9 @@
 /node_modules
 
 /storage/*.key
+/storage/framework/views/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
 /storage/pail
 /vendor
 .env
