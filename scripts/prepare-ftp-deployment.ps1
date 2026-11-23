@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Isaiah Nail Bar — Production FTP Deployment Preparation Script
 # ==============================================================================
 $ErrorActionPreference = "Continue"
@@ -126,8 +126,8 @@ FILESYSTEM_DISK=public
 FILESYSTEM_PUBLIC_ROOT=/home/stockcen/public_html/storage
 
 # WeFlexfy Mobile Money & Card Payments
-WEFLEXFY_ACCESS_KEY=3EzVQ0aoAC6I42A5DnaDLIKWn5IpO7PViS4TzadeD7uTY7wrYmKkeNYHDfVv3qKylVNBu5brt1PSrXTcO0hcdb7CPjCAvb4sdbAIUSGCHrSQtTvZ1H4KA1YLOcB28rMBce3wzByYBxQjqGYBCZkGj3X3qUtKMV2NrXF5
-WEFLEXFY_SECRET_KEY=kE6RZCp5IArF4kO25bb9HthEXqbeTgDbBByAoX8hrR6bohf5y5IMhd5mPreye4GpZDQ1xVuLKuUptnUdQ4QguWq8vrKBkgKkaEnqEIBAQwa1aGGOv5K1JambkyYHmFZTpMWqXIHUI38ROYNHXSw9OW8lggM2xtQO47gZ
+WEFLEXFY_ACCESS_KEY=YOUR_WEFLEXFY_ACCESS_KEY
+WEFLEXFY_SECRET_KEY=YOUR_WEFLEXFY_SECRET_KEY
 WEFLEXFY_BASE_URL=https://api.weflexfy.com
 WEFLEXFY_RECIPIENT_NUMBER=+250788421063
 
@@ -136,7 +136,7 @@ MAIL_MAILER=smtp
 MAIL_HOST=mail.isaiahnailbar.com
 MAIL_PORT=465
 MAIL_USERNAME=info@isaiahnailbar.com
-MAIL_PASSWORD=EwzN4LHBW!Np!wz
+MAIL_PASSWORD=YOUR_CPANEL_MAIL_PASSWORD
 MAIL_ENCRYPTION=ssl
 MAIL_FROM_ADDRESS=info@isaiahnailbar.com
 MAIL_FROM_NAME="Isaiah Nail Bar"
