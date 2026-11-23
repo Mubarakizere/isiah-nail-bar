@@ -1,0 +1,70 @@
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Booking extends Model
+{
+    protected $fillable = [
+        'customer_id',
+        'provider_id',
+        'date',
+        'time',
+        'payment_option',
+        'status',
+        'notes',
+        'deposit_amount',
+        'reference',
+        'source',
+        'is_home_service',
+        'address',
+        'pickup_location_id',
+        'pickup_fee',
+        'pickup_address',
+    ];
+
+    protected $casts = [
+        'is_fully_paid' => 'boolean',
+        'reminder_sent' => 'boolean',
+        'reminder_delivery_status' => 'array',
+        'reminder_failed_at' => 'datetime',
+    ];
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'booking_service')
+            ->withPivot(['price_at_booking', 'duration_minutes_at_booking']);
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
+    }
+
+    public function payments()
+{
+    return $this->hasMany(\App\Models\Payment::class);
+}
+
+
+    public function customer()
+    {
+        return $this->belongsTo(\App\Models\Customer::class, 'customer_id');
+    }
+
+    public function pickupLocation()
+    {
+        return $this->belongsTo(\App\Models\PickupLocation::class);
+    }
+
+    public function review()
+    {
+        return $this->hasOne(\App\Models\Review::class);
+    }
+}
+

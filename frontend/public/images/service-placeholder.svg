@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="90" y1="75" x2="730" y2="950" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FCF8F2"/>
+      <stop offset="1" stop-color="#E9DED0"/>
+    </linearGradient>
+    <linearGradient id="nail" x1="310" y1="300" x2="500" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4D8CF"/>
+      <stop offset="1" stop-color="#D9AFA2"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h800v1000H0z"/>
+  <circle cx="400" cy="445" r="224" stroke="#B8975A" stroke-opacity=".24" stroke-width="2"/>
+  <circle cx="400" cy="445" r="185" stroke="#B8975A" stroke-opacity=".16"/>
+  <path d="M400 275c-17 0-31 14-31 31v153c0 38 11 77 31 110 20-33 31-72 31-110V306c0-17-14-31-31-31Z" fill="url(#nail)" stroke="#B8975A" stroke-width="3"/>
+  <path d="M381 323c3-13 11-21 19-21" stroke="white" stroke-opacity=".72" stroke-linecap="round" stroke-width="7"/>
+  <path d="M331 509c25 20 48 29 69 29s44-9 69-29" stroke="#B8975A" stroke-opacity=".55" stroke-linecap="round" stroke-width="2"/>
+  <text x="400" y="770" fill="#6C5540" font-family="Georgia,serif" font-size="34" text-anchor="middle" letter-spacing="5">ISAIAH NAIL BAR</text>
+  <text x="400" y="817" fill="#8E857F" font-family="Arial,sans-serif" font-size="16" text-anchor="middle" letter-spacing="4">SIGNATURE CARE • KIGALI</text>
+</svg>

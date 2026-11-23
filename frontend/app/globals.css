@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), var(--font-body), 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: var(--font-heading), 'Playfair Display', Georgia, serif;
+}
+
+@layer base {
+  :root {
+    /* Editorial Boutique Light Sanctuary Palette */
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-admin: var(--font-sans), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    
+    /* Warm, Luminous Luxury Tokens */
+    --bg-primary: #FAF7F2;
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F3EFE8;
+    --bg-card: rgba(255, 255, 255, 0.92);
+    
+    --text-primary: #221C1A;
+    --text-secondary: #5C5550;
+    --text-muted: #8E857F;
+    
+    --brand-blush: #C4847A;
+    --brand-blush-light: #F7EFE9;
+    --brand-gold: #B8975A;
+    --brand-gold-light: #F9F5EC;
+    --brand-gold-glow: rgba(184, 151, 90, 0.2);
+    --brand-espresso: #221C1A;
+    --brand-sage: #6B7C6E;
+
+    --border-subtle: rgba(34, 28, 26, 0.08);
+    --border-gold: rgba(184, 151, 90, 0.3);
+    
+    --shadow-soft: 0 4px 20px -2px rgba(34, 28, 26, 0.05);
+    --shadow-hover: 0 16px 36px -6px rgba(184, 151, 90, 0.15);
+  }
+
+  * {
+    border-color: var(--border-subtle);
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .font-serif {
+    font-family: var(--font-heading);
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Admin Console: Professional, crisp, modern SaaS typography */
+.admin-console,
+.admin-console button,
+.admin-console input,
+.admin-console select,
+.admin-console textarea {
+  font-family: var(--font-sans), var(--font-body), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.admin-console h1,
+.admin-console h2,
+.admin-console h3,
+.admin-console h4,
+.admin-console h5,
+.admin-console h6 {
+  font-family: var(--font-sans), var(--font-body), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+.admin-console .font-serif {
+  font-family: var(--font-sans), var(--font-body), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.admin-console .font-mono {
+  font-family: var(--font-sans), var(--font-body), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.015em;
+}
+
+/* Luminous Micro-Interactions & Textures */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(184, 151, 90, 0.18);
+  box-shadow: 0 10px 30px -5px rgba(34, 28, 26, 0.04);
+}
+
+.gold-border-glow {
+  border: 1px solid rgba(184, 151, 90, 0.25);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.gold-border-glow:hover {
+  border-color: rgba(184, 151, 90, 0.65);
+  box-shadow: 0 12px 32px -4px rgba(184, 151, 90, 0.18);
+  transform: translateY(-3px);
+}
+
+/* Fluid Keyframe Animations */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer-light {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 5s ease-in-out infinite;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(184, 151, 90, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(184, 151, 90, 0.6);
+}
+
+/* Admin sidebar scroll — thin, quiet */
+.admin-sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.admin-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 9999px;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Light dashboard horizontal custom scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.35) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.35);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6);
+}
+
