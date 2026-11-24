@@ -311,9 +311,15 @@ export default function BookingStep5Client({
     sessionStorage.setItem(storageKey, idempotencyKey);
 
     try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       const response = await fetch("/api/v1/booking/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "same-origin",
         body: JSON.stringify({
           idempotency_key: idempotencyKey,
           name: guestName.trim(),

@@ -11,6 +11,8 @@ use App\Models\PickupLocation;
 use App\Models\Provider;
 use App\Models\ProviderWorkingHour;
 use App\Models\Service;
+use App\Models\User;
+use App\Support\ApiToken;
 use App\Services\WeFlexfyService;
 use Carbon\Carbon;
 use Illuminate\Http\Client\ConnectionException;
@@ -164,6 +166,7 @@ class BookingCheckoutApiController extends Controller
         $serviceTotal = (float) $services->sum(fn (Service $service) => $this->servicePrice($service));
         $total = (int) round(($serviceTotal * ($data['location_type'] === 'home' ? 2 : 1)) + (float) ($pickupLocation?->fee ?? 0));
         $paymentAmount = $data['payment_option'] === 'deposit' ? (int) round($total * 0.4) : $total;
+        $user = ApiToken::resolve($request->bearerToken() ?: $request->cookie('isaiah_api_token'));
 
         [$payment, $created] = DB::transaction(function () use (
             $data,
@@ -174,7 +177,8 @@ class BookingCheckoutApiController extends Controller
             $duration,
             $total,
             $paymentAmount,
-            $pickupLocation
+            $pickupLocation,
+            $user
         ) {
             $providers = $this->lockProviderRows($providerIds);
             $existing = Payment::query()->where('checkout_key', $data['idempotency_key'])->lockForUpdate()->with('booking')->first();
@@ -193,7 +197,7 @@ class BookingCheckoutApiController extends Controller
                 throw ValidationException::withMessages(['time' => 'That appointment time has just been taken. Please select another time.']);
             }
 
-            $customer = $this->findOrCreateCustomer($data);
+            $customer = $this->findOrCreateCustomer($data, $user);
             $notes = trim((string) ($data['special_notes'] ?? ''));
             if (!empty($data['silent_appointment'])) {
                 $notes = trim($notes."\nSilent appointment requested.");
@@ -720,30 +724,58 @@ class BookingCheckoutApiController extends Controller
             ->get();
     }
 
-    private function findOrCreateCustomer(array $data): Customer
+    private function findOrCreateCustomer(array $data, ?User $user = null): Customer
     {
+        // 1. If user is authenticated and already has customer profile
+        if ($user && $user->customer_id) {
+            $customer = Customer::find($user->customer_id);
+            if ($customer) {
+                $customer->name = trim($data['name']);
+                $customer->phone = $data['phone'];
+                if (!empty($data['email'])) {
+                    $customer->email = $data['email'];
+                }
+                $customer->save();
+                return $customer;
+            }
+        }
+
+        // 2. Lookup by email
         $customer = !empty($data['email'])
             ? Customer::query()->where('email', $data['email'])->first()
             : null;
 
+        // 3. Lookup by phone
         if (!$customer) {
             $customer = Customer::query()->where('phone', $data['phone'])->first();
         }
 
         if (!$customer) {
-            return Customer::create([
+            $customer = Customer::create([
                 'name' => trim($data['name']),
                 'email' => $data['email'] ?? null,
                 'phone' => $data['phone'],
             ]);
+        } else {
+            $customer->name = trim($data['name']);
+            $customer->phone = $data['phone'];
+            if (!empty($data['email'])) {
+                $customer->email = $data['email'];
+            }
+            $customer->save();
         }
 
-        $customer->name = trim($data['name']);
-        $customer->phone = $data['phone'];
-        if (!empty($data['email'])) {
-            $customer->email = $data['email'];
+        // 4. Ensure user is linked to this customer profile
+        if ($user && !$user->customer_id) {
+            $user->customer_id = $customer->id;
+            $user->save();
+        } elseif (!$user && !empty($data['email'])) {
+            $matchingUser = User::where('email', $data['email'])->first();
+            if ($matchingUser && !$matchingUser->customer_id) {
+                $matchingUser->customer_id = $customer->id;
+                $matchingUser->save();
+            }
         }
-        $customer->save();
 
         return $customer;
     }

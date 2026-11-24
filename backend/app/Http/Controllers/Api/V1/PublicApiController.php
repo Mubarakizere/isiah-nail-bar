@@ -499,6 +499,18 @@ class PublicApiController extends Controller
             ? Customer::find($user->customer_id)
             : Customer::where('email', $user?->email)->first();
 
+        if (!$customer && $user) {
+            $digitsOnly = preg_replace('/[^0-9]/', '', $user->phone ?? '');
+            if (strlen($digitsOnly) >= 7) {
+                $customer = Customer::where('phone', 'like', "%{$digitsOnly}%")->first();
+            }
+        }
+
+        if ($customer && $user && !$user->customer_id) {
+            $user->customer_id = $customer->id;
+            $user->save();
+        }
+
         if (!$customer) {
             return response()->json([
                 'success' => false,
