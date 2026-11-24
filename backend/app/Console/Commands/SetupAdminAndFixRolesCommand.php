@@ -8,7 +8,9 @@ use App\Models\Provider;
 use App\Models\TeamMember;
 use App\Models\Service;
 use App\Models\Category;
+use App\Models\HeroSlide;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
 use Spatie\Permission\Models\Role;
 
 class SetupAdminAndFixRolesCommand extends Command
@@ -99,8 +101,85 @@ class SetupAdminAndFixRolesCommand extends Command
         }
         $this->info("  ✓ Total Services: $totalServices (all marked approved)");
 
-        // 4. Summary Table of Users
-        $this->line("\n[4/4] Current Users & Roles in Database:");
+        // 4. Normalize and verify image paths
+        $this->line("\n[4/5] Normalizing & Verifying Image Paths in Database...");
+        $normalizePath = function (?string $path): ?string {
+            if (!$path) return null;
+            $path = trim(str_replace('\\', '/', $path));
+            if (preg_match('#^https?://[^/]+/storage/(.+)#i', $path, $m)) {
+                return $m[1];
+            }
+            if (preg_match('#^/?storage/(.+)#i', $path, $m)) {
+                return $m[1];
+            }
+            return ltrim($path, '/');
+        };
+
+        $fixedServices = 0;
+        foreach (Service::whereNotNull('image')->get() as $s) {
+            $cleaned = $normalizePath($s->image);
+            if ($cleaned !== $s->image) {
+                $s->image = $cleaned;
+                $s->save();
+                $fixedServices++;
+            }
+        }
+        if ($fixedServices > 0) {
+            $this->info("  ✓ Normalized $fixedServices service image path(s)");
+        } else {
+            $this->info("  ✓ Service image paths are clean");
+        }
+
+        $fixedProviders = 0;
+        foreach (Provider::whereNotNull('photo')->get() as $p) {
+            $cleaned = $normalizePath($p->photo);
+            if ($cleaned !== $p->photo) {
+                $p->photo = $cleaned;
+                $p->save();
+                $fixedProviders++;
+            }
+        }
+        if ($fixedProviders > 0) {
+            $this->info("  ✓ Normalized $fixedProviders provider photo path(s)");
+        } else {
+            $this->info("  ✓ Provider photo paths are clean");
+        }
+
+        $fixedTeam = 0;
+        foreach (TeamMember::whereNotNull('photo')->get() as $t) {
+            $cleaned = $normalizePath($t->photo);
+            if ($cleaned !== $t->photo) {
+                $t->photo = $cleaned;
+                $t->save();
+                $fixedTeam++;
+            }
+        }
+        if ($fixedTeam > 0) {
+            $this->info("  ✓ Normalized $fixedTeam team member photo path(s)");
+        } else {
+            $this->info("  ✓ Team member photo paths are clean");
+        }
+
+        // Check storage symlink
+        $storageLink = public_path('storage');
+        if (is_link($storageLink) || is_dir($storageLink)) {
+            $this->info("  ✓ public/storage link exists");
+        } else {
+            $this->warn("  ! public/storage is missing. Run: php artisan storage:link");
+        }
+
+        // Check storage file count
+        $diskPath = storage_path('app/public');
+        if (is_dir($diskPath)) {
+            $serviceFiles = is_dir("$diskPath/services") ? count(File::files("$diskPath/services")) : 0;
+            $providerFiles = is_dir("$diskPath/providers") ? count(File::files("$diskPath/providers")) : 0;
+            $teamFiles = is_dir("$diskPath/team_members") ? count(File::files("$diskPath/team_members")) : 0;
+            $galleryFiles = is_dir("$diskPath/gallery") ? count(File::files("$diskPath/gallery")) : 0;
+            $this->info("  ✓ Found files in storage: services ($serviceFiles), providers ($providerFiles), team ($teamFiles), gallery ($galleryFiles)");
+        }
+
+        // 5. Summary Table of Users
+        $this->line("\n[5/5] Current Users & Roles in Database:");
         $users = User::with('roles')->get()->map(function ($u) {
             return [
                 'ID' => $u->id,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\TeamMember;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -122,9 +123,7 @@ class AdminTeamMemberApiController extends Controller
             'name' => $member->name,
             'role' => $member->role,
             'bio' => $member->bio,
-            'photo_url' => $member->photo
-                ? Storage::disk('public')->url($member->photo)
-                : null,
+            'photo_url' => StorageUrl::format($member->photo),
             'active' => (bool) $member->active,
             'display_order' => (int) $member->display_order,
             'created_at' => $member->created_at?->toISOString(),

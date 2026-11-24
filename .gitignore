@@ -7,6 +7,7 @@
 /backend/.phpunit.result.cache
 /backend/database/database.sqlite
 /backend/public/storage-old-link
+/backend/public/storage
 /backend/storage/*.key
 /backend/storage/framework/views/*
 /backend/storage/framework/cache/*

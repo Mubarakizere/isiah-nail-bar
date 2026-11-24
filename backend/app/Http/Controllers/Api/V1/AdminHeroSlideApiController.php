@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\HeroSlide;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -121,7 +122,7 @@ class AdminHeroSlideApiController extends Controller
             'subtitle' => $slide->subtitle,
             'description' => $slide->description,
             'image' => $slide->image,
-            'image_url' => '/storage/' . ltrim($slide->image, '/'),
+            'image_url' => StorageUrl::format($slide->image),
             'button_text' => $slide->button_text,
             'button_url' => $slide->button_url,
             'secondary_button_text' => $slide->secondary_button_text,

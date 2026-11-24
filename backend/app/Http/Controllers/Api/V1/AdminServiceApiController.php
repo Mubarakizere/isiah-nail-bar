@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Service;
 use App\Notifications\ServiceStatusNotification;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -203,13 +204,6 @@ class AdminServiceApiController extends Controller
 
     private function serializeService(Service $service): array
     {
-        $image = $service->image;
-        $imageUrl = $image
-            ? (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')
-                ? $image
-                : Storage::disk('public')->url($image))
-            : null;
-
         return [
             'id' => $service->id,
             'name' => $service->name,
@@ -220,7 +214,7 @@ class AdminServiceApiController extends Controller
             'category' => $service->category
                 ? ['id' => $service->category->id, 'name' => $service->category->name]
                 : null,
-            'image_url' => $imageUrl,
+            'image_url' => StorageUrl::format($service->image),
             'tags' => $service->tags->pluck('tag')->values(),
             'approved' => $service->approved,
             'status' => is_null($service->approved)

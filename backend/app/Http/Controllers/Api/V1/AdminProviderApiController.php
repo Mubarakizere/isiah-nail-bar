@@ -8,6 +8,7 @@ use App\Models\Provider;
 use App\Models\ProviderWorkingHour;
 use App\Models\Service;
 use App\Models\User;
+use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -379,9 +380,7 @@ class AdminProviderApiController extends Controller
             'email' => $provider->email,
             'phone' => $provider->phone,
             'bio' => $provider->bio,
-            'photo_url' => $provider->photo
-                ? Storage::disk('public')->url($provider->photo)
-                : null,
+            'photo_url' => StorageUrl::format($provider->photo),
             'active' => (bool) $provider->active,
             'services' => $provider->services->map(fn (Service $service) => [
                 'id' => $service->id,

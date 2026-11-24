@@ -17,6 +17,17 @@ export interface TeamSupportMember {
   photo: string;
 }
 
+export function resolvePhoto(photo?: string | null, fallback = "/images/logo.png"): string {
+  const source = photo?.trim().replace(/\\/g, "/");
+  if (!source) return fallback;
+  if (/^(https?:)?\/\//i.test(source) || /^data:image\//i.test(source)) {
+    return source;
+  }
+  if (source.startsWith("/storage/")) return source;
+  if (source.startsWith("/")) return source;
+  return `/storage/${source.replace(/^storage\//i, "").replace(/^\/+/, "")}`;
+}
+
 export const DEFAULT_SUPPORT_TEAM: TeamSupportMember[] = [
   {
     id: 1,
@@ -70,9 +81,7 @@ export async function getTeamData(): Promise<{
             ? p.specialties
             : (Array.isArray(p.services) ? p.services.map((service: any) => service.name) : []),
           bio: p.bio || "",
-          photo: p.photo
-            ? (p.photo.startsWith("http") ? p.photo : `/storage/${p.photo}`)
-            : "/images/logo.png",
+          photo: resolvePhoto(p.photo, "/images/logo.png"),
           status: p.active ? "active" : "away",
           ...(p.experience_years ? { experience_years: p.experience_years } : {}),
         }));
@@ -83,9 +92,7 @@ export async function getTeamData(): Promise<{
               name: m.name,
               role: m.role || "Salon Coordinator",
               bio: m.bio || DEFAULT_SUPPORT_TEAM[idx % DEFAULT_SUPPORT_TEAM.length].bio,
-              photo: m.photo
-                ? (m.photo.startsWith("http") ? m.photo : `/storage/${m.photo}`)
-                : DEFAULT_SUPPORT_TEAM[idx % DEFAULT_SUPPORT_TEAM.length].photo,
+              photo: resolvePhoto(m.photo, DEFAULT_SUPPORT_TEAM[idx % DEFAULT_SUPPORT_TEAM.length].photo),
             }))
           : DEFAULT_SUPPORT_TEAM;
 
