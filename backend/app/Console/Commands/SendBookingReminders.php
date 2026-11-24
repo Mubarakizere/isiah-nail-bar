@@ -40,7 +40,11 @@ class SendBookingReminders extends Command
                         continue;
                     }
 
-                    SendBookingReminder::dispatch((int) $booking->id)->onQueue('default');
+                    try {
+                        SendBookingReminder::dispatchSync((int) $booking->id);
+                    } catch (\Throwable $dispatchException) {
+                        SendBookingReminder::dispatch((int) $booking->id)->onQueue('default');
+                    }
                     $queued++;
                 }
             });
