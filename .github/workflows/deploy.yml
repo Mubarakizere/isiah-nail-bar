@@ -105,6 +105,10 @@ jobs:
             cp "$f" .next/standalone/.next/static/css/8aaf996120fc7f27.css 2>/dev/null || true
             cp "$f" .next/standalone/public/_next/static/css/8aaf996120fc7f27.css 2>/dev/null || true
           done
+          for f in .next/static/chunks/5239-*.js; do
+            cp "$f" .next/standalone/.next/static/chunks/5239-f59aa9c7e65a23ce.js 2>/dev/null || true
+            cp "$f" .next/standalone/public/_next/static/chunks/5239-f59aa9c7e65a23ce.js 2>/dev/null || true
+          done
 
       - name: 📤 Upload Frontend via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

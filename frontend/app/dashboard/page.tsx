@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import ClientDashboard from "@/components/dashboard/ClientDashboard";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Sanctuary Portal — My Appointments | Isaiah Nail Bar",
   description:
@@ -10,4 +13,3 @@ export const metadata: Metadata = {
 export default function DashboardPage() {
   return <ClientDashboard />;
 }
-
