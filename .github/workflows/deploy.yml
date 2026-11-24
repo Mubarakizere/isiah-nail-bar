@@ -95,6 +95,8 @@ jobs:
         run: |
           mkdir -p .next/standalone/.next/static
           mkdir -p .next/standalone/public
+          mkdir -p .next/standalone/tmp
+          touch .next/standalone/tmp/restart.txt
           cp -r .next/static/* .next/standalone/.next/static/
           cp -r public/* .next/standalone/public/
 
