@@ -1,8 +1,28 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { TeamSupportMember } from "@/lib/team-data";
+
+function StaffPhoto({ photo, name }: { photo: string; name: string }) {
+  const [src, setSrc] = useState(photo);
+  return (
+    <Image
+      src={src}
+      alt={name}
+      fill
+      unoptimized
+      sizes="(max-width: 640px) 100vw, 400px"
+      className="object-cover object-top"
+      onError={() => {
+        if (src !== "/images/logo.png") {
+          setSrc("/images/logo.png");
+        }
+      }}
+    />
+  );
+}
 
 interface SupportStaffSectionProps {
   members: TeamSupportMember[];
@@ -38,14 +58,7 @@ export default function SupportStaffSection({ members }: SupportStaffSectionProp
             >
               <div>
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-5 bg-[#FAF7F2] border border-black/5">
-                  <Image
-                    src={member.photo}
-                    alt={member.name}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 640px) 100vw, 400px"
-                    className="object-cover object-top"
-                  />
+                  <StaffPhoto photo={member.photo} name={member.name} />
                 </div>
 
                 <div className="text-center space-y-1.5">
