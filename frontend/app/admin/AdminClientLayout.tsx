@@ -20,28 +20,6 @@ export default function AdminClientLayout({
 
   useEffect(() => {
     setMounted(true);
-
-    // Intercept window.fetch to automatically include Authorization token for same-origin API requests if not present
-    if (typeof window !== "undefined") {
-      const originalFetch = window.fetch;
-      window.fetch = async (...args) => {
-        let [resource, config] = args;
-        const url = typeof resource === "string" ? resource : resource instanceof Request ? resource.url : "";
-        if (url.includes("/api/v1/")) {
-          const token = localStorage.getItem("token");
-          if (token) {
-            config = config || {};
-            const headers = new Headers(config.headers || (resource instanceof Request ? resource.headers : {}));
-            if (!headers.has("Authorization")) {
-              headers.set("Authorization", `Bearer ${token}`);
-            }
-            config.headers = headers;
-            config.credentials = config.credentials || "same-origin";
-          }
-        }
-        return originalFetch(resource, config);
-      };
-    }
   }, []);
 
   useEffect(() => {
