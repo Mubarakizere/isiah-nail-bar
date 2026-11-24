@@ -95,11 +95,16 @@ jobs:
       - name: 🗂️ Merge Static & Public Assets for Standalone
         run: |
           mkdir -p .next/standalone/.next/static
-          mkdir -p .next/standalone/public
+          mkdir -p .next/standalone/public/_next/static
           mkdir -p .next/standalone/tmp
-          touch .next/standalone/tmp/restart.txt
+          date +%s > .next/standalone/tmp/restart.txt
           cp -r .next/static/* .next/standalone/.next/static/
+          cp -r .next/static/* .next/standalone/public/_next/static/
           cp -r public/* .next/standalone/public/
+          for f in .next/static/css/*.css; do
+            cp "$f" .next/standalone/.next/static/css/8aaf996120fc7f27.css 2>/dev/null || true
+            cp "$f" .next/standalone/public/_next/static/css/8aaf996120fc7f27.css 2>/dev/null || true
+          done
 
       - name: 📤 Upload Frontend via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
