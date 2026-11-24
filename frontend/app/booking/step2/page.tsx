@@ -17,8 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default async function BookingStep2Page() {
-  const { services } = await getServicesData();
-  const { providers } = await getTeamData();
+  const serviceData = await getServicesData();
+  const teamData = await getTeamData();
+  const services = serviceData?.services || [];
+  const providers = teamData?.providers || [];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#221C1A]">

@@ -22,6 +22,99 @@ import {
 import { TeamProvider } from "@/lib/team-data";
 import { ServiceItem } from "@/lib/services-data";
 
+function getInitials(name?: string | null): string {
+  if (!name || !name.trim()) return "IS";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function ProviderAvatar({
+  photo,
+  name,
+  className = "w-16 h-16 rounded-2xl",
+  textClass = "text-base",
+}: {
+  photo?: string | null;
+  name: string;
+  className?: string;
+  textClass?: string;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const initials = getInitials(name);
+  const cleanPhoto = photo?.trim();
+  const isInvalid = !cleanPhoto || cleanPhoto === "" || cleanPhoto.includes("logo.png") || hasError;
+
+  if (isInvalid) {
+    return (
+      <div
+        className={`${className} overflow-hidden bg-gradient-to-br from-[#FAF7F2] via-[#F2ECE1] to-[#E5DFD5] border border-[#B8975A]/30 flex flex-col items-center justify-center text-[#B8975A] shadow-xs select-none shrink-0`}
+        title={name}
+      >
+        <span className={`font-serif font-bold tracking-wider ${textClass}`}>
+          {initials}
+        </span>
+        <span className="text-[7px] font-sans font-semibold uppercase tracking-[0.16em] text-[#8E857F] -mt-0.5">
+          Artisan
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`relative ${className} overflow-hidden border-2 border-white shadow-xs bg-[#FAF7F2] shrink-0`}>
+      <img
+        src={cleanPhoto}
+        alt={name}
+        className="w-full h-full object-cover object-top"
+        onError={() => setHasError(true)}
+      />
+    </div>
+  );
+}
+
+function BioModalPhoto({
+  photo,
+  name,
+  role,
+}: {
+  photo?: string | null;
+  name: string;
+  role: string;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const cleanPhoto = photo?.trim();
+  const isInvalid = !cleanPhoto || cleanPhoto === "" || cleanPhoto.includes("logo.png") || hasError;
+
+  if (isInvalid) {
+    return (
+      <div className="w-full h-full min-h-[220px] bg-gradient-to-br from-[#FAF7F2] via-[#F5EFEB] to-[#E5DFD5] flex flex-col items-center justify-center p-6 text-center select-none">
+        <div className="w-20 h-20 rounded-full bg-white shadow-md border border-[#B8975A]/30 flex items-center justify-center text-[#B8975A] mb-3">
+          <span className="font-serif font-bold text-2xl tracking-wider">
+            {getInitials(name)}
+          </span>
+        </div>
+        <span className="font-serif text-lg text-[#221C1A] font-medium">{name}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#B8975A] mt-0.5">
+          {role}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <img
+        src={cleanPhoto}
+        alt={name}
+        className="w-full h-full object-cover object-center"
+        onError={() => setHasError(true)}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:hidden" />
+    </>
+  );
+}
+
 interface BookingStep2ClientProps {
   providers: TeamProvider[];
   allServices: ServiceItem[];
@@ -137,14 +230,18 @@ export default function BookingStep2Client({
   // Check if provider specialties match any selected service
   const isSpecialtyMatch = (provider: TeamProvider) => {
     if (selectedServices.length === 0) return false;
+    if (!provider?.specialties || !Array.isArray(provider.specialties)) return false;
     const serviceNames = selectedServices.map((s) => s.name.toLowerCase()).join(" ");
     return provider.specialties.some((spec) => {
+      if (!spec) return false;
       const specLower = spec.toLowerCase();
-      return serviceNames.includes(specLower) ||
+      return (
+        serviceNames.includes(specLower) ||
         (specLower.includes("russian") && serviceNames.includes("russian")) ||
         (specLower.includes("pedicure") && serviceNames.includes("pedicure")) ||
         (specLower.includes("gel") && serviceNames.includes("gel")) ||
-        (specLower.includes("art") && serviceNames.includes("art"));
+        (specLower.includes("art") && serviceNames.includes("art"))
+      );
     });
   };
 
@@ -267,15 +364,11 @@ export default function BookingStep2Client({
                       {/* Top Header: Avatar + Active Indicator + Radio Check */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="relative">
-                          <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white shadow-xs">
-                            <Image
-                              src={artist.photo}
-                              alt={artist.name}
-                              fill
-                              sizes="64px"
-                              className="object-cover object-center"
-                            />
-                          </div>
+                          <ProviderAvatar
+                            photo={artist.photo}
+                            name={artist.name}
+                            className="w-16 h-16 rounded-2xl"
+                          />
                           {/* Live Active Status Indicator (Pulsing Green Dot) */}
                           <span className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -381,15 +474,12 @@ export default function BookingStep2Client({
                 </span>
                 {selectedProvider ? (
                   <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-white/10 shrink-0">
-                      <Image
-                        src={selectedProvider.photo}
-                        alt={selectedProvider.name}
-                        fill
-                        sizes="40px"
-                        className="object-cover"
-                      />
-                    </div>
+                    <ProviderAvatar
+                      photo={selectedProvider.photo}
+                      name={selectedProvider.name}
+                      className="w-10 h-10 rounded-xl"
+                      textClass="text-xs"
+                    />
                     <div className="min-w-0 flex-1">
                       <h4 className="text-xs font-semibold text-white truncate">
                         {selectedProvider.name}
@@ -553,15 +643,12 @@ export default function BookingStep2Client({
               </button>
 
               <div className="grid grid-cols-1 sm:grid-cols-5">
-                <div className="sm:col-span-2 relative h-64 sm:h-auto min-h-[200px] bg-[#E5DFD5]">
-                  <Image
-                    src={activeBioProvider.photo}
-                    alt={activeBioProvider.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 240px"
-                    className="object-cover object-center"
+                <div className="sm:col-span-2 relative h-64 sm:h-auto min-h-[220px] bg-[#FAF7F2] flex items-center justify-center overflow-hidden">
+                  <BioModalPhoto
+                    photo={activeBioProvider.photo}
+                    name={activeBioProvider.name}
+                    role={activeBioProvider.role}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:hidden" />
                 </div>
 
                 <div className="sm:col-span-3 p-6 sm:p-8 flex flex-col justify-between">

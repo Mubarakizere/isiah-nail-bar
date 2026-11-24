@@ -1,8 +1,47 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { TeamSupportMember } from "@/lib/team-data";
+
+function getInitials(name?: string | null): string {
+  if (!name || !name.trim()) return "IS";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function StaffCardPhoto({ photo, name, role }: { photo?: string | null; name: string; role: string }) {
+  const [hasError, setHasError] = useState(false);
+  const cleanPhoto = photo?.trim();
+  const isInvalid = !cleanPhoto || cleanPhoto === "" || cleanPhoto.includes("logo.png") || hasError;
+
+  if (isInvalid) {
+    return (
+      <div className="w-full h-full min-h-[220px] bg-gradient-to-br from-[#FAF7F2] via-[#F5EFEB] to-[#E5DFD5] flex flex-col items-center justify-center p-6 text-center select-none">
+        <div className="w-20 h-20 rounded-full bg-white shadow-md border border-[#B8975A]/30 flex items-center justify-center text-[#B8975A] mb-3">
+          <span className="font-serif font-bold text-2xl tracking-wider">
+            {getInitials(name)}
+          </span>
+        </div>
+        <h4 className="font-serif text-lg text-[#221C1A] font-medium">{name}</h4>
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#B8975A] mt-0.5">
+          {role}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={cleanPhoto}
+      alt={name}
+      className="w-full h-full object-cover object-top"
+      onError={() => setHasError(true)}
+    />
+  );
+}
 
 interface SupportStaffSectionProps {
   members: TeamSupportMember[];
@@ -38,17 +77,7 @@ export default function SupportStaffSection({ members }: SupportStaffSectionProp
             >
               <div>
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-5 bg-[#FAF7F2] border border-black/5">
-                  <Image
-                    src={member.photo || "/images/logo.png"}
-                    alt={member.name}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 640px) 100vw, 400px"
-                    className="object-cover object-top"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/images/logo.png";
-                    }}
-                  />
+                  <StaffCardPhoto photo={member.photo} name={member.name} role={member.role} />
                 </div>
 
                 <div className="text-center space-y-1.5">

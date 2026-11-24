@@ -1,10 +1,49 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, CalendarCheck } from "@phosphor-icons/react";
 import { TeamProvider } from "@/lib/team-data";
+
+function getInitials(name?: string | null): string {
+  if (!name || !name.trim()) return "IS";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function ArtistCardPhoto({ photo, name, role }: { photo?: string | null; name: string; role: string }) {
+  const [hasError, setHasError] = useState(false);
+  const cleanPhoto = photo?.trim();
+  const isInvalid = !cleanPhoto || cleanPhoto === "" || cleanPhoto.includes("logo.png") || hasError;
+
+  if (isInvalid) {
+    return (
+      <div className="w-full h-full bg-gradient-to-br from-[#FAF7F2] via-[#F5EFEB] to-[#E5DFD5] flex flex-col items-center justify-center p-6 text-center select-none">
+        <div className="w-24 h-24 rounded-full bg-white shadow-lg border border-[#B8975A]/30 flex items-center justify-center text-[#B8975A] mb-4">
+          <span className="font-serif font-bold text-3xl tracking-wider">
+            {getInitials(name)}
+          </span>
+        </div>
+        <h4 className="font-serif text-xl text-[#221C1A] font-medium">{name}</h4>
+        <span className="text-[11px] font-semibold uppercase tracking-widest text-[#B8975A] mt-1">
+          {role}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={cleanPhoto}
+      alt={name}
+      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+      onError={() => setHasError(true)}
+    />
+  );
+}
 
 interface ProvidersGridProps {
   providers: TeamProvider[];
@@ -41,17 +80,7 @@ export default function ProvidersGrid({ providers }: ProvidersGridProps) {
               <div>
                 {/* Photo Frame */}
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-5 bg-white border border-black/5">
-                  <Image
-                    src={artist.photo || "/images/logo.png"}
-                    alt={artist.name}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/images/logo.png";
-                    }}
-                  />
+                  <ArtistCardPhoto photo={artist.photo} name={artist.name} role={artist.role} />
 
                   {/* Availability Badge */}
                   <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md shadow-xs border border-black/5 text-[11px] font-medium text-[#221C1A]">
