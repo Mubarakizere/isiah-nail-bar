@@ -20,17 +20,19 @@ class ApiTokenAuth
 
         if ($role) {
             $hasRolesMethod = method_exists($user, 'hasRole');
-            $isAdmin = $hasRolesMethod && ($user->hasRole('admin') || $user->id === 1);
+            $isAdmin = ($hasRolesMethod && $user->hasRole('admin')) || ($user->role ?? null) === 'admin' || (int) $user->id === 1;
 
             if (!$isAdmin) {
                 if ($role === 'customer') {
                     // All non-provider registered users have customer privileges
-                    $isProvider = $hasRolesMethod && $user->hasRole('provider');
+                    $isProvider = ($hasRolesMethod && $user->hasRole('provider')) || ($user->role ?? null) === 'provider';
                     if ($isProvider) {
                         return response()->json(['success' => false, 'message' => 'You are not authorized to access this resource.'], 403);
                     }
                 } elseif (!$hasRolesMethod || !$user->hasRole($role)) {
-                    return response()->json(['success' => false, 'message' => 'You are not authorized to access this resource.'], 403);
+                    if (($user->role ?? null) !== $role) {
+                        return response()->json(['success' => false, 'message' => 'You are not authorized to access this resource.'], 403);
+                    }
                 }
             }
         }

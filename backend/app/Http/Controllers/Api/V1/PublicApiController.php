@@ -277,6 +277,15 @@ class PublicApiController extends Controller
 
         $customer = Customer::where('email', $user->email)->first();
 
+        $isAdmin = ($user->role ?? null) === 'admin'
+            || (method_exists($user, 'hasRole') && $user->hasRole('admin'))
+            || (int) $user->id === 1;
+
+        $isProvider = ($user->role ?? null) === 'provider'
+            || (method_exists($user, 'hasRole') && $user->hasRole('provider'));
+
+        $role = $isAdmin ? 'admin' : ($isProvider ? 'provider' : (method_exists($user, 'roles') && $user->roles()->exists() ? $user->roles->first()->name : 'customer'));
+
         return response()->json([
             'success' => true,
             'user' => [
@@ -284,7 +293,7 @@ class PublicApiController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $customer?->phone ?? '',
-                'role' => $user->roles()->exists() ? $user->roles->first()->name : 'customer',
+                'role' => $role,
                 'customer_id' => $customer?->id ?? null,
             ],
         ]);
@@ -369,11 +378,35 @@ class PublicApiController extends Controller
             $user->save();
         }
 
-        // 5. Ensure roles exist
-        if (method_exists($user, 'roles') && !$user->roles()->exists()) {
-            try {
-                $user->assignRole('customer');
-            } catch (\Throwable $e) {}
+        // 5. Determine and assign appropriate role
+        $isAdmin = ($user->role ?? null) === 'admin'
+            || (method_exists($user, 'hasRole') && $user->hasRole('admin'))
+            || (int) $user->id === 1;
+
+        $isProvider = ($user->role ?? null) === 'provider'
+            || (method_exists($user, 'hasRole') && $user->hasRole('provider'));
+
+        $effectiveRole = 'customer';
+        if ($isAdmin) {
+            $effectiveRole = 'admin';
+            if (method_exists($user, 'assignRole') && !$user->hasRole('admin')) {
+                try {
+                    $user->assignRole('admin');
+                } catch (\Throwable $e) {}
+            }
+        } elseif ($isProvider) {
+            $effectiveRole = 'provider';
+            if (method_exists($user, 'assignRole') && !$user->hasRole('provider')) {
+                try {
+                    $user->assignRole('provider');
+                } catch (\Throwable $e) {}
+            }
+        } else {
+            if (method_exists($user, 'roles') && !$user->roles()->exists()) {
+                try {
+                    $user->assignRole('customer');
+                } catch (\Throwable $e) {}
+            }
         }
 
         $token = ApiToken::issue($user);
@@ -387,10 +420,10 @@ class PublicApiController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $customer?->phone ?? '',
-                'role' => method_exists($user, 'roles') && $user->roles()->exists() ? $user->roles->first()->name : 'customer',
+                'role' => $effectiveRole,
                 'customer_id' => $customer?->id ?? null,
             ],
-        ])->cookie('isaiah_api_token', $token, 8 * 60, '/', null, $request->isSecure(), true, false, 'lax');
+        ])->cookie('isaiah_api_token', $token, 8 * 60, '/', null, $request->isSecure() || app()->environment('production'), true, false, 'lax');
     }
 
     public function logout(Request $request)
