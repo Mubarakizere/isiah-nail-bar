@@ -43,6 +43,7 @@ export default function ProvidersGrid({ providers }: ProvidersGridProps) {
                     src={artist.photo}
                     alt={artist.name}
                     fill
+                    unoptimized
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover object-top group-hover:scale-104 transition-transform duration-500"
                   />

@@ -42,6 +42,7 @@ export default function SupportStaffSection({ members }: SupportStaffSectionProp
                     src={member.photo}
                     alt={member.name}
                     fill
+                    unoptimized
                     sizes="(max-width: 640px) 100vw, 400px"
                     className="object-cover object-top"
                   />
