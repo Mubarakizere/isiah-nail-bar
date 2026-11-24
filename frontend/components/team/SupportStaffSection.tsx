@@ -1,28 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { TeamSupportMember } from "@/lib/team-data";
-
-function StaffPhoto({ photo, name }: { photo: string; name: string }) {
-  const [src, setSrc] = useState(photo);
-  return (
-    <Image
-      src={src}
-      alt={name}
-      fill
-      unoptimized
-      sizes="(max-width: 640px) 100vw, 400px"
-      className="object-cover object-top"
-      onError={() => {
-        if (src !== "/images/logo.png") {
-          setSrc("/images/logo.png");
-        }
-      }}
-    />
-  );
-}
 
 interface SupportStaffSectionProps {
   members: TeamSupportMember[];
@@ -58,7 +38,17 @@ export default function SupportStaffSection({ members }: SupportStaffSectionProp
             >
               <div>
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-5 bg-[#FAF7F2] border border-black/5">
-                  <StaffPhoto photo={member.photo} name={member.name} />
+                  <Image
+                    src={member.photo || "/images/logo.png"}
+                    alt={member.name}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 640px) 100vw, 400px"
+                    className="object-cover object-top"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/images/logo.png";
+                    }}
+                  />
                 </div>
 
                 <div className="text-center space-y-1.5">
@@ -68,9 +58,11 @@ export default function SupportStaffSection({ members }: SupportStaffSectionProp
                   <span className="text-[11px] font-semibold uppercase tracking-wider text-[#C4847A] block">
                     {member.role}
                   </span>
-                  <p className="text-xs text-[#5C5550] font-light leading-relaxed pt-2">
-                    {member.bio}
-                  </p>
+                  {member.bio && (
+                    <p className="text-xs text-[#5C5550] font-light leading-relaxed pt-2">
+                      {member.bio}
+                    </p>
+                  )}
                 </div>
               </div>
             </motion.div>

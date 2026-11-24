@@ -29,7 +29,9 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamPage() {
-  const { providers, support } = await getTeamData();
+  const teamData = await getTeamData();
+  const providers = teamData?.providers || [];
+  const support = teamData?.support || [];
 
   // ItemList Schema for Team Providers
   const teamSchema = {
@@ -38,27 +40,34 @@ export default async function TeamPage() {
     name: "Isaiah Nail Bar Master Artists",
     description: "Certified senior nail technicians and specialists at Isaiah Nail Bar Kigali",
     numberOfItems: providers.length,
-    itemListElement: providers.map((provider, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "Person",
-        name: provider.name,
-        jobTitle: provider.role,
-        description: provider.bio,
-        image: `https://isaiahnailbar.com${provider.photo}`,
-        worksFor: {
-          "@type": "NailSalon",
-          name: "Isaiah Nail Bar",
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: "KG 4 Roundabout, Gisementi",
-            addressLocality: "Kigali",
-            addressCountry: "RW",
+    itemListElement: providers.map((provider, index) => {
+      const rawPhoto = provider.photo || "/images/logo.png";
+      const photoUrl = rawPhoto.startsWith("http")
+        ? rawPhoto
+        : `https://isaiahnailbar.com${rawPhoto.startsWith("/") ? "" : "/"}${rawPhoto}`;
+
+      return {
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "Person",
+          name: provider.name,
+          jobTitle: provider.role,
+          description: provider.bio || "",
+          image: photoUrl,
+          worksFor: {
+            "@type": "NailSalon",
+            name: "Isaiah Nail Bar",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: "KG 4 Roundabout, Gisementi",
+              addressLocality: "Kigali",
+              addressCountry: "RW",
+            },
           },
         },
-      },
-    })),
+      };
+    }),
   };
 
   // Breadcrumb Schema

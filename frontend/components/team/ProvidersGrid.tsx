@@ -1,36 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, CalendarCheck, ShieldCheck, Certificate } from "@phosphor-icons/react";
+import { ArrowRight, CalendarCheck } from "@phosphor-icons/react";
 import { TeamProvider } from "@/lib/team-data";
-
-function ArtistPhoto({ photo, name }: { photo: string; name: string }) {
-  const [src, setSrc] = useState(photo);
-  return (
-    <Image
-      src={src}
-      alt={name}
-      fill
-      unoptimized
-      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-      className="object-cover object-top group-hover:scale-104 transition-transform duration-500"
-      onError={() => {
-        if (src !== "/images/logo.png") {
-          setSrc("/images/logo.png");
-        }
-      }}
-    />
-  );
-}
 
 interface ProvidersGridProps {
   providers: TeamProvider[];
 }
 
 export default function ProvidersGrid({ providers }: ProvidersGridProps) {
+  if (!providers || providers.length === 0) return null;
+
   return (
     <section className="py-20 lg:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -59,7 +41,17 @@ export default function ProvidersGrid({ providers }: ProvidersGridProps) {
               <div>
                 {/* Photo Frame */}
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-5 bg-white border border-black/5">
-                  <ArtistPhoto photo={artist.photo} name={artist.name} />
+                  <Image
+                    src={artist.photo || "/images/logo.png"}
+                    alt={artist.name}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/images/logo.png";
+                    }}
+                  />
 
                   {/* Availability Badge */}
                   <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md shadow-xs border border-black/5 text-[11px] font-medium text-[#221C1A]">

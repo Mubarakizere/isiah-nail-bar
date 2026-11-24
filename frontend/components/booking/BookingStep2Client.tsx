@@ -311,25 +311,6 @@ export default function BookingStep2Client({
                       <p className="text-xs text-[#5C5550] font-light leading-relaxed line-clamp-2 mb-3">
                         {artist.bio}
                       </p>
-
-                      {/* Specialties Pill Badges (Max 3 for clean card display) */}
-                      {artist.specialties && artist.specialties.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                          {artist.specialties.slice(0, 3).map((spec) => (
-                            <span
-                              key={spec}
-                              className="px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[10px] text-[#5C5550] border border-[#E5DFD5]"
-                            >
-                              {spec}
-                            </span>
-                          ))}
-                          {artist.specialties.length > 3 && (
-                            <span className="px-1.5 py-0.5 text-[10px] text-[#8E857F]">
-                              +{artist.specialties.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      )}
                     </div>
 
                     {/* Card Footer: Experience & Bio Button */}
@@ -601,21 +582,23 @@ export default function BookingStep2Client({
                       {activeBioProvider.bio}
                     </p>
 
-                    <div className="mb-6">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#8E857F] block mb-2">
-                        Specialized Crafts
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {activeBioProvider.specialties.map((spec) => (
-                          <span
-                            key={spec}
-                            className="px-2.5 py-1 rounded-md bg-[#FAF7F2] text-[11px] text-[#221C1A] border border-[#E5DFD5]"
-                          >
-                            {spec}
-                          </span>
-                        ))}
+                    {activeBioProvider.specialties && activeBioProvider.specialties.length > 0 && (
+                      <div className="mb-6">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#8E857F] block mb-2">
+                          Specialized Crafts
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {activeBioProvider.specialties.slice(0, 6).map((spec) => (
+                            <span
+                              key={spec}
+                              className="px-2.5 py-1 rounded-md bg-[#FAF7F2] text-[11px] text-[#221C1A] border border-[#E5DFD5]"
+                            >
+                              {spec}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   <button

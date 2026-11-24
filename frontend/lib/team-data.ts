@@ -34,14 +34,14 @@ export const DEFAULT_SUPPORT_TEAM: TeamSupportMember[] = [
     name: "Sandrine B.",
     role: "Sanctuary Manager",
     bio: "Oversees daily autoclave sterilization protocols, booking flow, and uncompromised guest hospitality.",
-    photo: "/providers/oNIDo2QtAR5giQWiOG9iqgtlq0qBjYLemAiGOaq1.jpg",
+    photo: "/storage/providers/oNIDo2QtAR5giQWiOG9iqgtlq0qBjYLemAiGOaq1.jpg",
   },
   {
     id: 2,
     name: "Kevine T.",
     role: "Concierge & Guest Relations",
     bio: "Ensures seamless appointment scheduling, bespoke refreshments, and personalized client consultations.",
-    photo: "/providers/W6iGbjJkD9WHbX0gBL20yX0kGAUJaUsspUGBO6ch.jpg",
+    photo: "/storage/providers/W6iGbjJkD9WHbX0gBL20yX0kGAUJaUsspUGBO6ch.jpg",
   },
 ];
 
@@ -88,12 +88,12 @@ export async function getTeamData(): Promise<{
 
         const mappedSupport = Array.isArray(apiData?.team_members) && apiData.team_members.length > 0
           ? apiData.team_members.map((m: any, idx: number) => ({
-              id: m.id,
-              name: m.name,
-              role: m.role || "Salon Coordinator",
-              bio: m.bio || DEFAULT_SUPPORT_TEAM[idx % DEFAULT_SUPPORT_TEAM.length].bio,
-              photo: resolvePhoto(m.photo, DEFAULT_SUPPORT_TEAM[idx % DEFAULT_SUPPORT_TEAM.length].photo),
-            }))
+            id: m.id,
+            name: m.name,
+            role: m.role || "Salon Coordinator",
+            bio: m.bio || DEFAULT_SUPPORT_TEAM[idx % DEFAULT_SUPPORT_TEAM.length].bio,
+            photo: resolvePhoto(m.photo, DEFAULT_SUPPORT_TEAM[idx % DEFAULT_SUPPORT_TEAM.length].photo),
+          }))
           : DEFAULT_SUPPORT_TEAM;
 
         const result = {
