@@ -86,23 +86,11 @@ export default function ProvidersGrid({ providers }: ProvidersGridProps) {
                     </span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[#5C5550] font-light leading-relaxed pt-1">
-                    {artist.bio}
-                  </p>
-
-                  {/* Specialties Pills */}
-                  {artist.specialties && (
-                    <div className="flex flex-wrap gap-1.5 pt-3">
-                      {artist.specialties.map((spec, i) => (
-                        <span
-                          key={i}
-                          className="px-2.5 py-1 rounded-lg bg-white border border-[#E5DFD5] text-[10px] text-[#5C5550]"
-                        >
-                          {spec}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {artist.bio ? (
+                    <p className="text-xs sm:text-sm text-[#5C5550] font-light leading-relaxed pt-1">
+                      {artist.bio}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 

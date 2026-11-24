@@ -312,17 +312,24 @@ export default function BookingStep2Client({
                         {artist.bio}
                       </p>
 
-                      {/* Specialties Pill Badges */}
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {artist.specialties.map((spec) => (
-                          <span
-                            key={spec}
-                            className="px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[10px] text-[#5C5550] border border-[#E5DFD5]"
-                          >
-                            {spec}
-                          </span>
-                        ))}
-                      </div>
+                      {/* Specialties Pill Badges (Max 3 for clean card display) */}
+                      {artist.specialties && artist.specialties.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {artist.specialties.slice(0, 3).map((spec) => (
+                            <span
+                              key={spec}
+                              className="px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[10px] text-[#5C5550] border border-[#E5DFD5]"
+                            >
+                              {spec}
+                            </span>
+                          ))}
+                          {artist.specialties.length > 3 && (
+                            <span className="px-1.5 py-0.5 text-[10px] text-[#8E857F]">
+                              +{artist.specialties.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Card Footer: Experience & Bio Button */}
