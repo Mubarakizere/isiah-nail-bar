@@ -18,8 +18,21 @@ class ApiTokenAuth
             return response()->json(['success' => false, 'message' => 'Authentication is required.'], 401);
         }
 
-        if ($role && (!$user->hasRole($role))) {
-            return response()->json(['success' => false, 'message' => 'You are not authorized to access this resource.'], 403);
+        if ($role) {
+            $hasRolesMethod = method_exists($user, 'hasRole');
+            $isAdmin = $hasRolesMethod && ($user->hasRole('admin') || $user->id === 1);
+
+            if (!$isAdmin) {
+                if ($role === 'customer') {
+                    // All non-provider registered users have customer privileges
+                    $isProvider = $hasRolesMethod && $user->hasRole('provider');
+                    if ($isProvider) {
+                        return response()->json(['success' => false, 'message' => 'You are not authorized to access this resource.'], 403);
+                    }
+                } elseif (!$hasRolesMethod || !$user->hasRole($role)) {
+                    return response()->json(['success' => false, 'message' => 'You are not authorized to access this resource.'], 403);
+                }
+            }
         }
 
         $request->setUserResolver(fn () => $user);

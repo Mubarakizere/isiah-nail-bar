@@ -34,19 +34,10 @@ export default function LoginClient() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [showForgotModal, setShowForgotModal] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (searchParams.get("forgot") === "1") setShowForgotModal(true);
   }, [searchParams]);
-
-  if (!mounted) {
-    return null;
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,13 +180,13 @@ export default function LoginClient() {
 
           {/* Borderless clean form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Address */}
+            {/* Email / Phone Address */}
             <div>
               <label
                 htmlFor="email"
                 className="block text-[11px] font-semibold uppercase tracking-wider text-[#221C1A] mb-1.5"
               >
-                Email Address
+                Email Address or Phone Number
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#8E857F]">
@@ -203,12 +194,12 @@ export default function LoginClient() {
                 </div>
                 <input
                   id="email"
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="marieclaire@example.com"
-                  autoComplete="email"
+                  placeholder="marieclaire@example.com or +250..."
+                  autoComplete="username"
                   className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white border border-[#E2DBD1] focus:border-[#221C1A] rounded-xl text-xs sm:text-sm text-[#221C1A] placeholder-[#9E958E] outline-none transition-colors"
                 />
               </div>

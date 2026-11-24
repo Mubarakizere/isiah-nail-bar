@@ -2,6 +2,9 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import LoginClient from "@/components/auth/LoginClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Sign In | Isaiah Nail Bar Kigali",
   description: "Sign in to access your appointments and bespoke nail sanctuary rituals.",

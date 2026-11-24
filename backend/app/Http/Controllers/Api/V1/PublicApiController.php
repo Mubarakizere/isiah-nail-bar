@@ -293,23 +293,88 @@ class PublicApiController extends Controller
     /**
      * User Login API
      */
+    /**
+     * User Login API - Supports Email or Phone, Modern Bcrypt & Legacy Hashes
+     */
     public function login(Request $request)
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        $input = trim((string) ($request->input('email') ?? $request->input('login') ?? ''));
+        $password = (string) $request->input('password');
 
-        $user = User::where('email', $validated['email'])->first();
+        if (empty($input) || empty($password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide both your email or phone number and password.',
+            ], 422);
+        }
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        // 1. Try finding user directly by email
+        $user = User::where('email', $input)->first();
+
+        // 2. If not found, check if input is a phone number linked to a customer
+        if (!$user) {
+            $digitsOnly = preg_replace('/[^0-9]/', '', $input);
+            $customer = Customer::where('phone', $input)
+                ->when(strlen($digitsOnly) >= 7, function ($q) use ($digitsOnly) {
+                    $q->orWhere('phone', 'like', "%{$digitsOnly}%");
+                })
+                ->first();
+
+            if ($customer) {
+                $user = User::where('customer_id', $customer->id)
+                    ->orWhere('email', $customer->email)
+                    ->first();
+            }
+        }
+
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'The provided credentials do not match our records.',
             ], 422);
         }
 
-        $customer = Customer::where('email', $user->email)->first();
+        // 3. Verify password (support modern bcrypt/argon2 + legacy hashes with auto-upgrade)
+        $passwordValid = false;
+        if (Hash::check($password, $user->password)) {
+            $passwordValid = true;
+        } elseif (md5($password) === $user->password) {
+            $passwordValid = true;
+            $user->password = Hash::make($password);
+            $user->save();
+        } elseif (sha1($password) === $user->password) {
+            $passwordValid = true;
+            $user->password = Hash::make($password);
+            $user->save();
+        } elseif ($password === $user->password) {
+            $passwordValid = true;
+            $user->password = Hash::make($password);
+            $user->save();
+        }
+
+        if (!$passwordValid) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The provided credentials do not match our records.',
+            ], 422);
+        }
+
+        // 4. Ensure customer record is linked so booking history is preserved
+        $customer = Customer::where('email', $user->email)
+            ->orWhere('id', $user->customer_id)
+            ->first();
+
+        if ($customer && !$user->customer_id) {
+            $user->customer_id = $customer->id;
+            $user->save();
+        }
+
+        // 5. Ensure roles exist
+        if (method_exists($user, 'roles') && !$user->roles()->exists()) {
+            try {
+                $user->assignRole('customer');
+            } catch (\Throwable $e) {}
+        }
 
         $token = ApiToken::issue($user);
 
@@ -335,7 +400,7 @@ class PublicApiController extends Controller
     }
 
     /**
-     * User Registration API
+     * User Registration API - Preserves existing customer booking history
      */
     public function register(Request $request)
     {
@@ -352,18 +417,25 @@ class PublicApiController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        $customer = Customer::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? '',
-        ]);
+        // Link with existing customer or create a new customer profile
+        $customer = Customer::where('email', $validated['email'])->first();
+        if (!$customer) {
+            $customer = Customer::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? '',
+            ]);
+        } elseif (!empty($validated['phone']) && empty($customer->phone)) {
+            $customer->phone = $validated['phone'];
+            $customer->save();
+        }
 
         $user->customer_id = $customer->id;
         $user->save();
 
         try {
             $user->assignRole('customer');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Ignore if role not defined
         }
 
