@@ -338,15 +338,21 @@ export default function BookingSuccessClient({
               </div>
 
               <div className="flex items-start gap-3.5">
-                {provider?.photo ? (
-                  <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 border border-[#E5DFD5]">
-                    <Image
-                      src={provider.photo}
-                      alt={provider.name}
-                      fill
-                      sizes="40px"
-                      className="object-cover"
-                    />
+                {provider ? (
+                  <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 border border-[#E5DFD5] bg-[#FAF7F2] flex items-center justify-center text-[#B8975A]">
+                    <span className="font-serif font-bold text-xs select-none">
+                      {provider.name.slice(0, 2).toUpperCase()}
+                    </span>
+                    {provider.photo && !provider.photo.includes("logo.png") && (
+                      <img
+                        src={provider.photo}
+                        alt={provider.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    )}
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-2xl bg-[#FAF7F2] text-[#B8975A] border border-[#B8975A]/20 flex items-center justify-center shrink-0">

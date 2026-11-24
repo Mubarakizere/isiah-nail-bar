@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, CalendarCheck } from "@phosphor-icons/react";
@@ -16,12 +15,26 @@ function getInitials(name?: string | null): string {
 
 function ArtistCardPhoto({ photo, name, role }: { photo?: string | null; name: string; role: string }) {
   const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
   const cleanPhoto = photo?.trim();
   const isInvalid = !cleanPhoto || cleanPhoto === "" || cleanPhoto.includes("logo.png") || hasError;
 
-  if (isInvalid) {
-    return (
-      <div className="w-full h-full bg-gradient-to-br from-[#FAF7F2] via-[#F5EFEB] to-[#E5DFD5] flex flex-col items-center justify-center p-6 text-center select-none">
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      if (imgRef.current.naturalWidth > 0) {
+        setIsLoaded(true);
+      } else {
+        setHasError(true);
+      }
+    }
+  }, [cleanPhoto]);
+
+  return (
+    <div className="relative w-full h-full bg-[#FAF7F2] overflow-hidden select-none">
+      {/* Luxury Initials Monogram Fallback - rendered behind the image */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FAF7F2] via-[#F5EFEB] to-[#E5DFD5] flex flex-col items-center justify-center p-6 text-center select-none">
         <div className="w-24 h-24 rounded-full bg-white shadow-lg border border-[#B8975A]/30 flex items-center justify-center text-[#B8975A] mb-4">
           <span className="font-serif font-bold text-3xl tracking-wider">
             {getInitials(name)}
@@ -32,16 +45,27 @@ function ArtistCardPhoto({ photo, name, role }: { photo?: string | null; name: s
           {role}
         </span>
       </div>
-    );
-  }
 
-  return (
-    <img
-      src={cleanPhoto}
-      alt={name}
-      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-      onError={() => setHasError(true)}
-    />
+      {/* Real Image with smooth fade-in */}
+      {!isInvalid && (
+        <img
+          ref={imgRef}
+          src={cleanPhoto}
+          alt={name}
+          className={`absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-all duration-500 ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={(e) => {
+            if (e.currentTarget.naturalWidth > 0) {
+              setIsLoaded(true);
+            } else {
+              setHasError(true);
+            }
+          }}
+          onError={() => setHasError(true)}
+        />
+      )}
+    </div>
   );
 }
 

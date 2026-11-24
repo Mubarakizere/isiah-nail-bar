@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -41,16 +41,30 @@ function ProviderAvatar({
   textClass?: string;
 }) {
   const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
   const initials = getInitials(name);
   const cleanPhoto = photo?.trim();
   const isInvalid = !cleanPhoto || cleanPhoto === "" || cleanPhoto.includes("logo.png") || hasError;
 
-  if (isInvalid) {
-    return (
-      <div
-        className={`${className} overflow-hidden bg-gradient-to-br from-[#FAF7F2] via-[#F2ECE1] to-[#E5DFD5] border border-[#B8975A]/30 flex flex-col items-center justify-center text-[#B8975A] shadow-xs select-none shrink-0`}
-        title={name}
-      >
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      if (imgRef.current.naturalWidth > 0) {
+        setIsLoaded(true);
+      } else {
+        setHasError(true);
+      }
+    }
+  }, [cleanPhoto]);
+
+  return (
+    <div
+      className={`relative ${className} overflow-hidden border-2 border-white shadow-xs bg-[#FAF7F2] shrink-0 select-none`}
+      title={name}
+    >
+      {/* Luxury Initials Monogram Fallback */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FAF7F2] via-[#F2ECE1] to-[#E5DFD5] border border-[#B8975A]/30 flex flex-col items-center justify-center text-[#B8975A] shadow-xs select-none">
         <span className={`font-serif font-bold tracking-wider ${textClass}`}>
           {initials}
         </span>
@@ -58,17 +72,26 @@ function ProviderAvatar({
           Artisan
         </span>
       </div>
-    );
-  }
 
-  return (
-    <div className={`relative ${className} overflow-hidden border-2 border-white shadow-xs bg-[#FAF7F2] shrink-0`}>
-      <img
-        src={cleanPhoto}
-        alt={name}
-        className="w-full h-full object-cover object-top"
-        onError={() => setHasError(true)}
-      />
+      {/* Real Image with smooth fade-in */}
+      {!isInvalid && (
+        <img
+          ref={imgRef}
+          src={cleanPhoto}
+          alt={name}
+          className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-300 ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={(e) => {
+            if (e.currentTarget.naturalWidth > 0) {
+              setIsLoaded(true);
+            } else {
+              setHasError(true);
+            }
+          }}
+          onError={() => setHasError(true)}
+        />
+      )}
     </div>
   );
 }
@@ -83,12 +106,25 @@ function BioModalPhoto({
   role: string;
 }) {
   const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
   const cleanPhoto = photo?.trim();
   const isInvalid = !cleanPhoto || cleanPhoto === "" || cleanPhoto.includes("logo.png") || hasError;
 
-  if (isInvalid) {
-    return (
-      <div className="w-full h-full min-h-[220px] bg-gradient-to-br from-[#FAF7F2] via-[#F5EFEB] to-[#E5DFD5] flex flex-col items-center justify-center p-6 text-center select-none">
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      if (imgRef.current.naturalWidth > 0) {
+        setIsLoaded(true);
+      } else {
+        setHasError(true);
+      }
+    }
+  }, [cleanPhoto]);
+
+  return (
+    <div className="relative w-full h-full min-h-[220px] bg-[#FAF7F2] overflow-hidden select-none">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FAF7F2] via-[#F5EFEB] to-[#E5DFD5] flex flex-col items-center justify-center p-6 text-center select-none">
         <div className="w-20 h-20 rounded-full bg-white shadow-md border border-[#B8975A]/30 flex items-center justify-center text-[#B8975A] mb-3">
           <span className="font-serif font-bold text-2xl tracking-wider">
             {getInitials(name)}
@@ -99,19 +135,29 @@ function BioModalPhoto({
           {role}
         </span>
       </div>
-    );
-  }
 
-  return (
-    <>
-      <img
-        src={cleanPhoto}
-        alt={name}
-        className="w-full h-full object-cover object-center"
-        onError={() => setHasError(true)}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:hidden" />
-    </>
+      {!isInvalid && (
+        <>
+          <img
+            ref={imgRef}
+            src={cleanPhoto}
+            alt={name}
+            className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-300 ${
+              isLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={(e) => {
+              if (e.currentTarget.naturalWidth > 0) {
+                setIsLoaded(true);
+              } else {
+                setHasError(true);
+              }
+            }}
+            onError={() => setHasError(true)}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent sm:hidden pointer-events-none" />
+        </>
+      )}
+    </div>
   );
 }
 

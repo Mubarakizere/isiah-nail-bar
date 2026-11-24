@@ -672,15 +672,21 @@ export default function BookingStep5Client({
                   {/* With Card */}
                   <div className="bg-white rounded-3xl p-5 border border-[#E5DFD5] flex flex-col justify-between shadow-2xs">
                     <div className="flex items-start gap-3.5 mb-3">
-                      {selectedProvider && selectedProvider.photo ? (
-                        <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 border border-[#E5DFD5]">
-                          <Image
-                            src={selectedProvider.photo}
-                            alt={selectedProvider.name}
-                            fill
-                            sizes="40px"
-                            className="object-cover"
-                          />
+                      {selectedProvider ? (
+                        <div className="relative w-10 h-10 rounded-2xl overflow-hidden shrink-0 border border-[#E5DFD5] bg-[#FAF7F2] flex items-center justify-center text-[#B8975A]">
+                          <span className="font-serif font-bold text-xs select-none">
+                            {selectedProvider.name.slice(0, 2).toUpperCase()}
+                          </span>
+                          {selectedProvider.photo && !selectedProvider.photo.includes("logo.png") && (
+                            <img
+                              src={selectedProvider.photo}
+                              alt={selectedProvider.name}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                            />
+                          )}
                         </div>
                       ) : (
                         <div className="w-10 h-10 rounded-2xl bg-[#FAF7F2] text-[#B8975A] border border-[#B8975A]/20 flex items-center justify-center shrink-0">
