@@ -93,6 +93,8 @@ jobs:
         run: |
           set -o pipefail
           npm run build 2>&1 | tee /tmp/next-build.log || {
+            ERR_MSG=$(tail -n 60 /tmp/next-build.log | python3 -c "import sys; print(sys.stdin.read().replace('%','%25').replace('\r','').replace('\n','%0A'))")
+            echo "::error title=Next.js Build Failed::${ERR_MSG}"
             echo "## ❌ Next.js Build Failed" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             tail -n 120 /tmp/next-build.log >> $GITHUB_STEP_SUMMARY
