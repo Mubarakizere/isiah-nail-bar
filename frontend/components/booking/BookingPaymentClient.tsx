@@ -202,11 +202,39 @@ export default function BookingPaymentClient() {
             }}
           />
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 text-center text-xs text-[#8E857F]">
-            <span>{statusMessage || "Preparing the secure WeFlexy terminal…"}</span>
-            <button type="button" onClick={() => void verifyPaymentStatus()} className="rounded-full border border-[#B8975A]/40 px-4 py-2 font-semibold text-[#221C1A] hover:bg-white">
-              Check payment status
-            </button>
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#E5DFD5] shadow-lg text-center space-y-4">
+              <div className="w-14 h-14 rounded-full bg-[#FAF7F2] border border-[#B8975A]/30 flex items-center justify-center mx-auto text-[#B8975A]">
+                <LockSimple size={24} weight="bold" />
+              </div>
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-semibold tracking-[0.22em] uppercase text-[#B8975A] block">
+                  Sanctuary Payment Gateway
+                </span>
+                <h2 className="font-serif text-xl text-[#221C1A] font-normal">
+                  {reference ? `Reference ${reference}` : "Connecting to Payment Gateway"}
+                </h2>
+                <p className="text-xs text-[#5C5550] leading-relaxed">
+                  {statusMessage || "Preparing the secure WeFlexy terminal…"}
+                </p>
+              </div>
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => void verifyPaymentStatus()}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#221C1A] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white hover:bg-[#B8975A] transition-colors cursor-pointer"
+                >
+                  <ArrowClockwise size={14} weight="bold" />
+                  <span>Check Payment Status</span>
+                </button>
+                <Link
+                  href="/booking/step4"
+                  className="inline-flex items-center rounded-full border border-[#E5DFD5] bg-[#FAF7F2] px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#221C1A] hover:border-[#221C1A] transition-colors"
+                >
+                  Return to Checkout
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 

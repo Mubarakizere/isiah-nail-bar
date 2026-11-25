@@ -8,6 +8,9 @@ import ContactFaqSection from "@/components/contact/ContactFaqSection";
 import ServiceBookingCta from "@/components/services/ServiceBookingCta";
 import { PhoneCall, ChatCircleDots } from "@phosphor-icons/react/dist/ssr";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Contact Isaiah Nail Bar | Book Appointment Kigali Rwanda",
   description:

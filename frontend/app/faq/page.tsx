@@ -3,6 +3,9 @@ import Link from "next/link";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "FAQ | Isaiah Nail Bar Kigali",
   description: "Answers to common questions about booking, payment, and appointment policies at Isaiah Nail Bar Kigali.",

@@ -5,6 +5,9 @@ import Footer from "@/components/layout/Footer";
 import BookingFailedClient from "@/components/booking/BookingFailedClient";
 import BookingGuarantees from "@/components/booking/BookingGuarantees";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Payment Authorization Unsuccessful | Isaiah Nail Bar Kigali",
   description: "Retry your luxury nail appointment payment or contact our Kigali concierge for assistance.",

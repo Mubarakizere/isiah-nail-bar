@@ -9,6 +9,9 @@ import AboutAtelierSection from "@/components/about/AboutAtelierSection";
 import ServiceBookingCta from "@/components/services/ServiceBookingCta";
 import { CalendarCheck, PhoneCall } from "@phosphor-icons/react/dist/ssr";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "About Isaiah Nail Bar | Kigali's Premier Luxury Nail Salon",
   description:

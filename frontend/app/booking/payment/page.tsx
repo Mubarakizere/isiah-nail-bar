@@ -2,6 +2,9 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import BookingPaymentClient from "@/components/booking/BookingPaymentClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Secure Payment Terminal | Isaiah Nail Bar Kigali",
   description: "Complete your luxury nail appointment payment with MTN/Airtel MoMo or Card.",
