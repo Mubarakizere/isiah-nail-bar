@@ -7,8 +7,8 @@ import ServicesClient from "@/components/services/ServicesClient";
 import IsaiahStandardSection from "@/components/services/IsaiahStandardSection";
 import ServiceFaqSection from "@/components/services/ServiceFaqSection";
 import ServiceBookingCta from "@/components/services/ServiceBookingCta";
+import ShareMenuButton from "@/components/services/ShareMenuButton";
 import { getServicesData } from "@/lib/services-data";
-import { CalendarCheck } from "@phosphor-icons/react/dist/ssr";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -149,13 +149,7 @@ export default async function ServicesPage() {
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/booking"
-                className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full text-xs font-semibold uppercase tracking-wider text-[#221C1A] bg-white hover:bg-[#FAF7F2] hover:text-[#B8975A] transition-all duration-300 shadow-xl hover:-translate-y-0.5"
-              >
-                <CalendarCheck size={16} weight="bold" />
-                <span>Reserve Appointment</span>
-              </Link>
+              <ShareMenuButton />
             </div>
           </div>
         </section>
