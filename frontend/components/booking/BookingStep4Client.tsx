@@ -239,8 +239,8 @@ export default function BookingStep4Client({
   }, [selectedDate]);
 
   // Handle Returning User Sign In
-  const handleInlineLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleInlineLogin = async (e?: React.SyntheticEvent) => {
+    e?.preventDefault();
     if (!loginInput.trim() || !loginPassword) {
       setLoginError("Please enter both your email/phone and password.");
       return;
@@ -524,6 +524,12 @@ export default function BookingStep4Client({
                                 type="text"
                                 value={loginInput}
                                 onChange={(e) => setLoginInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    void handleInlineLogin(e);
+                                  }
+                                }}
                                 placeholder="e.g. marie@example.com or 078..."
                                 className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#E5DFD5] rounded-xl text-xs sm:text-sm text-[#221C1A] outline-none"
                               />
@@ -540,6 +546,12 @@ export default function BookingStep4Client({
                                 type={showPassword ? "text" : "password"}
                                 value={loginPassword}
                                 onChange={(e) => setLoginPassword(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    void handleInlineLogin(e);
+                                  }
+                                }}
                                 placeholder="Your password"
                                 className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#E5DFD5] rounded-xl text-xs sm:text-sm text-[#221C1A] outline-none"
                               />
@@ -589,8 +601,22 @@ export default function BookingStep4Client({
                         )}
 
                         {registerError && (
-                          <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
-                            {registerError}
+                          <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex flex-wrap items-center justify-between gap-2">
+                            <span>{registerError}</span>
+                            {/already/i.test(registerError) && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setLoginInput(guestEmail);
+                                  setAuthTab("signin");
+                                  setRegisterError(null);
+                                  setLoginError(null);
+                                }}
+                                className="font-semibold underline text-[#221C1A] hover:text-[#B8975A] cursor-pointer"
+                              >
+                                Sign in instead &rarr;
+                              </button>
+                            )}
                           </div>
                         )}
 

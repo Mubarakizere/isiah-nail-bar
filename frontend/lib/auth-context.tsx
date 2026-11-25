@@ -90,41 +90,93 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const persistAuthSession = (authUser: AuthUser, token?: string | null) => {
+    setUser(authUser);
     try {
-      const res = await fetch("/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success && data.user) {
-        setUser(data.user);
-        try {
-          localStorage.setItem("isaiah_auth_user", JSON.stringify(data.user));
-          if (data.token) {
-            localStorage.setItem("token", data.token);
-          } else {
-            localStorage.removeItem("token");
-          }
-        } catch {
-          // Ignore
-        }
-        return { success: true, message: data.message, user: data.user };
+      localStorage.setItem("isaiah_auth_user", JSON.stringify(authUser));
+      if (token) {
+        localStorage.setItem("token", token);
       } else {
-        return {
-          success: false,
-          message: data.message || "Invalid email or password credentials.",
-        };
+        localStorage.removeItem("token");
       }
     } catch {
+      // Ignore storage errors
+    }
+  };
+
+  const postAuthJson = async (
+    url: string,
+    payload: Record<string, unknown>
+  ): Promise<{ ok: boolean; status: number; data: Record<string, any> | null; networkError: boolean; retriedAfterTransient: boolean }> => {
+    const attemptRequest = async () => {
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "same-origin",
+          body: JSON.stringify(payload),
+        });
+
+        const raw = await res.text();
+        let data: Record<string, any> | null = null;
+        if (raw) {
+          try {
+            data = JSON.parse(raw);
+          } catch {
+            data = null;
+          }
+        }
+
+        return { ok: res.ok, status: res.status, data, networkError: false };
+      } catch {
+        return { ok: false, status: 0, data: null, networkError: true };
+      }
+    };
+
+    const first = await attemptRequest();
+    const isTransientProxyFailure =
+      first.networkError ||
+      first.status >= 502 ||
+      (first.status >= 500 && !first.data);
+
+    if (!isTransientProxyFailure) {
+      return { ...first, retriedAfterTransient: false };
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const second = await attemptRequest();
+    return { ...second, retriedAfterTransient: true };
+  };
+
+  const login = async (email: string, password: string) => {
+    const { ok, status, data, networkError } = await postAuthJson("/api/v1/auth/login", {
+      email,
+      password,
+    });
+
+    if (networkError) {
       return { success: false, message: "Could not reach the sign-in service. Please try again." };
     }
+
+    if (ok && data?.success && data.user) {
+      persistAuthSession(data.user, data.token);
+      return { success: true, message: data.message, user: data.user };
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        message: `Sign-in service temporarily unavailable (HTTP ${status || "error"}). Please try again.`,
+      };
+    }
+
+    return {
+      success: false,
+      message: data.message || "Invalid email or password credentials.",
+    };
   };
 
   const register = async (
@@ -134,48 +186,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password_confirmation: string,
     phone?: string
   ) => {
-    try {
-      const res = await fetch("/api/v1/auth/register", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          ...(phone ? { phone } : {}),
-          password,
-          password_confirmation,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success && data.user) {
-        setUser(data.user);
-        try {
-          localStorage.setItem("isaiah_auth_user", JSON.stringify(data.user));
-          if (data.token) {
-            localStorage.setItem("token", data.token);
-          } else {
-            localStorage.removeItem("token");
-          }
-        } catch {
-          // Ignore
-        }
-        return { success: true, message: data.message };
-      } else {
-        return {
-          success: false,
-          message:
-            data.message ||
-            (data.errors ? Object.values(data.errors).flat().join(" ") : "Registration failed."),
-        };
+    const { ok, status, data, networkError, retriedAfterTransient } = await postAuthJson(
+      "/api/v1/auth/register",
+      {
+        name,
+        email,
+        ...(phone ? { phone } : {}),
+        password,
+        password_confirmation,
       }
-    } catch {
+    );
+
+    if (networkError) {
       return { success: false, message: "Could not reach the registration service. Please try again." };
     }
+
+    if (ok && data?.success && data.user) {
+      persistAuthSession(data.user, data.token);
+      return { success: true, message: data.message };
+    }
+
+    // If the first attempt succeeded server-side before a proxy socket reset and the retry
+    // received "email already taken", sign the new user in seamlessly with their password.
+    if (retriedAfterTransient && status === 422 && data?.errors?.email) {
+      const autoLogin = await login(email, password);
+      if (autoLogin.success) {
+        return { success: true, message: autoLogin.message };
+      }
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        message: `Registration service temporarily unavailable (HTTP ${status || "error"}). Please try again.`,
+      };
+    }
+
+    return {
+      success: false,
+      message:
+        data.message ||
+        (data.errors ? Object.values(data.errors).flat().join(" ") : "Registration failed."),
+    };
   };
 
   const logout = () => {

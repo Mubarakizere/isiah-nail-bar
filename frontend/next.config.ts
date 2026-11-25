@@ -4,6 +4,11 @@ import path from "path";
 const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: path.resolve(__dirname),
+  // Upstream Laravel on 127.0.0.1:8000 sends `Connection: close`; disable HTTP
+  // keep-alive so Next.js rewrites and SSR fetches never hit stale closed sockets.
+  httpAgentOptions: {
+    keepAlive: false,
+  },
 
   typescript: {
     ignoreBuildErrors: true,

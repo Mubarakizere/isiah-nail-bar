@@ -17,6 +17,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\Customer;
 use App\Support\ApiToken;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -275,7 +276,9 @@ class PublicApiController extends Controller
             ], 401);
         }
 
-        $customer = Customer::where('email', $user->email)->first();
+        $customer = $user->customer_id
+            ? Customer::find($user->customer_id)
+            : Customer::where('email', $user->email)->first();
 
         $isAdmin = ($user->role ?? null) === 'admin'
             || (method_exists($user, 'hasRole') && $user->hasRole('admin'))
@@ -437,6 +440,10 @@ class PublicApiController extends Controller
      */
     public function register(Request $request)
     {
+        if ($request->filled('email')) {
+            $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
@@ -444,27 +451,31 @@ class PublicApiController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        // Link with existing customer or create a new customer profile
-        $customer = Customer::where('email', $validated['email'])->first();
-        if (!$customer) {
-            $customer = Customer::create([
-                'name' => $validated['name'],
+        [$user, $customer] = DB::transaction(function () use ($validated) {
+            $user = User::create([
+                'name' => trim($validated['name']),
                 'email' => $validated['email'],
-                'phone' => $validated['phone'] ?? '',
+                'password' => Hash::make($validated['password']),
             ]);
-        } elseif (!empty($validated['phone']) && empty($customer->phone)) {
-            $customer->phone = $validated['phone'];
-            $customer->save();
-        }
 
-        $user->customer_id = $customer->id;
-        $user->save();
+            // Link with existing customer or create a new customer profile
+            $customer = Customer::where('email', $validated['email'])->first();
+            if (!$customer) {
+                $customer = Customer::create([
+                    'name' => trim($validated['name']),
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'] ?? '',
+                ]);
+            } elseif (!empty($validated['phone']) && empty($customer->phone)) {
+                $customer->phone = $validated['phone'];
+                $customer->save();
+            }
+
+            $user->customer_id = $customer->id;
+            $user->save();
+
+            return [$user, $customer];
+        });
 
         try {
             $user->assignRole('customer');
@@ -486,7 +497,7 @@ class PublicApiController extends Controller
                 'role' => 'customer',
                 'customer_id' => $customer->id,
             ],
-        ])->cookie('isaiah_api_token', $token, 8 * 60, '/', null, $request->isSecure(), true, false, 'lax');
+        ])->cookie('isaiah_api_token', $token, 8 * 60, '/', null, $request->isSecure() || app()->environment('production'), true, false, 'lax');
     }
 
     /**
