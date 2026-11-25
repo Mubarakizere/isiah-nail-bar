@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { ALL_SERVICES, getServiceBySlugOrIdLocal } from "@/lib/services-data";
+import { getServiceBySlugOrId, slugifyServiceName } from "@/lib/services-data";
 import { formatCurrency } from "@/lib/utils";
 import ServiceImage from "@/components/services/ServiceImage";
 import {
@@ -14,28 +14,20 @@ import {
   CalendarCheck,
   WhatsappLogo,
   CaretLeft,
-  ShareNetwork,
 } from "@phosphor-icons/react/dist/ssr";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface ServiceDetailPageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const bySlug = ALL_SERVICES.map((service) => ({
-    slug: service.slug || service.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, ""),
-  }));
-  const byId = ALL_SERVICES.map((service) => ({
-    slug: service.id.toString(),
-  }));
-  return [...bySlug, ...byId];
 }
 
 export async function generateMetadata({
   params,
 }: ServiceDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const service = getServiceBySlugOrIdLocal(slug);
+  const { service } = await getServiceBySlugOrId(slug);
 
   if (!service) {
     return {
@@ -63,18 +55,20 @@ export async function generateMetadata({
 
 export default async function ServiceDetailPage({ params }: ServiceDetailPageProps) {
   const { slug } = await params;
-  const service = getServiceBySlugOrIdLocal(slug);
+  const { service, services } = await getServiceBySlugOrId(slug);
 
   if (!service) {
     notFound();
   }
 
-  const serviceSlug = service.slug || service.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
-
   // Related services in the same category
-  const relatedServices = ALL_SERVICES.filter(
-    (s) => s.category_id === service.category_id && s.id !== service.id
-  ).slice(0, 3);
+  const relatedServices = services
+    .filter((s) => s.category_id === service.category_id && s.id !== service.id)
+    .slice(0, 3);
+
+  const schemaImage = service.image.startsWith("http")
+    ? service.image
+    : `https://isaiahnailbar.com${service.image.startsWith("/") ? "" : "/"}${service.image}`;
 
   // Schema.org Service data
   const serviceSchema = {
@@ -82,7 +76,7 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
     "@type": "Service",
     name: service.name,
     description: service.description,
-    image: `https://isaiahnailbar.com${service.image}`,
+    image: schemaImage,
     provider: {
       "@type": "NailSalon",
       name: "Isaiah Nail Bar",
@@ -285,7 +279,7 @@ export default async function ServiceDetailPage({ params }: ServiceDetailPagePro
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {relatedServices.map((rel) => {
-                  const relSlug = rel.slug || rel.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+                  const relSlug = rel.slug || slugifyServiceName(rel.name) || `service-${rel.id}`;
                   return (
                     <Link
                       key={rel.id}

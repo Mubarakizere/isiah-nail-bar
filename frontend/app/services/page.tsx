@@ -10,6 +10,9 @@ import ServiceBookingCta from "@/components/services/ServiceBookingCta";
 import { getServicesData } from "@/lib/services-data";
 import { CalendarCheck } from "@phosphor-icons/react/dist/ssr";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Nail Services Menu & Prices Kigali | Isaiah Nail Bar",
   description:

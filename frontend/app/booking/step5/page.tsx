@@ -10,6 +10,9 @@ import BookingGuarantees from "@/components/booking/BookingGuarantees";
 import { getServicesData } from "@/lib/services-data";
 import { getTeamData } from "@/lib/team-data";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Final Confirmation & Summary | Isaiah Nail Bar Kigali Booking",
   description:

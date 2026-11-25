@@ -9,6 +9,9 @@ import ServiceBookingCta from "@/components/services/ServiceBookingCta";
 import { getTeamData } from "@/lib/team-data";
 import { CalendarCheck } from "@phosphor-icons/react/dist/ssr";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Meet Our Team | Expert Nail Artists - Isaiah Nail Bar Kigali",
   description:

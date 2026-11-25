@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { resolveServiceImage } from "@/lib/service-image";
 
 export interface ServiceCategory {
@@ -282,27 +283,43 @@ export const ALL_SERVICES: ServiceItem[] = [
   },
 ];
 
-let cachedServicesResult: { services: ServiceItem[]; categories: ServiceCategory[] } | null = null;
-let lastServicesFetchTime = 0;
-const SERVICES_CACHE_TTL = 60 * 1000; // 60 seconds
+export function slugifyServiceName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
 
-export async function getServicesData() {
-  const now = Date.now();
-  if (cachedServicesResult && now - lastServicesFetchTime < SERVICES_CACHE_TTL) {
-    return cachedServicesResult;
-  }
+export function findServiceByIdentifier(
+  services: ServiceItem[],
+  identifier: string
+): ServiceItem | undefined {
+  const clean = decodeURIComponent(identifier).toLowerCase().trim();
+  const numericMatch = clean.match(/^(?:service-)?(\d+)$/);
+  const numericId = numericMatch ? parseInt(numericMatch[1], 10) : NaN;
 
+  return services.find((s) => {
+    if (!isNaN(numericId) && s.id === numericId) return true;
+    if (s.slug && s.slug.toLowerCase() === clean) return true;
+    const nameSlug = slugifyServiceName(s.name);
+    return nameSlug === clean || s.name.toLowerCase() === clean;
+  });
+}
+
+// Per-request React cache deduplicates multiple calls (e.g. metadata + page)
+// without persisting stale menu state across requests or poisoning Next.js ISR.
+export const getServicesData = cache(async function getServicesData() {
   const apiUrl = process.env.LARAVEL_API_URL || "http://127.0.0.1:8000";
 
   try {
     const [servicesRes, categoriesRes] = await Promise.all([
       fetch(`${apiUrl}/api/v1/services`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(800),
+        cache: "no-store",
+        signal: AbortSignal.timeout(5000),
       }),
       fetch(`${apiUrl}/api/v1/categories`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(800),
+        cache: "no-store",
+        signal: AbortSignal.timeout(5000),
       }),
     ]);
 
@@ -314,7 +331,7 @@ export async function getServicesData() {
       const apiCategories = categoriesJson?.data;
 
       if (Array.isArray(apiServices) && apiServices.length > 0) {
-        const result = {
+        return {
           services: apiServices.map((s: any) => ({
             id: s.id,
             name: s.name,
@@ -336,10 +353,6 @@ export async function getServicesData() {
               }))
             : SERVICE_CATEGORIES,
         };
-
-        cachedServicesResult = result;
-        lastServicesFetchTime = now;
-        return result;
       }
     }
   } catch {
@@ -350,6 +363,14 @@ export async function getServicesData() {
     services: ALL_SERVICES,
     categories: SERVICE_CATEGORIES,
   };
+});
+
+export async function getServiceBySlugOrId(
+  identifier: string
+): Promise<{ service: ServiceItem | undefined; services: ServiceItem[] }> {
+  const { services } = await getServicesData();
+  const service = findServiceByIdentifier(services, identifier) || getServiceBySlugOrIdLocal(identifier);
+  return { service, services };
 }
 
 export function getServiceByIdLocal(id: number): ServiceItem | undefined {
@@ -357,13 +378,5 @@ export function getServiceByIdLocal(id: number): ServiceItem | undefined {
 }
 
 export function getServiceBySlugOrIdLocal(identifier: string): ServiceItem | undefined {
-  const clean = decodeURIComponent(identifier).toLowerCase().trim();
-  const numericId = parseInt(clean, 10);
-  
-  return ALL_SERVICES.find((s) => {
-    if (!isNaN(numericId) && s.id === numericId) return true;
-    if (s.slug && s.slug.toLowerCase() === clean) return true;
-    const nameSlug = s.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
-    return nameSlug === clean || s.name.toLowerCase() === clean;
-  });
+  return findServiceByIdentifier(ALL_SERVICES, identifier);
 }

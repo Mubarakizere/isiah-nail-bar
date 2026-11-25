@@ -68,14 +68,34 @@ export default function ServicesClient({
     );
   }, [initialServices, isSearching, searchQuery]);
 
-  // Grouped by category
+  // Grouped by category (keeping configured categories first, plus any unmapped services)
   const categorizedServices = useMemo(() => {
-    return categories
+    const groups = categories
       .map((cat) => ({
         category: cat,
         items: initialServices.filter((s) => s.category_id === cat.id),
       }))
       .filter((group) => group.items.length > 0);
+
+    const knownCategoryIds = new Set(categories.map((c) => c.id));
+    const unmappedMap = new Map<number, { category: ServiceCategory; items: ServiceItem[] }>();
+
+    for (const service of initialServices) {
+      if (knownCategoryIds.has(service.category_id)) continue;
+      if (!unmappedMap.has(service.category_id)) {
+        unmappedMap.set(service.category_id, {
+          category: {
+            id: service.category_id,
+            name: service.category_name || "Additional Treatments",
+            slug: `category-${service.category_id}`,
+          },
+          items: [],
+        });
+      }
+      unmappedMap.get(service.category_id)!.items.push(service);
+    }
+
+    return [...groups, ...Array.from(unmappedMap.values())];
   }, [categories, initialServices]);
 
   // Generate clean slug from service name

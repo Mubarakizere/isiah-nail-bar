@@ -6,6 +6,9 @@ import SanctuaryExperience from "@/components/home/SanctuaryExperience";
 import GoogleReviewsSection from "@/components/home/GoogleReviewsSection";
 import VisitUsSection from "@/components/home/VisitUsSection";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getHomeData() {
   const apiUrl = process.env.LARAVEL_API_URL || "http://127.0.0.1:8000";
   try {

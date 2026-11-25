@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 export interface TeamProvider {
   id: number;
   name: string;
@@ -45,24 +47,15 @@ export const DEFAULT_SUPPORT_TEAM: TeamSupportMember[] = [
   },
 ];
 
-let cachedTeamResult: { providers: TeamProvider[]; support: TeamSupportMember[] } | null = null;
-let lastTeamFetchTime = 0;
-const TEAM_CACHE_TTL = 60 * 1000; // 60 seconds
-
-export async function getTeamData(): Promise<{
+export const getTeamData = cache(async function getTeamData(): Promise<{
   providers: TeamProvider[];
   support: TeamSupportMember[];
 }> {
-  const now = Date.now();
-  if (cachedTeamResult && now - lastTeamFetchTime < TEAM_CACHE_TTL) {
-    return cachedTeamResult;
-  }
-
   const apiUrl = process.env.LARAVEL_API_URL || "http://127.0.0.1:8000";
 
   try {
     const res = await fetch(`${apiUrl}/api/v1/providers`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
       // Local Laravel cold starts can exceed 800ms. Keep the API response
       // authoritative instead of silently showing hardcoded fake providers.
       signal: AbortSignal.timeout(6000),
@@ -96,14 +89,10 @@ export async function getTeamData(): Promise<{
           }))
           : DEFAULT_SUPPORT_TEAM;
 
-        const result = {
+        return {
           providers: mappedProviders,
           support: mappedSupport,
         };
-
-        cachedTeamResult = result;
-        lastTeamFetchTime = now;
-        return result;
       }
     }
   } catch {
@@ -114,4 +103,4 @@ export async function getTeamData(): Promise<{
     providers: [],
     support: DEFAULT_SUPPORT_TEAM,
   };
-}
+});

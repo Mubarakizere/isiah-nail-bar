@@ -7,6 +7,9 @@ import BookingGuarantees from "@/components/booking/BookingGuarantees";
 import { getServicesData } from "@/lib/services-data";
 import { getTeamData } from "@/lib/team-data";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Sanctuary Reservation Confirmed | Isaiah Nail Bar Kigali",
   description: "Your luxury nail appointment has been confirmed and guaranteed at Isaiah Nail Bar Kigali.",

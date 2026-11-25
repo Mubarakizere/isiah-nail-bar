@@ -9,6 +9,9 @@ import BookingStep1Client from "@/components/booking/BookingStep1Client";
 import BookingGuarantees from "@/components/booking/BookingGuarantees";
 import { getServicesData } from "@/lib/services-data";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Book Nail Services & Treatments Kigali | Isaiah Nail Bar",
   description:

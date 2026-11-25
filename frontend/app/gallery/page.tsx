@@ -8,6 +8,9 @@ import ServiceBookingCta from "@/components/services/ServiceBookingCta";
 import { getInstagramPosts } from "@/lib/gallery-data";
 import { InstagramLogo } from "@phosphor-icons/react/dist/ssr";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Instagram Gallery & Visual Stories | Isaiah Nail Bar Kigali",
   description:
