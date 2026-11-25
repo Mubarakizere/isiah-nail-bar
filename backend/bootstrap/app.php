@@ -25,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // ✅ Register standard Laravel middleware groups
         $middleware->web();
         $middleware->api();
+        $middleware->validateCsrfTokens(except: [
+            'webhook/*',
+        ]);
 
         // ✅ Alias Spatie permissions middleware
         $middleware->alias([

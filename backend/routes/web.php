@@ -18,7 +18,11 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 Route::post('/webhook/weflexfy', [PaymentWebhookController::class, 'handleWeFlexfyWebhook'])
     ->middleware('throttle:60,1')
-    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class, HandlePrecognitiveRequests::class])
+    ->withoutMiddleware([
+        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+        HandlePrecognitiveRequests::class,
+    ])
     ->name('weflexfy.webhook');
 
 Route::get('/', fn () => $frontendRedirect('/'))->name('home');

@@ -104,15 +104,34 @@ export default function BookingPaymentClient() {
       return;
     }
 
+    const isTrustedGatewayOrigin = (origin: string) => {
+      if (origin === expectedOrigin) return true;
+      try {
+        const parsed = new URL(origin);
+        return (
+          parsed.protocol === "https:" &&
+          (parsed.hostname === "weflexfy.com" || parsed.hostname.endsWith(".weflexfy.com"))
+        );
+      } catch {
+        return false;
+      }
+    };
+
     const handleMessage = (event: MessageEvent) => {
-      if (event.source !== iframeRef.current?.contentWindow || event.origin !== expectedOrigin) return;
+      if (
+        event.source !== iframeRef.current?.contentWindow ||
+        !isTrustedGatewayOrigin(event.origin)
+      ) {
+        return;
+      }
       if (event.data?.type !== "PAYMENT_STATUS") return;
 
-      if (event.data.status === "success" || event.data.status === "failed") {
+      const paymentEventStatus = String(event.data.status || "").toLowerCase();
+      if (paymentEventStatus === "success" || paymentEventStatus === "failed") {
         setPaymentSubmitted(true);
         setStatusMessage("Payment response received. Waiting for WeFlexy’s signed confirmation…");
         void verifyPaymentStatus();
-      } else if (event.data.status === "close" || event.data.status === "cancelled") {
+      } else if (paymentEventStatus === "close" || paymentEventStatus === "cancelled") {
         setShowCancelConfirm(true);
       }
     };

@@ -60,6 +60,14 @@ const nextConfig: NextConfig = {
         destination: `${apiUrl}/api/:path*`,
       },
       {
+        source: "/webhook/:path*",
+        destination: `${apiUrl}/webhook/:path*`,
+      },
+      {
+        source: "/payment/callback",
+        destination: `${apiUrl}/payment/callback`,
+      },
+      {
         source: "/storage/:path*",
         destination: `${apiUrl}/storage/:path*`,
       },

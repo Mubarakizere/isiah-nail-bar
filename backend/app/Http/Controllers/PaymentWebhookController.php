@@ -26,10 +26,12 @@ class PaymentWebhookController extends Controller
         $secret = (string) config('services.weflexfy.secret_key', '');
 
         if (!is_string($token) || $token === '' || !in_array($requestType, ['payment', 'transfer'], true)) {
+            $this->logRejectedWebhook('Invalid webhook payload.', $requestType);
             return response()->json(['error' => 'Invalid webhook payload.'], 400);
         }
         if ($secret === '') {
             Log::error('WeFlexy webhook secret is not configured.');
+            $this->logRejectedWebhook('Webhook is not configured.', $requestType);
             return response()->json(['error' => 'Webhook is not configured.'], 503);
         }
 
@@ -37,9 +39,11 @@ class PaymentWebhookController extends Controller
             $verified = JWT::decode($token, new Key($secret, 'HS256'));
             $decoded = json_decode(json_encode($verified, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
         } catch (ExpiredException) {
+            $this->logRejectedWebhook('Webhook token expired.', $requestType);
             return response()->json(['error' => 'Webhook token expired.'], 401);
         } catch (Throwable $exception) {
             Log::warning('WeFlexy webhook signature verification failed.');
+            $this->logRejectedWebhook('Invalid webhook signature.', $requestType);
             return response()->json(['error' => 'Invalid webhook signature.'], 401);
         }
 
@@ -61,7 +65,7 @@ class PaymentWebhookController extends Controller
 
         // requestType is outside the JWT. Check the signed payload shape too,
         // so a signed transfer event cannot be replayed as a payment event.
-        if (isset($decoded['transferRef']) || empty($decoded['paymentMethod'])) {
+        if (isset($decoded['transferRef']) || empty($decoded['paymentRef']) || empty($decoded['requestToken']) || empty($decoded['status'])) {
             return response()->json(['error' => 'Webhook payload does not describe a payment event.'], 400);
         }
 
@@ -280,13 +284,43 @@ class PaymentWebhookController extends Controller
 
     private function paymentMethod(array $payload): ?string
     {
-        $method = strtoupper((string) ($payload['paymentMethod'] ?? $payload['paymentChannel'] ?? ''));
-        return match ($method) {
-            'MTN', 'MOMO', 'MOBILE_MONEY' => 'momo',
-            'AIRTEL' => 'airtel',
-            'CARD', 'VISA', 'MASTERCARD' => 'card',
-            default => null,
-        };
+        $method = strtoupper(trim((string) ($payload['paymentMethod'] ?? $payload['paymentChannel'] ?? '')));
+        if ($method === '') {
+            return null;
+        }
+
+        if (str_contains($method, 'MTN') || in_array($method, ['MOMO', 'MOBILE_MONEY'], true)) {
+            return 'momo';
+        }
+
+        if (str_contains($method, 'AIRTEL')) {
+            return 'airtel';
+        }
+
+        if (in_array($method, ['CARD', 'VISA', 'MASTERCARD'], true) || str_contains($method, 'CARD')) {
+            return 'card';
+        }
+
+        return null;
+    }
+
+    private function logRejectedWebhook(string $reason, string $requestType = ''): void
+    {
+        try {
+            WebhookLog::create([
+                'type' => 'weflexfy_rejected',
+                'payload' => [
+                    'request_type' => $requestType !== '' ? $requestType : null,
+                    'reason' => $reason,
+                ],
+                'status' => 'rejected',
+            ]);
+        } catch (Throwable $exception) {
+            Log::warning('Failed to persist rejected WeFlexy webhook log.', [
+                'reason' => $reason,
+                'error' => $exception->getMessage(),
+            ]);
+        }
     }
 
     private function sendNotifications(Booking $booking): void
